@@ -1,0 +1,56 @@
+\section{Introduction}
+\label{sec:intro}
+
+Datacenters have lots of problems
+\begin{myitemize} 
+  \item Datacenters - units of computation - growing in scale and utility~\cite{dc-teenage-decade}
+  \item Heterogenous mix of jobs run in a datacenter~\cite{charles-socc, kay-yahoo}
+  \item Many varying goals/issues - responsiveness, utilization, energy efficiency etc
+\end{myitemize}
+
+Our observation: most of the problems are due to power-law characteristics. Some trends favor change
+\begin{myitemize} 
+  \item Job sizes and data-sizes are power law
+  \item data access patterns are power-law 
+  \item Utilization of machines are power-law 
+  \item Network utilization across racks is power-law 
+  \item Memory-large enough as a working set. Full bisection bandwidth
+\end{myitemize}
+
+Existing solutions don't work or are band-aid like solution
+\begin{myitemize} 
+  \item many point solutions like speculation, cloning for job completion time
+  \item other techniques to load balance storage traffic and caching things
+  \item don't address all the problems and not clear how they interact with each other
+\end{myitemize}
+
+Tiny tasks attack the fundamental problem - To address power-law you need fine grained execution units 
+\begin{myitemize} 
+  \item To convert power-law to uniform, we need fine-grained control
+  \item examples: if a file is really hot, we should be able to replicate just the parts that are hot
+  \item if a job is really large, then we need to be able to run small portions of the job
+\end{myitemize}
+
+Execution framework for tiny tasks - design and highlights
+\begin{myitemize}
+  \item Data-intensive computation begins with data-access -- Need for fine grained data access, small blocks, fast access. Example: FDS, Separating storage from compute etc.
+  \item Task execute on fine-grained units of data. Already well defined for MapReduce, Spark (on a key) and for GraphLab, Pregel (per vertex)
+  \item Data transfer is managed as a standalone service. No need for long-lived reduce tasks that are fetching data as mappers run. 
+  \item Putting it together: Each tiny task describes a set of keys from a set of files it needs as input. A set of keys to a set of files produced as output. All tasks look like this. Flat input and intermediate data as well
+\end{myitemize}
+
+Challenges or why this is hard
+\begin{myitemize}
+  \item Scheduling needs to be done really fast. Sparrow is a great step towards this
+  \item Overhead of launching tasks and reading input. Some sweet spot below which this becomes expensive.
+  \item Efficient techniques to capture state of a task that is running and restore the state rapdily. Required if we need to preempt tasks
+  \item Data transfer of fine grained blocks across racks. Even with full bisection bandwidth we may have too many flows and this may affect bandwidth.
+\end{myitemize}
+
+Relevance and related work (probably should not belong here)
+\begin{myitemize}
+  \item Utility based computing is leading to auction-based approaches where resources available change rapidly - Spot instances in EC2
+  \item Streaming systems like Storm, Spark-Streaming already operate on unit of a few milliseconds or seconds.
+  \item Coflow like API provides a good abstraction between network and application frameworks
+  \item Checkpoint, restore proposed by Ganesh at SOCC and fine grained reduce tasks helps Shark reduce skew among tasks, when intermediate data fits in memory
+\end{myitemize}
