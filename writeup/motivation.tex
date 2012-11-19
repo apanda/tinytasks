@@ -1,0 +1,33 @@
+\section{Trends \& Motivation}
+
+Common problems seen in datacenters. Probably need a graph for each one of these
+\begin{myitemize}
+  \item  Some tasks are very short/small and others are very large (in terms of
+    resource usage) and long (in terms of time) \todo{Graph}.  
+    Scheduling these is difficult; 
+
+  \item Stragglers are exacerbated by the above problem~\todo{Graph}: if a task
+    ends up on a machine with a large task consuming tons-o-resources, it will
+    straggle
+
+  \item Hot spots: there are hot spots in network usage, and also on machines
+    that host popular data
+\end{myitemize}
+
+Make a table of problems caused by power-law distributions and papers about
+them (should make this more concrete/compelling)
+
+Datacenters and workloads are changing
+\begin{myitemize}
+  \item Focus is on main memory workloads, with need for low latency. Use the
+    MapReduce$\rightarrow$Dremel$\rightarrow$Spark Streaming data here.
+  \item Networks have grown to be fast making disk locality irrelevant. This
+    means getting data from a remote location is fast. Further networks don't
+    have a fixed overhead of transfer. Disk-based stuff uses 64MB to amortize
+    that cost. \todo{Numbers ?}
+  \item SSDs are becoming cheaper - Fast random access with low access time.
+    With growing memory sizes + SSD, it is feasible to fetch most of the data
+    without hitting the disk (local or remote).
+  \item Need for low latency and ability to exploit fast-data access leads to
+    tiny tasks
+\end{myitemize}
