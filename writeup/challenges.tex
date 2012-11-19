@@ -1,1 +1,11 @@
 \section{Challenges}
+
+\begin{myitemize}
+  \item how small can we go ? Either use some measurements in terms of JVM
+    launching overhead or network access overhead ?
+  \item how to estimate resource usage ? we need to bin-pack lots of tiny tasks
+    but don't know their sizes. also how to bin-pack in a distributed setting
+    (sparrow-like) ?
+  \item i.e., what if a task doesn't remain tiny ? how to prempt it efficiently ? 
+  \item can we build a serving system out of this ? 
+\end{myitemize}

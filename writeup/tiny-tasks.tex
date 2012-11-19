@@ -1,6 +1,6 @@
 \documentclass[pdftex,twoside,twocolumn,10pt,letterpaper]{article}
 \usepackage{graphicx, subfigure, multirow, times}
-\usepackage{url, amsfonts, verbatim, mathtools}
+\usepackage{url, amsfonts, verbatim, mathtools, color}
 
 \renewcommand{\ttdefault}{cmtt}
 \usepackage{mdwlist}
@@ -18,6 +18,8 @@
 {
     \end{list}
 }
+
+\newcommand{\todo}[1]{\textbf{\textcolor{red}{TODO: #1}}}
 
 \begin{document}
 \title{tinyTasks}
