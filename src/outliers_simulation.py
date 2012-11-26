@@ -85,7 +85,6 @@ def main(argv):
     # Total work, defined in terms of ms of things that need to be done. This 
     # number has no real meaning (since it's alllll relative).
     total_work = 100000
-    total_slots = 100
     slots_values = [1, 2, 5, 10, 100, 1000, 10000]
 
     #gnuplot_file = open("results.gp", "w")
