@@ -1,4 +1,4 @@
-set terminal pdfcairo font 'Gill Sans,20' linewidth 6 dashed rounded dashlength 1
+set terminal pdfcairo font 'Gill Sans,20' linewidth 4 dashed rounded dashlength 1
 set style line 80 lt 1 lc rgb "#808080"
 set style line 81 lt 0 # dashed
 set style line 81 lt rgb "#808080"  # grey
@@ -14,7 +14,7 @@ set style line 4 lt rgb "#984EA3" lw 2 pt 9
 set output 'skew_results.pdf'
 set xlabel 'Machine Load (Relative to Average)' offset 0,0.5
 set ylabel 'Cumulative Probability' offset 1.5
-plot 'skew_results_100000' using 2:1 with l lt 1 title 'Multiplier=1',\
-'skew_results_200000' using 2:1 with l lt 2 title 'Multiplier=2',\
-'skew_results_500000' using 2:1 with l lt 3 title 'Multiplier=5',\
-'skew_results_1000000' using 2:1 with l lt 4 title 'Multiplier=10'
+plot 'skew_results_100000' using 2:1 with l ls 1 title 'Multiplier=1',\
+'skew_results_200000' using 2:1 with l ls 2 title 'Multiplier=2',\
+'skew_results_500000' using 2:1 with l ls 3 title 'Multiplier=5',\
+'skew_results_1000000' using 2:1 with l ls 4 title 'Multiplier=10'
