@@ -2,26 +2,20 @@
 Today's systems accept work in discrete units: networks process flows of data
 between two endpoints, operating systems execute individual applications, and
 data centers process data in individual jobs.  In the context of networks and
-operating systems, system designers have found that indivisible \st{finite} units of work to be
-inconvenient: indivisible \st{finite} units of work limit utilization and load balancing,
+operating systems, system designers have found that indivisible units of work are
+inconvenient: large, indivisible units of work limit utilization and load balancing,
 and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a 
-few milliseconds, thus approximating a fluid flow.  This paper argues for
-bringing this fluid flow model \panda{I am not entirely sure we should call this
-the ``fluid-flow'' model, partly because we are still arguing for quantization, not
-infinitely small units of work} to the data center by breaking jobs up into
+few milliseconds.  This paper argues for
+bringing small units of work to the data center by breaking jobs up into
 millions of ``tiny tasks'' that each complete in hundreds of milliseconds.
 
 Tiny tasks solve three major problems in today's datacenters:
 \begin{itemize}
 \item \textbf{Running batch jobs alongside interactive ones}: Running interactive
-jobs is difficult in today's datacenters because long-running, batch jobs may be
+jobs is difficult in today's datacenters because long-running tasks for batch jobs may be
 using the resources needed by an interactive job. Bursts of interactive jobs
 cannot be serviced quickly, because they must wait for batch jobs to complete.
-\panda{We should phrase this in terms of tasks not jobs. In particular if a job has
-10 tasks that must run on the same machine, you can fit a task from an interactive job
-in there in between the two. The real problem is that the tasks themselves are pretty
-long.}
 This problem frustrates data analysts trying to run real-time queries, and makes
 running user-facing services alongside batch services impossible. Breaking large
 jobs into millions of tiny tasks, each with runtime similar to the runtime for a
@@ -38,9 +32,10 @@ resource contention at the machine or on the network or data skew.  If all tasks
 have without the outlier, prompting a flurry of work on mitigating the outlier
 problem ~\cite{blah,blah,blah}. On the other hand, if the job is broken into millions of tiny tasks (only a subset of which execute at any given time), a machine
 that runs an outlier task will simply run fewer total tasks, rather than
-stalling the completion time for the entire job.
+stalling the completion time for the entire job. We have found that tiny tasks can reduce job
+completion time by as much as a factor of 5.
 \item \textbf{Misc Others that we'll probably eliminate:} Fragmentation (solves
-lots of YARN's problems)
+lots of YARN's problems and simplifies scheduling)
 \end{itemize}
 
 Breaking jobs into tiny units of work requires a re-architecting of today's frameworks.  We argue that these challenges are not insurmountable, and in fact, many
