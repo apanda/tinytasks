@@ -1,0 +1,67 @@
+\section{Introduction}
+Existing cluster compute frameworks like MapReduce, Spark, etc, rely on dividing a large unit of computation (a job)
+into smaller, discrete units, \ie tasks. Tasks, and their storage analogs, blocks, are the atomic units of computation
+on which extant cluster computing schedulers manage. Tasks provide a convenient atomic unit for which frameworks
+provide scheduling, fault-tolerance, and other guarantees, \ie frameworks do not consider cases where a task partially
+fails, nor do they schedule partial tasks. 
+
+Most cluster frameworks use reasonably large blocks, and tasks, with a single task occasionally processing 1 GB of
+data, and usually processing at least 64 MB of data. These large task, and block sizes are mostly dictated by the
+prevalence of centralized metadata stores for distributed file systems, which make it necessary to reduce the amount of
+metadata stored, and by the prevalence of distributed schedulers which require that scheduling be carried out at a
+fairly coarse granularity, lest the centralized scheduler which lives on a single machine, be overwhelmed. In fact
+prior work \fixme{cite facebook http://cloud.berkeley.edu/data/hdfs-scalability.pdf somehow} has argued that larger
+blocks are a necessity for scaling such clusters.
+
+However recent work on distributed filesystems~\cite{nightingale2012flat} has shown that one can efficiently
+support a filesystem with much smaller block sizes using a distributed metadata store. At the same time, work on cluster
+scheduling~\fixme{cite Kay's NSDI paper} has shown that distributed schedulers can schedule an extremely large number of
+tasks with little or no increase in scheduling latency. Given these developments it is now feasible to schedule smaller
+tasks than before. However the question of tasks sizes is far from resolved, while a wide range of sizes can now be accommodated,
+what is an appropriate size for a task? In this paper we argue that smaller is better in this case, and make a case for
+tiny tasks of a couple of hundred milliseconds each.
+
+Tiny tasks build on the same intuition that has been used by network, and operating system designers, who found that
+large indivisible chunks of work are inconvenient. Networks rely on dividing traffic into smaller packets, allowing for
+increased utilization through statistical multiplexing, fairer sharing of bottle-necked links, and better load
+balancing. Operating systems schedulers similarly rely on preemption as a means of running application ins small chunks
+of a few milliseconds, allowing for fair allocation of resources amongst a wide
+set of applications, including computationally intensive and interactive applications.
+
+Some of the problems affecting data centers today are very similar to the problems solved by packets in networks, and
+preemptible tasks in operating systems. Smaller tasks provide a mechanism similar to packets, where machines are
+occupied for a much smaller time, thus helping with the following problems
+\begin{itemize}
+\item \textbf{Running batch jobs alongside interactive ones}: Running interactive
+jobs is difficult in today's datacenters because long-running tasks for batch jobs may be
+using the resources needed by an interactive job. Bursts of interactive jobs
+cannot be serviced quickly, because they must wait for batch jobs to complete.
+This problem frustrates data analysts trying to run real-time queries, and makes
+running user-facing services alongside batch services impossible. Breaking large
+jobs into millions of tiny tasks, each with runtime similar to the runtime for a
+task in a user-facing service, eliminates this problem.
+\item \textbf{Data Skew}: Data skew affects jobs in two ways: first, some tasks
+may be processing far more data than other tasks, causing them to take much
+longer; and second, congested network links due to one or more large jobs using
+the same link can slow down other jobs reading data over the same link. Dividing
+jobs into millions of tiny tasks dramatically improves load balancing to eliminate
+this problem.
+\item \textbf{Outliers}: Today's frameworks are plagued by outliers: tasks that
+take as much as 10 or 100x longer than other tasks in the same job due to
+resource contention at the machine or on the network or data skew.  If all tasks in a job execute in parallel, the job takes 10 or 100x longer than it would
+have without the outlier, prompting a flurry of work on mitigating the outlier
+problem ~\cite{blah,blah,blah}. On the other hand, if the job is broken into millions of tiny tasks (only a subset of which execute at any given time), a machine
+that runs an outlier task will simply run fewer total tasks, rather than
+stalling the completion time for the entire job. We have found that tiny tasks can reduce job
+completion time by as much as a factor of 5.
+\item \textbf{Misc Others that we'll probably eliminate:} Fragmentation (solves
+lots of YARN's problems and simplifies scheduling)
+\end{itemize}
+
+While smaller tasks offer many benefits, there are certain kinds of tasks that might not benefit from such division. In
+particular tasks which are not easily parallellizable, or whose performance increases sublinearly with increased
+parallelism might in fact perform worse. In this paper we show that in many cases such tasks can be modified, by having
+them use a framework provided scratch space, in a way that ameliorates this problem. We also show that a large class of
+jobs can be readily converted to using smaller tasks, and demonstrate that tiny tasks still make sense in the presence
+of a few longer jobs. In the next few sections, we list some of our assumptions, describe a few trends that motivate our
+move towards smaller tasks, and then analyze the efficacy of such a move.

@@ -1,0 +1,57 @@
+\documentclass[pdftex,twoside,twocolumn,10pt,letterpaper]{article}
+\usepackage{graphicx, subfigure, multirow, times, xspace}
+\usepackage{url, amsfonts, verbatim, mathtools, color, soul}
+
+\renewcommand{\ttdefault}{cmtt}
+\usepackage{mdwlist}
+
+
+\newenvironment{myitemize}
+{
+   \vspace{0mm}
+    \begin{list}{$\bullet$ }{}
+        \setlength{\topsep}{0em}
+        \setlength{\parskip}{0pt}
+        \setlength{\partopsep}{0pt}
+        \setlength{\parsep}{0pt}
+        \setlength{\itemsep}{1mm}
+}
+{
+    \end{list}
+}
+
+\newcommand{\todo}[1]{\textbf{\textcolor{red}{TODO: #1}}}
+\newcommand{\eg}{{\it e.g.,}\xspace}
+\newcommand{\ie}{{\it i.e.,}\xspace}
+
+% To make the FIXMEs go away, comment out this line...
+\newcommand{\allnotes}[1]{}
+% To make the FIXMEs go away, comment out this line...
+\renewcommand{\allnotes}[1]{\textit{#1}}
+\newcommand{\fixme}[1]{\allnotes{\bf\textcolor{red}{[#1]}}}
+\newcommand{\panda}[1]{\allnotes{\bf\textcolor{blue}{[Panda: #1]}}}
+\definecolor{comment-red}{rgb}{1,0,0}
+\newcommand{\kay}[1]{\allnotes{\textnormal{\color{comment-red}{\textbf{KAY:#1}}}\unskip}}
+
+\begin{document}
+\title{\vspace{-1in}The Case for \begin{large}tinyTasks\end{large}}
+\author{}
+\date{}
+
+\interfootnotelinepenalty=10000
+
+\maketitle
+
+\begin{quote}
+  \textit{To see the world in a grain of sand...}\\
+  \textit{-- William Blake}
+\end{quote}
+\input{introduction}
+\input{assumptions}
+\input{motivation}
+\input{feasibility}
+\input{benefits}
+\bibliographystyle{abbrv}
+\bibliography{tiny-tasks}
+
+\end{document}

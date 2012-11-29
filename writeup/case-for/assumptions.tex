@@ -1,0 +1,14 @@
+\section{Assumptions}
+Our analysis targets large scale clusters running a mixture of analytical and interactive queries of the kind that are
+prevalent today. While one could achieve results similar to ours through other means, we assume that cluster computing
+frameworks have control over tasks, which are atomic units of work. A cluster compute framework can only schedule, or
+kill processes at the granularity of a task, and either all of a task completes, and its output is used by other tasks
+in the job, or none of a task finishes. Furthermore, we assume that a task cannot be preempted, it can only be killed.
+
+We also assume, in a manner similar to what is available today, machines in a cluster have a certain number of
+processing slots, and a certain amount of memory, that the cluster scheduler can allocate such memory and CPU, and can
+get reasonable isolation from other tasks that are run on that machine. 
+
+Finally our last assumption is that the network is reasonably fast, and full-bisection, such that the placement of tasks
+is no longer a large concern. This is especially important as it allows for better load balancing, since tasks can be
+placed on another machine more easily.
