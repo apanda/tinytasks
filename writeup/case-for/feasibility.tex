@@ -4,8 +4,18 @@ potpurri at this time}
 \begin{myitemize}
 \item A tiny task is fundamentally a ``task'' that uses a small amount of input and runs relatively quickly. While one
 can rely on programmers to make sure that the run time is small, it makes more sense to try and enforce this somehow,
-and also provide tools to help the programmer. Further more running a taks on the same machine might provide some
+and also provide tools to help the programmer. Further more running a tasks on the same machine might provide some
 benefits.
-\item The lease/queuing thing for tasks
-\item 
+\item What jobs can be easily converted to Tiny Tasks \fixme{While this is one of those points of debate with Ion, it is
+fine to say at least for the initial thing that a lot of jobs not involving sorting or uniques are easily convertable,
+without little external support from us, sort of as a way of saying this is what is easy. Also maybe a \bf{GRAPH}
+showing what percentage of some benchmark is easily convertible}
+\item Despite how easy it is for one to convert some of these jobs to TinyTasks we think programming support might be
+helpful. One could use standard methods to either limit the runtime of a function, or provide static analysis support to
+limit this.
+\item For other kinds of jobs and tasks not covered so far, especially large reducers we propose using a key-value store
+where they can store partial data, and use it for computation.
+\item However for initial deployments, one could expect some mixture of tiny tasks, and larger tasks, we show in
+\fixme{GRAPH, text} that this does not hinder performance. While this limits some of the benefits of TinyTasks, it does
+not adversely affect existing jobs.
 \end{myitemize}
