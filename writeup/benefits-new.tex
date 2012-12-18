@@ -1,0 +1,27 @@
+\section{Benefits of Tiny Tasks}
+Tiny tasks benefit data center workloads by providing inherent elasticity:
+fine-grained units of work can be dynamically allocated to machines as
+resources become available, eliminating stragglers and issues of data skew,
+and allow jobs to use available resources without sacrificing fairness
+when new jobs are submitted.
+
+\subsection{Inherent handling of skew and stragglers}
+\begin{enumerate}
+\item Sources of data skew: key skew, value skew, ...
+\item Ideal improvement (show CDF of max/median job time, reduce skew maybe, and Panda's binpacking graph)
+\item Experimental results: improvements are possible simply by using this
+design principle in today's frameworks! Josh's results here
+\end{enumerate}
+This is Josh's stuff (should probably dump the crap simulation I did for this)
+
+\subsection{Fairness without Sacrificing Utilization}
+Diagram here showing a before and after of what happens when a new job arrives
+(and another job was already using the entire cluster)
+
+\subsection{Seamlessly Integrating Batch and Interactive Workloads}
+should this be merged with the above?
+\begin{enumerate}
+\item Kay's simulation of response times for differently sized jobs as
+parallelization increases
+\end{enumerate}
+

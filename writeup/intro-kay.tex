@@ -7,38 +7,35 @@ inconvenient: large, indivisible units of work limit utilization and load balanc
 and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a 
 few milliseconds.  This paper argues for
-bringing small units of work to the data center by breaking jobs up into
+bringing elasticity to the data center by breaking jobs up into
 millions of ``tiny tasks'' that each complete in hundreds of milliseconds.
 
-Tiny tasks solve three major problems in today's datacenters:
+By inreasing elasticity, tiny tasks solve two major problems in today's datacenters:
 \begin{itemize}
 \item \textbf{Running batch jobs alongside interactive ones}: Running interactive
-jobs is difficult in today's datacenters because long-running tasks for batch jobs may be
-using the resources needed by an interactive job. Bursts of interactive jobs
+jobs is difficult because long-running tasks for batch jobs may be
+using the resources needed by an interactive job (mention Amoeba tradeoffs
+here?). Bursts of interactive jobs
 cannot be serviced quickly, because they must wait for batch jobs to complete.
 This problem frustrates data analysts trying to run real-time queries, and makes
 running user-facing services alongside batch services impossible. Breaking large
 jobs into millions of tiny tasks, each with runtime similar to the runtime for a
-task in a user-facing service, eliminates this problem.
-\item \textbf{Data Skew}: Data skew affects jobs in two ways: first, some tasks
-may be processing far more data than other tasks, causing them to take much
-longer; and second, congested network links due to one or more large jobs using
-the same link can slow down other jobs reading data over the same link. Dividing
-jobs into millions of tiny tasks dramatically improves load balancing to eliminate
-this problem.
-\item \textbf{Outliers}: Today's frameworks are plagued by outliers: tasks that
-take as much as 10 or 100x longer than other tasks in the same job due to
-resource contention at the machine or on the network or data skew.  If all tasks in a job execute in parallel, the job takes 10 or 100x longer than it would
-have without the outlier, prompting a flurry of work on mitigating the outlier
-problem ~\cite{blah,blah,blah}. On the other hand, if the job is broken into millions of tiny tasks (only a subset of which execute at any given time), a machine
-that runs an outlier task will simply run fewer total tasks, rather than
-stalling the completion time for the entire job. We have found that tiny tasks can reduce job
-completion time by as much as a factor of 5.
-\item \textbf{Misc Others that we'll probably eliminate:} Fragmentation (solves
-lots of YARN's problems and simplifies scheduling)
+task in a user-facing service, eliminates this problem. We have found that
+tiny tasks reduce the wait time for short tasks by a factor of X.
+\item \textbf{Skew}: Skew affects tasks in a number of ways: a single task
+may be processing more data than other tasks in the job, it may be processing
+data that is more computationally complex, or a slow machine may cause tasks
+to take longer for arbitrary reasons (stagglers). Tiny tasks avoid the need
+for complex skew mitigation techniques by turning a data partitioning problem
+    into a scheduling problem.  Rather than needing to evenly partition data
+    in advance, with tiny tasks, a scheduler simply needs to assign tasks to
+    machines as resoures become available, thus automatically balancing a job's
+    work over the available resources. By architecting for skew, tiny tasks
+    reduce average job completion time by a factor of X.
 \end{itemize}
 
-Breaking jobs into tiny units of work requires a re-architecting of today's frameworks.  We argue that these challenges are not insurmountable, and in fact, many
+Breaking jobs into tiny units of work requires a re-architecting of today's frameworks, which have high overheads that render sub-second tasks impractical.
+We argue that these challenges are not insurmountable, and in fact, many
 have been solved by prior work:
 \begin{itemize}
 \item Task launch overhead: start JVM for MapReduce. Spark doesn't do this.
@@ -46,13 +43,17 @@ have been solved by prior work:
 \item Small file system blocks: FDS
 \end{itemize}
 
-Contributions of this paper:
-\begin{itemize}
-\item Quantify benefits of tiny taks (5x speedup from outlier problem, 2x speedup
-from data skew problem, ?? from batch/interactive)
-\item Outline system architecture
-\item Quantify how low we can go (100ms?)
-\end{itemize}
+This paper begins by quantifying the benefits of tiny tasks,
+using Spark~\cite{??} to demonstrate that tiny tasks can improve performance
+even in an unmodified framework (\S\ref{??}).
+Next, we outline a system architected for tiny tasks, and explore how small
+we can make tasks before the expected task launch overhead exceeds the benefit.
+While smaller tasks offer many benefits, certain kinds of tasks are indivisible
+in today's frameworks, or have performance that decreases sublinearly with
+increased parallelimsm. In \S\ref{??}, we discuss how to convert these jobs
+into tiny tasks using a new framework that provides distributed ``scratch
+space.''
+We conclude with a discussion of related work (\S\ref{??}).
 
 \begin{comment}
 Today's datacenters run increasingly diverse workloads. A decade ago, compute
