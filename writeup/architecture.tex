@@ -1,10 +1,84 @@
 \section{Architecting for Tiny Tasks}
 
-\subsection{Minimizing Scheduling and Task Launch Overhead}
-Sparrow, don't use a new JVM (duh)
+Tiny tasks present many challenges in designing a computing framework.
+In order to make tasks smaller, they must operate on very small data blocks,
+demanding a highly scalable file system that can store 2-3 orders of magnitude
+more blocks of much smaller size.  These tiny tasks must be scheduled more
+frequently, demannding a low-latency and high throughput scheduler, and
+must be launched quickly so that the task launch overhead does not
+exceed the benefit of having smaller tasks.
 
-\subsection{Scalable File System}
-Need very small blocks. Use FDS (but we want locality) or in-memory.
+\subsection{Low-Overhead Scheduling}
+Breaking each task into hundreds or thousands of tiny tasks leads to 2-3 orders
+of magnitude more scheduling decisions that the scheduler needs to make.
+While the Hadoop job tracker (for example) has a well-known scalability limit
+at approximately 4000 machines, recent work~\cite{sparrow} has shown that
+distributed scheduilng provides a near-optimal and highly scalable alternative
+to centralized schedulers. Might also want to cite YARN here, even though it
+does not work as advertised.
+
+Can use leases to further improve scalability.
+
+\subsection{Minimizing Task Launch Overhead}
+Early frameworks (e.g., MapReduce) launch a
+new JVM for each task, so launching a task takes seconds.  Earlier
+work~\cite{Amoeba} has used high task launch overheads to argue against
+using smaller task sizes.  Launching a new JVM for each task is
+unnecessary and costly; newer frameworks like Spark don't do this and can
+launch tasks in milliseconds (true?).
 
 \subsection{Pipelining}
-this is where we get to the dough stage
+To further reduce task launch overheads, Tiny tasks can be pipelined: the input for one task can use I/O while another task is running and consuming CPU.  Since
+tasks are smaller, don't consume as much memory; instead we have explicit
+control over memory.  Can shuffle when convenient and fluidly move data
+between machines.
+
+\subsection{Scalable File System}
+In order for tasks to be short, they must operate on a small amount of on-disk
+data, or use in-memory data.
+For data stored on-disk, assuming data can be read from disk at 100MB/s,
+a task can read no more than 10MB of data if it is to complete in 100ms.
+Current file systems like HDFS already hit scalabilty limits in many clusters
+using the default block size of 64MB (Facebook uses 1GB block sizes for this
+reason), so could not handle the metadata needed to store small file blocks.
+The recent Flat Data Center Storage~\cite{fds} work solved this problem
+by distributing meta data in the magic table; tiny tasks would be built
+atop a file syste like FDS.
+
+To make tasks complete even faster, tasks may operate on in-memory data.
+Frameworks like Spark and PacMan store disk in memory, allowing a task that
+completes in 100ms to scan as much as 1GB of data.
+
+Comment on memory: we anticipate needing some degree of locality, unlike FDS,
+since there will always be a storage technology with higher bandwidth than
+is current cost effective for networking. Scheduling in this environment
+is an open problem but might rely on something like delay scheduling, which
+can be implemented in distributed schedulers (see Sparrow).
+
+\subsection{How Low Can We Go? (move this throughout!)}
+Given the architecture described above and current technologies, we expect that
+running tasks shorter than 100ms will lead to significant overheads. With disk
+blocks lower than 8MB, can no longer amortize seek times, making disk reads take
+longer. (use progress rate graphs to show what task lengths this would lead to?)
+Sparrow found task launch overheads to be approximately 8ms; while much of this
+overhead was the cost of shipping the task over the network, which can be
+improved by making more compact task descriptions, the current 8ms overheads
+limit task runtime at about 100ms before launch becomes an unacceptably high
+portion of runtime. We are hopeful that storing data in memory and further
+improving scheduling can drive task launch overheads to <1ms, making tasks that
+complete in tens of milliseconds practical.
+
+\subsection{What About Tasks that Cannot Easily Be Parallelized?}
+As a starting point, we consider the improvements from ``tiny-ifying'' only the
+tasks that are easily parallelized.  Figure~\ref{??} depicts the performance of
+tiny tasks as we decrease the percentage of tasks that can be parallelized, based
+on traces from Facebook.  There is an elbow at ??.
+
+As shown in Figure~\ref{??}, using tiny tasks as a design principle improves
+performance by X\%, but when tasks cannot be parallelized, we leave X\% of
+performance on the table.  To enable making \emph{all} tasks tiny, we propose
+creating a new computing framework that provides distributed ``scratch space.''
+Parallelize by storing some stuff in this scratch space, so it can be accessed
+by multiple tasks.  Give an example (e.g., unique). Provide some estimate
+of how many tasks fall in this category?
+

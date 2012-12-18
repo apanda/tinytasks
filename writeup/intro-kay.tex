@@ -34,9 +34,15 @@ for complex skew mitigation techniques by turning a data partitioning problem
     reduce average job completion time by a factor of X.
 \end{itemize}
 
-Breaking jobs into tiny units of work requires a re-architecting of today's frameworks, which have high overheads that render sub-second tasks impractical.
-We argue that these challenges are not insurmountable, and in fact, many
-have been solved by prior work:
+While tiny tasks can be used as a design principle in today's frameworks,
+scalability limits of the scheduler and file system limit the size of a
+cluster running tiny tasks; furthermore, some tasks cannot easily be
+parallelized in today's frameworks. 
+%Breaking jobs into tiny units of work requires a re-architecting of today's frameworks, which have high overheads that render sub-second tasks impractical.
+We propose a system designed for tiny tasks that builds on recent research
+that solves the above problems:
+%We argue that these challenges are not insurmountable, and in fact, many
+%have been solved by prior work:
 \begin{itemize}
 \item Task launch overhead: start JVM for MapReduce. Spark doesn't do this.
 \item Scheduling: sparrow

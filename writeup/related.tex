@@ -1,0 +1,19 @@
+\section{Related Work}
+\paragraph{Process Migration} Include operating systems work on process
+migration, as well as Ganesh's Amoeba paper. This work is most similar to
+our approach. With tiny tasks, we are effectively architecting for pre-emption,
+without needing to worry about moving large amounts of contexts between a
+stopped and re-started job.
+
+\paragraph{Skew Mitigation} Large body of over-engineered work on skew-
+mitigation; most solutions fix only part of the problem and are highly
+complex
+
+\paragraph{Running Batch Workloads Alongside Interactive Workloads}
+Google touts the fact that Omega/Borg schedule for both batch and interactive
+workloads, but what they do is effecitively static partitioning (interactive
+services have some portion of the cluster that they re-use to execute requests,
+rather than scheduling a new job for each user request)! E.g., 
+Dremel has a statically allocated part of the cluster.
+
+
