@@ -1,32 +1,38 @@
 import java.util.concurrent.*;
 
 class ThreadPoolBench {
-
-  public static final int THREAD_POOL_SIZE = 1;
-  public static final int NUM_TASKS = 1000000;
+  private static volatile int counter = 0;
 
   public static void main(String args[]) throws Exception {
-    ExecutorService execService = Executors.newFixedThreadPool(1);
+    if (args.length != 2) {
+      System.err.println("Usage: ThreadPoolBench <thread_pool_size> <num_tasks>");
+      System.exit(0);
+    }
+    int threadPoolSize = Integer.valueOf(args[0]);
+    int numTasks = Integer.valueOf(args[1]);
+    ExecutorService execService = Executors.newFixedThreadPool(threadPoolSize);
     long start = System.nanoTime();
+
     System.err.println("Start " + start);
 
     Runnable task = new Runnable() {
       @Override
       public void run() {
-        System.out.println(System.nanoTime());
+        counter++;
       }
     };
 
-    for (int i = 0; i < NUM_TASKS; ++i) {
+    for (int i = 0; i < numTasks; ++i) {
       execService.submit(task);
     }
 
     execService.shutdown();
     // Wait at most 1ms per task ?
-    execService.awaitTermination(NUM_TASKS, TimeUnit.MILLISECONDS);
+    execService.awaitTermination(numTasks, TimeUnit.MILLISECONDS);
     long end = System.nanoTime();
     System.err.println("End " + end);
     System.err.println("Total Time taken " + (end-start) + " ns");
-    System.err.println("Per-task Time taken " + (end-start)/NUM_TASKS + " ns");
+    System.err.println("Per-task Time taken " + (end-start)/numTasks + " ns");
+    System.err.println("Final Counter value is " + counter);
   }
 }
