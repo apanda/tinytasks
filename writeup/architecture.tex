@@ -13,7 +13,7 @@ deterministic unit of execution and a task's description contains the code to be
 executed and a set of named inputs chunks. We enforce that each input chunk is
 restricted in size to 8MB and that tasks execute in around $100$ms.  Unlike
 existing systems, our task execution framework pre-fetches a task's input into
-memory(~\ref{sec:pipeline}) before running it. Tasks produce a set of named
+memory(Section ~\ref{sec:pipeline}) before running it. Tasks produce a set of named
 outputs that can be used as inputs by subsequent tasks. We use a co-operative
 multi-tasking scheme where the scheduler waits for a task to finish before launching
 the next task.  Task running times are controlled by using small input blocks
@@ -30,7 +30,7 @@ scheduling techniques like batch sampling~\cite{sparrow} have been shown to
 provide near-optimal scheduling decisions. We plan to explore distributed 
 scheduling schemes which can also provide fairness guarantees and balance
 utilization of machines across the cluster. To minimize data-movement
-distributed scheduling schemes will also have to consider locality constraints
+schedulers will also have to consider locality constraints
 and techniques like delay-scheduling~\cite{delay} can be used to maximize locality at the
 cost of latency. 
 
@@ -108,7 +108,7 @@ This would require programmer intervention to explicitly annontate such tasks
 and scheduler modifications will be necessary to support this hybrid model.  As
 large tasks have been shown to occupy most of the cluster's
 resources~\cite{something}, we plan to explore the trade-off between flexibility
-and utilization while support larger tasks.  While the projected benefits of
+and utilization while supporting larger tasks.  While the projected benefits of
 using tiny tasks (Section ~\ref{sec:benefits}) are realized when all the tasks
 are uniformly small, we believe that supporting a few large tasks will still
 provide significant benefits.
@@ -122,42 +122,6 @@ etc. Also VM migration work. Need to differentiate from them.
 - Argue for global scheduling as we want load balancing across the datacenter.
 }
 
-\subsection{Alternate Designs}
-Our proposal to use a co-operative multi-tasking scheme is in contrast to
-preemption based schemes commonly used in operating systems. The benefits of 
-preemption and short task length are well studied in operating
-systems literature; for instance~\cite{sherman1972trace} shows that operating
-system schedulers should ideally be preemptive, and should prevent jobs from
-capturing the CPU for too long a time. However achieveing low overhead
-task-switching is more expensive in the distributed setting. 
-
-Previous work in process
-migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
-machine migration~\cite{xen-vm-move} have looked at transparently moving
-computation across machines. However these methods present overheads as
-preempting a long running task involves checkpointing the task context and its
-associated state. For data intensive applications, this could involve saving
-gigabytes of data to disk or transferring it over the network in case the task
-is to be resumed on another machine. Such large data transfers can put a
-significant load on the data center network. Using co-operative multi-tasking in
-the form of tiny tasks removes most of the requirement for saving or restoring
-state.  In our design, the distributed ``scratch space''(Section~\ref{sec:prog})
-is an example of state that is maintained across task executions, but since
-programmers explicitly specify data that needs to be saved, we believe this will
-be more efficient than automatic checkpointing of all the memory allocated by a
-task. 
-
-In a datacenter setting, tiny tasks are also better suited to provide fault
-tolerance when compared to task preemption. Since each tiny task is assumed to a
-deterministic unit of work, tasks can be executed in parallel during recovery.
-In contrast, using preemption we would need to maintain redundant checkpoints
-and fault recovery cannot be executed in parallel. 
-
-The major advantage of choosing preemption would be that task execution times
-can be precisely controlled. However we believe that by controlling task input
-sizes, making modifications to programming frameworks like MapReduce or 
-Spark and using task running time estimation~\cite{something}, we believe that
-task execution times can be controlled while using co-operative multi-tasking. 
 
 \eat{
 \subsection{Low-Overhead Scheduling}

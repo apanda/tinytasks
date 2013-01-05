@@ -1,0 +1,59 @@
+\section{Discussion}
+
+\subsection{Alternate Design Schemes}
+\label{sec:alternate}
+Our proposal to use a co-operative multi-tasking scheme is in contrast to
+preemption based schemes commonly used in operating systems. The benefits of 
+preemption and short task length are well studied in operating
+systems literature; for instance~\cite{sherman1972trace} shows that operating
+system schedulers should ideally be preemptive, and should prevent jobs from
+capturing the CPU for too long a time. We discuss different aspects of this
+design trade-off:\\
+%However achieveing low overhead task-switching is more expensive in the distributed setting. 
+\textbf{Cost of task-switching}: Previous work in process
+migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
+machine migration~\cite{xen-vm-move} have looked at transparently moving
+computation across machines. However these methods present overheads as
+preempting a long running task involves checkpointing the task context and its
+associated state. For data intensive applications, this could involve saving
+gigabytes of data to disk or transferring it over the network in case the task
+is to be resumed on another machine. Such large data transfers can put a
+significant load on the data center network. Using co-operative multi-tasking in
+the form of tiny tasks removes most of the requirement for saving or restoring
+state.  In our design, the distributed ``scratch space''(Section~\ref{sec:prog})
+is an example of state that is maintained across task executions, but since
+programmers explicitly specify data that needs to be saved, we believe this will
+be more efficient than automatic checkpointing of all the memory allocated by a
+task.\\ 
+\textbf{Fault tolerance:} In a datacenter setting, tiny tasks are also better suited to provide fault
+tolerance when compared to task preemption. Since each tiny task is assumed to a
+deterministic unit of work, tasks can be executed in parallel during recovery.
+In contrast, using preemption we would need to maintain redundant checkpoints
+and fault recovery cannot be executed in parallel. \\
+\textbf{Enforcing tiny tasks:} The major advantage of choosing preemption would be that task execution times
+can be precisely controlled. However we believe that by controlling task input
+sizes, making modifications to programming frameworks like MapReduce or 
+Spark and using task running time estimation~\cite{something}, we believe that
+task execution times can be controlled while using co-operative multi-tasking. 
+
+\subsection{Skew-Handling in Clusters}
+A separate line of research has focused on skew-mitigation to improve job
+performance in datacenters. Examples of such work include
+Mantri~\cite{ananthanarayanan2010reining}, SkewTune~\cite{kwon2012skewtune},
+Scarlett~\cite{ananthanarayanan2011scarlett}, and the work on task
+speculation~\cite{zaharia2008improving}. Mantri, and Scarlett, attempt to
+mitigate task runtime skew by modeling the causes for skew, and accounting for
+these. In particular Mantri performs resource aware scheduling to decrease the
+probability of observing task skews, while Scarlett replicates storage blocks
+based on their probability to decrease the wait time for a popular block. While
+both of these systems moderately reduce task skew, they rely on a fragile set of
+signals, and do not work in all cases. Using tiny tasks naturally overcomes data
+skew among reduce tasks as fine-grained hash partitioning ensures that the data is
+more evenly spread across tasks~\cite{something}. As shown in 
+Section~\ref{sec:benefits}, using tiny tasks also allows work to be balanced across
+different machines thereby overcoming skew due to slow machines.
+Furthermore, existing skew mitigation techniques trade-off cluster resources to
+gain more predictable task runtimes. This limits the applicability of these
+techniques under situations of high load, where such guarantees might be most
+important.
+

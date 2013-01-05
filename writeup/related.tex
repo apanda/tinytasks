@@ -1,58 +1,38 @@
 \section{Related Work}
-The benefits of preemption and short task length are well studied in operating
-systems, for instance~\cite{sherman1972trace} shows that operating system
-schedulers should ideally be preemptive, and should prevent jobs from capturing
-the CPU for too long a time. This is unfortunately harder to achieve in the
-cluster computing context, since resource allocation includes much more than the
-CPU, and revoking allocated resources might require moving the task. Previous
-work has also looked into process
-migration~\cite{douglis1991transparent,milojivcic2000process}, where processes
-are transparently moved between machines. These methods present overheads, as
-process context and state needs to be transfered across the network. For large
-tasks such state can be of significant size, and such transfer would put a
-significant load on the data center network. 
 
-Amoeba~\cite{ananthanarayanan2012true} proposes a model in the same vein. In
-Amoeba, the system identifies safe-points where a task can be killed, while
-minimizing wasted work. At safe-points a task can checkpoint output based on
-inputs it has processed so far, and a new task is spawned to process the
-remaining inputs. This work is perhaps closest to TinyTasks, and shows that
-preemptibility is an important feature for tasks scheduled on a cluster.
-However, while the work acknowledges the necessity for preemptibility, it places
-no requirements on how frequently safe-point occur, and hence places no bounds
-on the maximum time for which a single task can capture the processor.
-Furthermore, actually determining safe-points for general tasks is non-trivial,
-and while Amoeba provides some examples of safe-points for certain kinds of
-tasks, they do not provide a generic framework for determining where such
-safe-points could occur.  TinyTasks by contrast do not require any program
-analysis to identify such points, and instead relies on limiting input sizes to
-achieve preemption.
+There has been a large body of work in the context of distributed operating 
+systems~\cite{douglis1991transparent, milojivcic2000process, amoeba-os, chorus} 
+and virtual machines~\cite{xen, something} that have looked at scheduling and
+context-switching among processes across different machines. Migration of
+processes or virtual machines typically use premptive methods and we compare
+them to our design goals in Section~\ref{sec:alternate}.
+
+Recent work proposed Amoeba~\cite{ananthanarayanan2012true}, a system that
+shares similar goals as our work. In Amoeba, the system identifies safe-points
+where a task can be killed, while minimizing wasted work. At safe-points a task
+can checkpoint output based on inputs it has processed so far, and a new task is
+spawned to process the remaining inputs. This work is perhaps closest to
+TinyTasks, and shows that preemptibility is an important feature for tasks
+scheduled on a cluster.  However, while the work acknowledges the necessity for
+preemptibility, it places no requirements on how frequently safe-point occur,
+and hence places no bounds on the maximum time for which a single task can
+capture the processor.  Furthermore, actually determining safe-points for
+general tasks is non-trivial, and while Amoeba provides some examples of
+safe-points for certain kinds of tasks, they do not provide a generic framework
+for determining where such safe-points could occur.  TinyTasks by contrast do
+not require any program analysis to identify such points, and instead relies on
+limiting input sizes to achieve preemption.
 
 Dremel~\cite{melnik2010dremel}, in conjunction with Google's cluster scheduler
-Omega, has also been used to run interactive jobs in a cluster otherwise used
-for batch processing. Dremel achieves low latency by spinning up long-running
-agents on which queries are executed. This is similar to statically partitioning
-a cluster, where a part of the cluster is reserved for interactive jobs, and the
-rest can be used for batch jobs. Such a method necessarily limits the
-utilization of a cluster, and requires that the peak load for interactive jobs
-be known in advance, so as to ensure that constraints are met. Furthermore, such
-systems require that application requirements be known in advance, which makes
-this unsuitable to shared clusters, and frequently changing workloads.
-
-A separate line of research has focused on skew-mitigation to improve job
-performance. Examples of such work include
-Mantri~\cite{ananthanarayanan2010reining}, SkewTune~\cite{kwon2012skewtune},
-Scarlett~\cite{ananthanarayanan2011scarlett}, and the work on task
-speculation~\cite{zaharia2008improving}. Mantri, and Scarlett, attempt to
-mitigate task runtime skew by modeling the causes for skew, and accounting for
-these. In particular Mantri performs resource aware scheduling to decrease the
-probability of observing task skews, while Scarlett replicates storage blocks
-based on their probability to decrease the wait time for a popular block. While
-both of these systems reduce task skew somewhat, they rely on a somewhat fragile
-set of signals, and do not work in all cases. Furthermore, both these systems,
-task speculation, and SkewTune trade-off cluster resources to gain more
-predictable task runtimes. This limits the applicability of these techniques
-under situations of high load, where such guarantees might be most important.
+Omega~\cite{wilkes-berkeley}, has also been used to run interactive jobs in a
+cluster otherwise used for batch processing. Dremel achieves low latency by
+spinning up long-running agents on which queries are executed. This is similar
+to statically partitioning a cluster, where a part of the cluster is reserved
+for interactive jobs, and the rest can be used for batch jobs. Such a method
+necessarily limits the utilization of a cluster, and requires that the peak load
+for interactive jobs be known in advance, so as to ensure that constraints are
+met. Requiring application requirements be known in advance makes static
+partitioning unsuitable to shared clusters with frequently changing workloads.
 
 \eat{\paragraph{Process Migration} Include operating systems work on process
 migration, as well as Ganesh's Amoeba paper. This work is most similar to
@@ -70,3 +50,18 @@ workloads, but what they do is effecitively static partitioning (interactive
 services have some portion of the cluster that they re-use to execute requests,
 rather than scheduling a new job for each user request)! E.g., 
 Dremel has a statically allocated part of the cluster.}
+
+\eat{
+The benefits of preemption and short task length are well studied in operating
+systems, for instance~\cite{sherman1972trace} shows that operating system
+schedulers should ideally be preemptive, and should prevent jobs from capturing
+the CPU for too long a time. This is unfortunately harder to achieve in the
+cluster computing context, since resource allocation includes much more than the
+CPU, and revoking allocated resources might require moving the task. Previous
+work has also looked into process
+migration~\cite{douglis1991transparent,milojivcic2000process}, where processes
+are transparently moved between machines. These methods present overheads, as
+process context and state needs to be transfered across the network. For large
+tasks such state can be of significant size, and such transfer would put a
+significant load on the data center network. 
+}
