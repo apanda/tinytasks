@@ -1,13 +1,165 @@
 \section{Architecting for Tiny Tasks}
+Tiny tasks present many challenges in designing a computing framework.  Breaking
+down jobs in clusters into tiny execution units implies the need for
+low-overhead high-throughput scheduling, scalable storage systems and a
+programming model that can be used to support different kinds of computations.
+In this section, we present our design goals and outline the challenges in
+realizing them.
 
-Tiny tasks present many challenges in designing a computing framework.
-In order to make tasks smaller, they must operate on very small data blocks,
-demanding a highly scalable file system that can store 2-3 orders of magnitude
-more blocks of much smaller size.  These tiny tasks must be scheduled more
-frequently, demannding a low-latency and high throughput scheduler, and
-must be launched quickly so that the task launch overhead does not
-exceed the benefit of having smaller tasks.
+\subsection{Execution Model}
+We propose an execution model where every job in the cluster is split into a
+large number of tiny tasks. Similar to existing frameworks, each task is a
+deterministic unit of execution and a task's description contains the code to be
+executed and a set of named inputs chunks. We enforce that each input chunk is
+restricted in size to 8MB and that tasks execute in around $100$ms.  Unlike
+existing systems, our task execution framework pre-fetches a task's input into
+memory(~\ref{sec:pipeline}) before running it. Tasks produce a set of named
+outputs that can be used as inputs by subsequent tasks. We use a co-operative
+multi-tasking scheme where the scheduler waits for a task to finish before launching
+the next task.  Task running times are controlled by using small input blocks
+and support from programming frameworks. We compare against alternate design
+schemes in Section~\ref{sec:alternate}.
 
+\subsection{Low-latency scheduling}
+In a datacenter containing thousands of machines, having tasks which execute for
+$100$ms would mean that cluster schedulers need to make millions of scheduling
+decisions every second. Centralized scheduling schemes have well known
+scalability limits~\cite{john-wilkes-berkeley} and distributed scheduling
+schemes will be required to handle tiny tasks. Recently proposed distributed
+scheduling techniques like batch sampling~\cite{sparrow} have been shown to 
+provide near-optimal scheduling decisions. We plan to explore distributed 
+scheduling schemes which can also provide fairness guarantees and balance
+utilization of machines across the cluster. To minimize data-movement
+distributed scheduling schemes will also have to consider locality constraints
+and techniques like delay-scheduling~\cite{delay} can be used to maximize locality at the
+cost of latency. 
+
+In addition to scheduling latency, task launch overheads will have to be
+minimized to ensure that tasks can spend a large fraction of their execution
+time doing useful work. Existing frameworks like Hadoop typically launch a new
+JVM for each task and launching new tasks takes \fixme{5-10} seconds. Newer
+frameworks like Spark reuse existing JVMs, but task launch overhead is still on
+the order of a few milliseconds~\cite{sparrow}.
+
+We believe that average task launch overhead can be reduced $100 \mu$s making it
+an insignificant portion of the execution time. Much of the existing task launch
+overhead stems from shipping the task over the network and this can be
+eliminated by caching tasks. Task launch latency can then be reduced to one
+intra-datacenter RPC, containing a checksum of the task description, path to
+task inputs, and the time required to execute a new thread. Furthermore, 
+scheduling decisions where a task continues to execute in a given slot can be 
+efficiently implemented using a lightweight renewal message similar to leases.\\
+
+\subsection{Pipelined Execution}
+\label{sec:pipeline}
+Task execution can be made more efficient by using a pipelined execution scheme.
+Every tiny task can be broken down in to three main phases: a fetch phase where
+the task descriptions and the inputs are fetched consuming I/O resources, an
+execute phase where task consumes CPU and an output phase where the tasks
+outputs are saved to the storage system. By pipelining CPU and I/O resources
+across different tasks, we can further reduce associated overheads. With tiny
+tasks we expect task inputs and outputs to be small as well and this allows the
+execution framework to cache these values and flexibly schedule data transfers.
+Using a data transfer interface similar to coflows~\cite{coflow-hotnets} we
+believe that explicitly managing data transfer between tasks will allow us to
+optimize network utilization in the data center.
+
+\subsection{Scalable Storage Systems}
+In order for tasks to be short, they must operate on a small amount of on-disk
+data, or use in-memory data.  For data stored on-disk, assuming data can be read
+from disk at 100MB/s, a task can read no more than 10MB of data in 100ms.  Hence
+we propose that blocks in the distributed file system must be limited to around
+8MB. Existing file systems like HDFS, which use a centralized metadata server,
+hit scalabilty limits with smaller block sizes~\cite{facebook-berkeley-talk}.
+Recent work on Flat Data Center Storage~\cite{fds}, addresses this problem by
+distributing metadata across servers and their results indicate that tasks can
+overcome the need for disk locality. While FDS provides a natural environment
+for tiny tasks, we believe there is a need to consider in-memory locality as
+well. Accessing in memory data~\cite{pacman, spark} will enable tasks to access 
+up to 1GB in 100ms and an integrated approach to caching, scheduling based on
+memory locality and appropriate placement on disks will be necessary to handle
+tiny tasks.
+
+\subsection{Programming model}
+\label{sec:prog}
+Splitting jobs into tiny tasks is relatively straight forward for data parallel
+programs as programming frameworks can sub-divide the input to many more tasks.
+However some computations could become more expensive as we increase the total
+number of tasks. An example of this would be MapReduce computations where we
+have an all-to-all shuffle ($O(N^2)$ in communication) and benefits from higher
+degree of parallelism may not enough to offset the costs. Combiners, which can
+perform partial aggregation of data, are commonly used in computations which are
+associative and commutative. Extending this, we plan to explore using
+aggregation trees~\cite{something} which can address this problem and ensure
+that tasks remain tiny.
+
+However we could still have computations that are either not associative,
+commutative or require a large amount of temporary state (e.g. computing
+distinct elements). To handle such computations, we propose providing 
+support for a distributed ``scratch space'' that can be used by tasks to 
+communicate across different executions. For example, to compute the set of
+unique elements in a file, tasks could use the scratch space to store elements
+seen so far. We envision that a simple key-value store like interface would
+be sufficient for this purpose and plan to provide strong 
+consistency~\cite{something} for accesses within a datacenter. 
+
+As an exception, we also plan to accomodate some large tasks in the cluster.
+This would require programmer intervention to explicitly annontate such tasks
+and scheduler modifications will be necessary to support this hybrid model.  As
+large tasks have been shown to occupy most of the cluster's
+resources~\cite{something}, we plan to explore the trade-off between flexibility
+and utilization while support larger tasks.  While the projected benefits of
+using tiny tasks (Section ~\ref{sec:benefits}) are realized when all the tasks
+are uniformly small, we believe that supporting a few large tasks will still
+provide significant benefits.
+
+\eat{
+- Major point: Data intensive applications have a lot of state -- and
+this is hard to checkpoint. Need a crisp quantitative argument for
+this.
+- Lots of work in distributed OS about this - Amoeba, Sprite, Chorus
+etc. Also VM migration work. Need to differentiate from them.
+- Argue for global scheduling as we want load balancing across the datacenter.
+}
+
+\subsection{Alternate Designs}
+Our proposal to use a co-operative multi-tasking scheme is in contrast to
+preemption based schemes commonly used in operating systems. The benefits of 
+preemption and short task length are well studied in operating
+systems literature; for instance~\cite{sherman1972trace} shows that operating
+system schedulers should ideally be preemptive, and should prevent jobs from
+capturing the CPU for too long a time. However achieveing low overhead
+task-switching is more expensive in the distributed setting. 
+
+Previous work in process
+migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
+machine migration~\cite{xen-vm-move} have looked at transparently moving
+computation across machines. However these methods present overheads as
+preempting a long running task involves checkpointing the task context and its
+associated state. For data intensive applications, this could involve saving
+gigabytes of data to disk or transferring it over the network in case the task
+is to be resumed on another machine. Such large data transfers can put a
+significant load on the data center network. Using co-operative multi-tasking in
+the form of tiny tasks removes most of the requirement for saving or restoring
+state.  In our design, the distributed ``scratch space''(Section~\ref{sec:prog})
+is an example of state that is maintained across task executions, but since
+programmers explicitly specify data that needs to be saved, we believe this will
+be more efficient than automatic checkpointing of all the memory allocated by a
+task. 
+
+In a datacenter setting, tiny tasks are also better suited to provide fault
+tolerance when compared to task preemption. Since each tiny task is assumed to a
+deterministic unit of work, tasks can be executed in parallel during recovery.
+In contrast, using preemption we would need to maintain redundant checkpoints
+and fault recovery cannot be executed in parallel. 
+
+The major advantage of choosing preemption would be that task execution times
+can be precisely controlled. However we believe that by controlling task input
+sizes, making modifications to programming frameworks like MapReduce or 
+Spark and using task running time estimation~\cite{something}, we believe that
+task execution times can be controlled while using co-operative multi-tasking. 
+
+\eat{
 \subsection{Low-Overhead Scheduling}
 Breaking each task into hundreds or thousands of tiny tasks leads to 2-3 orders
 of magnitude more scheduling decisions that the scheduler needs to make.
@@ -19,19 +171,12 @@ does not work as advertised.
 
 Can use leases to further improve scalability.
 
-\subsection{Minimizing Task Launch Overhead}
 Early frameworks (e.g., MapReduce) launch a
 new JVM for each task, so launching a task takes seconds.  Earlier
 work~\cite{Amoeba} has used high task launch overheads to argue against
 using smaller task sizes.  Launching a new JVM for each task is
 unnecessary and costly; newer frameworks like Spark don't do this and can
 launch tasks in milliseconds (true?).
-
-\subsection{Pipelining}
-To further reduce task launch overheads, Tiny tasks can be pipelined: the input for one task can use I/O while another task is running and consuming CPU.  Since
-tasks are smaller, don't consume as much memory; instead we have explicit
-control over memory.  Can shuffle when convenient and fluidly move data
-between machines.
 
 \subsection{Scalable File System}
 In order for tasks to be short, they must operate on a small amount of on-disk
@@ -60,11 +205,8 @@ Given the architecture described above and current technologies, we expect that
 running tasks shorter than 100ms will lead to significant overheads. With disk
 blocks lower than 8MB, can no longer amortize seek times, making disk reads take
 longer. (use progress rate graphs to show what task lengths this would lead to?)
-Sparrow found task launch overheads to be approximately 8ms; while much of this
-overhead was the cost of shipping the task over the network, which can be
-improved by making more compact task descriptions, the current 8ms overheads
-limit task runtime at about 100ms before launch becomes an unacceptably high
-portion of runtime. We are hopeful that storing data in memory and further
+
+We are hopeful that storing data in memory and further
 improving scheduling can drive task launch overheads to <1ms, making tasks that
 complete in tens of milliseconds practical.
 
@@ -81,4 +223,4 @@ creating a new computing framework that provides distributed ``scratch space.''
 Parallelize by storing some stuff in this scratch space, so it can be accessed
 by multiple tasks.  Give an example (e.g., unique). Provide some estimate
 of how many tasks fall in this category?
-
+}
