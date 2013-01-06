@@ -31,6 +31,19 @@ Assigning tiny tasks to idle machines at run-time approximates a static bin-pack
 \label{fig:binpacked}
 \end{figure}
 
+Figure~\ref{fig:sparkskew} demonstrates the improvement offered by tiny tasks on a Spark MapReduce job with data skew and machines that exhibited a random 5x performance variance.
+With tiny tasks, Spark is able to mitigate both skew and stragglers without explicit knowledge of machines' speeds or records' processing costs.
+
+\begin{figure}[t]
+\centering
+\hspace{2ex}
+\includegraphics[width=0.5\textwidth]{figures/spark-skew-results}
+\vspace{-4ex}
+\caption{Improvement from using tiny tasks in the presence of skew and heterogeneous machines.  Error bars depict standard deviation.}
+\vspace{-2ex}
+\label{fig:sparkskew}
+\end{figure}
+
 
 
 \subsection{Fairness NEED A BETTER NAME}
