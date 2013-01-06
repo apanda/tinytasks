@@ -2,74 +2,62 @@
 Today's systems accept work in discrete units: networks process flows of data
 between two endpoints, operating systems execute individual applications, and
 data centers process data in individual jobs.  In the context of networks and
-operating systems, system designers have found that indivisible units of work are
+operating systems, system designers have found that large, indivisible units of work are
 inconvenient: large, indivisible units of work limit utilization and load balancing,
 and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a 
 few milliseconds.  This paper argues for
-bringing elasticity to the data center by breaking jobs up into
-millions of ``tiny tasks'' that each complete in hundreds of milliseconds.
+applying a similar modely to data centers by breaking jobs into
+several ``tiny tasks'', each of which runs for a few hundred milliseconds.
 
-By inreasing elasticity, tiny tasks solve two major problems in today's datacenters:
+Decreased task runtimes solve two major problems in today's datacenters:
 \begin{itemize}
-\item \textbf{Running batch jobs alongside interactive ones}: Running interactive
-jobs is difficult because long-running tasks for batch jobs may be
-using the resources needed by an interactive job (mention Amoeba tradeoffs
-here?). Bursts of interactive jobs
-cannot be serviced quickly, because they must wait for batch jobs to complete.
-This problem frustrates data analysts trying to run real-time queries, and makes
-running user-facing services alongside batch services impossible. Breaking large
-jobs into millions of tiny tasks, each with runtime similar to the runtime for a
-task in a user-facing service, eliminates this problem. We have found that
-tiny tasks reduce the wait time for short tasks by a factor of X.
-\item \textbf{Skew}: Skew affects tasks in a number of ways: a single task
-may be processing more data than other tasks in the job, it may be processing
-data that is more computationally complex, or a slow machine may cause tasks
-to take longer for arbitrary reasons (stagglers). Tiny tasks avoid the need
-for complex skew mitigation techniques by turning a data partitioning problem
-    into a scheduling problem.  Rather than needing to evenly partition data
-    in advance, with tiny tasks, a scheduler simply needs to assign tasks to
-    machines as resoures become available, thus automatically balancing a job's
-    work over the available resources. By architecting for skew, tiny tasks
-    reduce average job completion time by a factor of X.
+\item \textbf{Sharing a cluster for both batch and interactive workloads}: 
+Long task runtimes make it challenging to run both batch and interactive
+jobs on the same cluster. In particular, task lengths place a lower bound on
+the time before resources allocated to a running task can be recovered. A new
+task therefore must wait for running tasks to finish, before they can start running.
+This waiting time is a significant contributor to task latency, and thus adversly
+affects the request latency for interactive jobs.
+
+One must tradeoff between
+cluster utilization and responsiveness, limiting the benefits of sharing
+a cluster. By reducing task runtimes to an acceptably small value, tiny
+tasks allow batch and interactive jobs share the same resources, without
+trading off request latency.
+
+\item \textbf{Outliers}: Prior work has shown that tasks runtimes exhibit a long
+tailed distribution, and are highly variable. This variance can be caused by
+a number of factors, including a single task processing a larger amoung of data
+than others, machines processing data at different reasons, network effects, or
+a combination of such affects. Many mechanisms have been suggested for mitigating
+the effects of this variability, generally either by avoiding causes of these
+long task runtimes, or by launching additional tasks in response to slow tasks.
+By providing the scheduler with fine grained control over job execution, tiny
+tasks makes such mitigation easier, allowing the scheduler to change the resources
+allocated to a job in response to outliers.
 \end{itemize}
 
-While tiny tasks can be used as a design principle in today's frameworks,
-scalability limits of the scheduler and file system limit the size of a
-cluster running tiny tasks; furthermore, some tasks cannot easily be
-parallelized in today's frameworks. 
-%Breaking jobs into tiny units of work requires a re-architecting of today's frameworks, which have high overheads that render sub-second tasks impractical.
-We propose a system designed for tiny tasks that builds on recent research
-that solves the above problems:
-%We argue that these challenges are not insurmountable, and in fact, many
-%have been solved by prior work:
-\begin{itemize}
-\item Task launch overhead: start JVM for MapReduce. Spark doesn't do this.
-\item Scheduling: sparrow
-\item Small file system blocks: FDS
-\end{itemize}
+Scalability limitations of current centralized distributed file systems and cluster
+scheduler limit the size of the cluster for which task lengths can be reduced. Similarly
+current frameworks need to be rearchitected to enable tasks to be broken into even smaller
+units. 
+Recent work on distributed filesystems\cite{nightingale2012flat} and cluster schedulers\cite{sparrow}
+present the first steps towards
+building a cluster framework that allows for tiny tasks. While these new filesystems
+and scheduler solve many of the scalability problems, many challenges remain. In particular
+efficient use of tiny tasks requires that the overhead for launching a task is small. Current
+frameworks take on the order of several of hundred milliseconds to a second to launch a task, negating
+many of the gains providied by a system with sub-second task lengths. Similarly, any system
+supporting tiny tasks must provide additional architecutural support for more easily dividing tasks.
 
-This paper begins by quantifying the benefits of tiny tasks,
-using Spark~\cite{??} to demonstrate that tiny tasks can improve performance
-even in an unmodified framework (\S\ref{??}).
-Next, we outline a system architected for tiny tasks, and explore how small
-we can make tasks before the expected task launch overhead exceeds the benefit.
-While smaller tasks offer many benefits, certain kinds of tasks are indivisible
-in today's frameworks, or have performance that decreases sublinearly with
-increased parallelimsm. In \S\ref{??}, we discuss how to convert these jobs
-into tiny tasks using a new framework that provides distributed ``scratch
-space.''
-We conclude with a discussion of related work (\S\ref{??}).
+In this paper we present the design for a system supporting tiny tasks, in particular
+we propose a system that supports $100$ microsecond task launches, and an architecture
+that allows most general application to be expressed in terms of a set of tiny tasks.
 
-\begin{comment}
-Today's datacenters run increasingly diverse workloads. A decade ago, compute
-clusters were designed for batch workloads: a typical job took hours to complete.
-As users migrated large amounts of data to these clusters, they demanded ever
-faster access to this data, spurring low-latency frameworks (e.g., Dremel, Spark,
-Shark, Impala) that stripe work across thousands of machines or store data in
-memory in order to complete jobs in seconds. While data analysts and user-facing
-services rely on these low-latency frameworks, clusters continue to run
-long-running, batch jobs (e.g., indexing the web), leading to a diverse mix of
-job runtimes.  Workload studies from Facebook, Microsoft, Yahoo!, and Google
-corroborate this claim, finding that job completion times range from seconds to days.
-\end{comment}
+We begin by quantifying the benefits of tiny tasks, using a series of simulations, 
+and application built on Spark\cite{zaharia2010spark} demonstrating the potential benefits
+of using Spark. In Section~\ref{something} we outline the architecture for our system supporting tiny tasks, and 
+try and determine an appropriate task length based on task launch overheads, and other factors.
+Next in Section~\ref{somethingelse} we discuss how to convert arbitrary jobs to better take advantage of tiny tasks, following
+hich we discuss related work in Section~\ref{something}. Finally we conclude in Section~\ref{conclusion}. 
