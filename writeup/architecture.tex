@@ -2,7 +2,7 @@
 Tiny tasks present many design challenges for computing frameworks.
 Splitting jobs into tiny execution units requires low-overhead
 high-throughput scheduling, scalable storage systems and a programming model
-that can be used to support different kinds of computations.
+that can be used to support both low- and high-latency computations.
 % TODO(josh): maybe the bit about "different kinds" can be made clearer?
 In this section, we present our design goals and outline the challenges in
 realizing them.
@@ -11,23 +11,23 @@ realizing them.
 \subsection{Execution Model}
 We propose an execution model where every job in the cluster is split into a
 large number of tiny tasks. Similar to existing frameworks, each task is a
-deterministic unit of execution and a task's description contains the code to be
+deterministic and idempotent unit of execution and a task's description contains the code to be
 executed and a set of named inputs chunks. We enforce that each input chunk is
 restricted in size to 8MB and that tasks execute in around $100$ms.  Unlike
 existing systems, our task execution framework pre-fetches a task's input into
 memory (Section~\ref{sec:pipeline}) before running it. Tasks produce a set of named
-outputs that can be used as inputs by subsequent tasks. We use a co-operative
+outputs that can be used as inputs in subsequent tasks. We use a co-operative
 multi-tasking scheme where the scheduler waits for a task to finish before launching
 the next task.  Task running times are controlled by using small input blocks
 and support from programming frameworks. We compare against alternate design
 schemes in Section~\ref{sec:alternate}.
 
 \subsection{Low-latency scheduling}
-In a datacenter containing thousands of machines, having tasks which execute for
-$100$ms would mean that cluster schedulers need to make millions of scheduling
-decisions every second. Centralized scheduling schemes have well-known
-scalability limits~\cite{john-wilkes-berkeley} and distributed scheduling
-schemes will be required to handle tiny tasks. Recently proposed distributed
+In order to support task runtime of $100$ms in a datacenter consisting of thousands
+of machines, cluster schedulers would need to make millions of scheduling decisions
+every second. This necessitates distributed scheduling schemes as centralized schemes
+have well-known scalability limits~\cite{john-wilkes-berkeley}.
+Recently proposed distributed
 scheduling techniques like batch sampling~\cite{sparrow} have been shown to
 provide near-optimal scheduling decisions. We plan to explore distributed
 scheduling schemes which can also provide fairness guarantees and balance
@@ -43,14 +43,16 @@ JVM for each task and launching new tasks takes \fixme{5-10} seconds. Newer
 frameworks like Spark reuse existing JVMs, but task launch overhead is still on
 the order of a few milliseconds~\cite{sparrow}.
 
-We believe that average task launch overhead can be reduced $100 \mu$s, making it
-an insignificant portion of the execution time. Much of the existing task launch
+We believe that average task launch overhead can be reduced to $100 \mu$s, making it
+an insignificant portion of a task's total execution time. 
+Much of the existing task launch
 overhead stems from shipping the task over the network and this can be
-eliminated by caching tasks. Task launch latency can then be reduced to one
+eliminated by a combination of pipelining and caching tasks.
+Task launch latency can then be reduced to one
 intra-datacenter RPC, containing a checksum of the task description, path to
 task inputs, and the time required to execute a new thread. Furthermore, 
 scheduling decisions where a task continues to execute in a given slot can be 
-efficiently implemented using a lightweight renewal message similar to leases.\\
+efficiently implemented using a lightweight renewal message similar to leases.
 
 \subsection{Pipelined Execution}
 \label{sec:pipeline}
@@ -89,11 +91,12 @@ programs as programming frameworks can sub-divide the input to many more tasks.
 However some computations could become more expensive as we increase the total
 number of tasks. An example of this would be MapReduce computations where we
 have an all-to-all shuffle ($O(N^2)$ in communication) and benefits from higher
-degree of parallelism may not enough to offset the costs. Combiners, which can
-perform partial aggregation of data, are commonly used in computations which are
-associative and commutative. Extending this, we plan to explore using
+degree of parallelism may not be enough to offset the costs.
+Combiners are commonly used in computations that are
+associative and commutative to perform partial aggregation.
+Extending this, we plan to explore using
 aggregation trees~\cite{something} which can address this problem and ensure
-that tasks remain tiny.
+that tasks remain small.
 
 However we could still have computations that are either not associative and
 commutative or require a large amount of temporary state (e.g. computing
