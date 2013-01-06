@@ -1,24 +1,21 @@
 \begin{abstract}
-Today's cluster computing frameworks suffer from excessively large tasks.
-Long-running tasks lead
-to long wait times for interactive and user-facing
-jobs, which may need to wait for long-running tasks to complete before being
-launched.
-Furthermore, even with elaborate skew-mitigation techniques, system designers
-struggle to distribute a job's work over large tasks evenly enough to avoid
-stragglers.
-We argue for bringing greater elasticity to the data center by breaking today's
-tasks into thousands of tiny tasks.  Tiny tasks avoid the need to do an
-a-priori partioning of work across tasks; instead, simply scheduling each tiny
-task as resources become available ensures that work will be evenly
-spread across workers.  Second, since even batch jobs are run in tiny units of
-work, jobs can consume available resources while also guaranteeing that newly
-arriving jobs will quickly gain their fair share of the cluster.
-This paper argues that recent improvements in distributed file systems and
-schedulers make task launch overhead small enough to run sub-second tasks,
-and demonstrates that breaking jobs into tiny tasks improves
-response times by a factor of 5.\footnote{lies}.
-We describe not only the benefits of using tiny tasks, but also the challenges
-of building a system that ensures that all tasks are tiny and that can launch
-tasks with uniformly low overhead.
+Current wisdom dictates that cluster computing frameworks should
+use tasks with long task runtimes. However, long-running tasks result in
+long wait-times for interactive, and user-facing jobs in mixed use clusters.
+Furthermore, despite the use of elaborate skew mitigation
+techniques, system designers continue to struggle with more evenly distributing the work required for a 
+job across tasks. Recent improvements in distributed file systems, and scheduling
+have eliminated many of the reasons why long task runtimes have been historically
+preferred.
+In this paper we argue for a move to tiny-tasks,
+tasks with runtimes of a few $100$ milliseconds. Tiny tasks minimize
+the necessity for pre-partitioning work across tasks, by enabling mechanisms for
+dynamically
+repartition the work for a job.  Furthermore,
+for mixed workloads, the use of tiny tasks limits the time an
+interactive job must wait before its tasks are run, allowing for  increased 
+cluster utilization, and improving responsiveness, and job fairness.
+We quantify these simulations, and show that smaller tasks can improve
+response time by a factor of \fixme{5}. We also discuss some challenges 
+faced in building a system using tiny tasks.
 \end{abstract}
