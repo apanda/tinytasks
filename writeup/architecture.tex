@@ -1,10 +1,12 @@
 \section{Architecting for Tiny Tasks}
-Tiny tasks present many challenges in designing a computing framework.  Breaking
-down jobs in clusters into tiny execution units implies the need for
-low-overhead high-throughput scheduling, scalable storage systems and a
-programming model that can be used to support different kinds of computations.
+Tiny tasks present many design challenges for computing frameworks.
+Splitting jobs into tiny execution units requires low-overhead
+high-throughput scheduling, scalable storage systems and a programming model
+that can be used to support different kinds of computations.
+% TODO(josh): maybe the bit about "different kinds" can be made clearer?
 In this section, we present our design goals and outline the challenges in
 realizing them.
+% TODO(josh) Do we need this transition sentence?
 
 \subsection{Execution Model}
 We propose an execution model where every job in the cluster is split into a
@@ -13,7 +15,7 @@ deterministic unit of execution and a task's description contains the code to be
 executed and a set of named inputs chunks. We enforce that each input chunk is
 restricted in size to 8MB and that tasks execute in around $100$ms.  Unlike
 existing systems, our task execution framework pre-fetches a task's input into
-memory(Section ~\ref{sec:pipeline}) before running it. Tasks produce a set of named
+memory (Section~\ref{sec:pipeline}) before running it. Tasks produce a set of named
 outputs that can be used as inputs by subsequent tasks. We use a co-operative
 multi-tasking scheme where the scheduler waits for a task to finish before launching
 the next task.  Task running times are controlled by using small input blocks
@@ -23,16 +25,16 @@ schemes in Section~\ref{sec:alternate}.
 \subsection{Low-latency scheduling}
 In a datacenter containing thousands of machines, having tasks which execute for
 $100$ms would mean that cluster schedulers need to make millions of scheduling
-decisions every second. Centralized scheduling schemes have well known
+decisions every second. Centralized scheduling schemes have well-known
 scalability limits~\cite{john-wilkes-berkeley} and distributed scheduling
 schemes will be required to handle tiny tasks. Recently proposed distributed
-scheduling techniques like batch sampling~\cite{sparrow} have been shown to 
-provide near-optimal scheduling decisions. We plan to explore distributed 
+scheduling techniques like batch sampling~\cite{sparrow} have been shown to
+provide near-optimal scheduling decisions. We plan to explore distributed
 scheduling schemes which can also provide fairness guarantees and balance
 utilization of machines across the cluster. To minimize data-movement
 schedulers will also have to consider locality constraints
 and techniques like delay-scheduling~\cite{delay} can be used to maximize locality at the
-cost of latency. 
+cost of latency.
 
 In addition to scheduling latency, task launch overheads will have to be
 minimized to ensure that tasks can spend a large fraction of their execution
@@ -41,7 +43,7 @@ JVM for each task and launching new tasks takes \fixme{5-10} seconds. Newer
 frameworks like Spark reuse existing JVMs, but task launch overhead is still on
 the order of a few milliseconds~\cite{sparrow}.
 
-We believe that average task launch overhead can be reduced $100 \mu$s making it
+We believe that average task launch overhead can be reduced $100 \mu$s, making it
 an insignificant portion of the execution time. Much of the existing task launch
 overhead stems from shipping the task over the network and this can be
 eliminated by caching tasks. Task launch latency can then be reduced to one
@@ -82,7 +84,7 @@ tiny tasks.
 
 \subsection{Programming model}
 \label{sec:prog}
-Splitting jobs into tiny tasks is relatively straight forward for data parallel
+Splitting jobs into tiny tasks is relatively straightforward for data parallel
 programs as programming frameworks can sub-divide the input to many more tasks.
 However some computations could become more expensive as we increase the total
 number of tasks. An example of this would be MapReduce computations where we
@@ -93,7 +95,7 @@ associative and commutative. Extending this, we plan to explore using
 aggregation trees~\cite{something} which can address this problem and ensure
 that tasks remain tiny.
 
-However we could still have computations that are either not associative,
+However we could still have computations that are either not associative and
 commutative or require a large amount of temporary state (e.g. computing
 distinct elements). To handle such computations, we propose providing 
 support for a distributed ``scratch space'' that can be used by tasks to 
