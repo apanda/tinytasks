@@ -42,8 +42,8 @@ Scalability limitations of current centralized distributed file systems and clus
 scheduler limit the size of the cluster for which task lengths can be reduced. Similarly
 current frameworks need to be rearchitected to enable tasks to be broken into even smaller
 units. 
-Recent work on distributed filesystems\cite{nightingale2012flat} and cluster schedulers\cite{sparrow}
-present the first steps towards
+Recent work on distributed filesystems\cite{nightingale2012flat} and cluster
+schedulers\cite{ousterhoutbatch} present the first steps towards
 building a cluster framework that allows for tiny tasks. While these new filesystems
 and scheduler address the scalability problems, many challenges remain. In particular
 efficient use of tiny tasks requires that the overhead for launching a task is small. Current
