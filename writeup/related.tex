@@ -1,10 +1,11 @@
 \section{Related Work}
 
 There has been a large body of work in the context of distributed operating 
-systems~\cite{douglis1991transparent, milojivcic2000process, amoeba-os, chorus} 
-and virtual machines~\cite{xen, something} that have looked at scheduling and
+systems~\cite{douglis1991transparent, milojivcic2000process,tanenbaum1990experiences, 
+rozier1991overview} 
+and virtual machines~\cite{tanenbaum1990experiences} that have looked at scheduling and
 context-switching among processes across different machines. Migration of
-processes or virtual machines typically use premptive methods and we compare
+processes or virtual machines typically use preemptive methods and we compare
 them to our design goals in Section~\ref{sec:alternate}.
 
 Recent work proposed Amoeba~\cite{ananthanarayanan2012true}, a system that
@@ -24,7 +25,7 @@ not require any program analysis to identify such points, and instead relies on
 limiting input sizes to achieve preemption.
 
 Dremel~\cite{melnik2010dremel}, in conjunction with Google's cluster scheduler
-Omega~\cite{wilkes-berkeley}, has also been used to run interactive jobs in a
+Omega~\cite{wilkesberkeley}, has also been used to run interactive jobs in a
 cluster otherwise used for batch processing. Dremel achieves low latency by
 spinning up long-running agents on which queries are executed. This is similar
 to statically partitioning a cluster, where a part of the cluster is reserved
@@ -34,34 +35,3 @@ for interactive jobs be known in advance, so as to ensure that constraints are
 met. Requiring application requirements be known in advance makes static
 partitioning unsuitable to shared clusters with frequently changing workloads.
 
-\eat{\paragraph{Process Migration} Include operating systems work on process
-migration, as well as Ganesh's Amoeba paper. This work is most similar to
-our approach. With tiny tasks, we are effectively architecting for pre-emption,
-without needing to worry about moving large amounts of contexts between a
-stopped and re-started job.
-
-\paragraph{Skew Mitigation} Large body of over-engineered work on skew-
-mitigation; most solutions fix only part of the problem and are highly
-complex
-
-\paragraph{Running Batch Workloads Alongside Interactive Workloads}
-Google touts the fact that Omega/Borg schedule for both batch and interactive
-workloads, but what they do is effecitively static partitioning (interactive
-services have some portion of the cluster that they re-use to execute requests,
-rather than scheduling a new job for each user request)! E.g., 
-Dremel has a statically allocated part of the cluster.}
-
-\eat{
-The benefits of preemption and short task length are well studied in operating
-systems, for instance~\cite{sherman1972trace} shows that operating system
-schedulers should ideally be preemptive, and should prevent jobs from capturing
-the CPU for too long a time. This is unfortunately harder to achieve in the
-cluster computing context, since resource allocation includes much more than the
-CPU, and revoking allocated resources might require moving the task. Previous
-work has also looked into process
-migration~\cite{douglis1991transparent,milojivcic2000process}, where processes
-are transparently moved between machines. These methods present overheads, as
-process context and state needs to be transfered across the network. For large
-tasks such state can be of significant size, and such transfer would put a
-significant load on the data center network. 
-}
