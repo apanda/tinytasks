@@ -7,12 +7,12 @@ inconvenient: large, indivisible units of work limit utilization and load balanc
 and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a 
 few milliseconds.  This paper argues for
-applying a similar modely to data centers by breaking jobs into
+applying a similar model to data centers by breaking jobs into
 several ``tiny tasks'', each of which runs for a few hundred milliseconds.
 
 Decreased task runtimes solve two major problems in today's datacenters:
-\begin{itemize}
-\item \textbf{Sharing a cluster for both batch and interactive workloads}: 
+
+\vspace{4pt}\noindent\textbf{Batch and interactive sharing:}
 Long task runtimes make it challenging to run both batch and interactive
 jobs on the same cluster. In particular, task lengths place a lower bound on
 the time before resources allocated to a running task can be recovered. A new
@@ -26,24 +26,28 @@ a cluster. By reducing task runtimes to an acceptably small value, tiny
 tasks allow batch and interactive jobs share the same resources, without
 trading off request latency.
 
-\item \textbf{Outliers}: Prior work has shown that tasks runtimes exhibit a long
+\vspace{4pt}\noindent\textbf{Straggler mitigation:}
+Prior work has shown that tasks runtimes exhibit a long
 tailed distribution, and are highly variable. This variance can be caused by
-a number of factors, including a single task processing a larger amoung of data
-than others, machines processing data at different reasons, network effects, or
-a combination of such affects. Many mechanisms have been suggested for mitigating
+a number of factors, including slow machines, congested networks, a single task
+processing larger amount of data, or a combination of the above.
+Many mechanisms have been suggested for mitigating
 the effects of this variability, generally either by avoiding causes of these
-long task runtimes, or by launching additional tasks in response to slow tasks.
+long task runtimes, or by speculatively launching additional tasks in response to slow tasks.
 By providing the scheduler with fine grained control over job execution, tiny
 tasks makes such mitigation easier, allowing the scheduler to change the resources
-allocated to a job in response to outliers.
-\end{itemize}
+allocated to a job in response to outliers.\\
 
-Scalability limitations of current centralized distributed file systems and cluster
-scheduler limit the size of the cluster for which task lengths can be reduced. Similarly
-current frameworks need to be rearchitected to enable tasks to be broken into even smaller
+
+Existing data-parallel systems have engineering limitations in their distributed
+file systems and cluster schedulers that prevent low task runtimes. For example, in
+large Hadoop clusters, larger block size is advised to avoid overflowing the name node.
+Hadoop also piggybacks the heart beat messages to send scheduling decisions, which
+results in high scheduling latency
+Current frameworks need to be re-architected to enable tasks to be broken into even smaller
 units. 
-Recent work on distributed filesystems\cite{nightingale2012flat} and cluster schedulers\cite{sparrow}
-present the first steps towards
+Recent work on distributed filesystems\cite{nightingale2012flat} and
+cluster schedulers\cite{sparrow} present the first steps towards
 building a cluster framework that allows for tiny tasks. While these new filesystems
 and scheduler address the scalability problems, many challenges remain. In particular
 efficient use of tiny tasks requires that the overhead for launching a task is small. Current
