@@ -3,7 +3,7 @@ Today's systems accept work in discrete units: networks process flows of data
 between two endpoints, operating systems execute individual applications, and
 data centers process data in individual jobs.  In the context of networks and
 operating systems, system designers have found that large, indivisible units of work are
-inconvenient: large, indivisible units of work limit utilization and load balancing,
+inconvenient: they limit utilization and load balancing,
 and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a 
 few milliseconds.  This paper argues for
@@ -46,8 +46,8 @@ Hadoop also piggybacks the heart beat messages to send scheduling decisions, whi
 results in high scheduling latency
 Current frameworks need to be re-architected to enable tasks to be broken into even smaller
 units. 
-Recent work on distributed filesystems\cite{nightingale2012flat} and
-cluster schedulers\cite{sparrow} present the first steps towards
+Recent work on distributed filesystems\cite{nightingale2012flat} and cluster
+schedulers\cite{ousterhoutbatch} present the first steps towards
 building a cluster framework that allows for tiny tasks. While these new filesystems
 and scheduler address the scalability problems, many challenges remain. In particular
 efficient use of tiny tasks requires that the overhead for launching a task is small. Current
