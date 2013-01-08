@@ -5,7 +5,7 @@ data centers process data in individual jobs.  In the context of networks and
 operating systems, system designers have found that large, indivisible units of work are
 inconvenient: they limit utilization and load balancing,
 and complicate fair sharing.  Instead, networks divide large flows into small
-packets, and operating systems run applications in pre-emptable units of a 
+packets, and operating systems run applications in pre-emptable units of a
 few milliseconds.  This paper argues for
 applying a similar model to data centers by breaking jobs into
 several ``tiny tasks'', each of which runs for a few hundred milliseconds.
@@ -16,7 +16,7 @@ Decreased task runtimes solve two major problems in today's datacenters:
 Long task runtimes make it challenging to run both batch and interactive
 jobs on the same cluster. In particular, task lengths place a lower bound on
 the time before resources allocated to a running task can be recovered. A new
-task therefore must wait for running tasks to finish, before they can start running.
+task therefore must wait for running tasks to finish before it can start running.
 This waiting time is a significant contributor to task latency, and thus adversly
 affects the request latency for interactive jobs.
 
@@ -40,29 +40,29 @@ allocated to a job in response to outliers.\\
 
 
 Existing data-parallel systems have engineering limitations in their distributed
-file systems and cluster schedulers that prevent low task runtimes. For example, in
-large Hadoop clusters, larger block size is advised to avoid overflowing the name node.
-Hadoop also piggybacks the heart beat messages to send scheduling decisions, which
-results in high scheduling latency
+file systems and cluster schedulers that prevent short task runtimes. For example, in
+large Hadoop clusters, a larger block size is advised to avoid overflowing the name node.
+Hadoop also piggybacks the heartbeat messages to send scheduling decisions, which
+results in high scheduling latency.
 Current frameworks need to be re-architected to enable tasks to be broken into even smaller
-units. 
+units.
 Recent work on distributed filesystems\cite{nightingale2012flat} and cluster
 schedulers\cite{ousterhoutbatch} present the first steps towards
 building a cluster framework that allows for tiny tasks. While these new filesystems
-and scheduler address the scalability problems, many challenges remain. In particular
+and schedulers address the scalability problems, many challenges remain. In particular,
 efficient use of tiny tasks requires that the overhead for launching a task is small. Current
-frameworks take on the order of several of hundred milliseconds to a second to launch a task, negating
+frameworks take on the order of several hundred milliseconds to a second to launch a task, negating
 many of the gains provided by a system with sub-second task lengths. Similarly, any system
 supporting tiny tasks must provide additional architectural support for more easily dividing tasks.
 
 In this paper we present arguments and results motivating a move towards tiny tasks,
-and we present preliminary design for a system supporting tiny tasks, in particular
+and we present preliminary design for a system supporting tiny tasks. In particular,
 we propose a system that supports $100$ microsecond task launches, and an architecture
-that allows most general application to be expressed in terms of a set of tiny tasks.
+that allows most general applications to be expressed in terms of a set of tiny tasks.
 
-\eat{We begin by quantifying the benefits of tiny tasks, using a series of simulations, 
+\eat{We begin by quantifying the benefits of tiny tasks, using a series of simulations,
 and application built on Spark\cite{zaharia2010spark} demonstrating the potential benefits
-of using Spark. In Section~\ref{something} we outline the architecture for our system supporting tiny tasks, and 
+of using Spark. In Section~\ref{something} we outline the architecture for our system supporting tiny tasks, and
 try and determine an appropriate task length based on task launch overheads, and other factors.
 Next in Section~\ref{somethingelse} we discuss how to convert arbitrary jobs to better take advantage of tiny tasks, following
 hich we discuss related work in Section~\ref{something}. Finally we conclude in Section~\ref{conclusion}.}
