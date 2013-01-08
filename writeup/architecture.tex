@@ -31,7 +31,7 @@ supports a wide variety of jobs.
 }
 \subsection{Execution Model}
 We propose an execution model similar to today's cluster frameworks (e.g.,
-MapReduce~\cite{??}, Spark~\cite{??}). Each job is composed of a large number
+MapReduce~\cite{dean2008mapreduce}, Spark~\cite{zaharia2010spark}). Each job is composed of a large number
 of tasks that each represent an indivisible and idempotent unit of
 execution. A task is comprised of a set of named
 inputs and code that operates on these inputs, and each task runs on a single
@@ -40,13 +40,13 @@ machine.
 %model, inputs for a task are small, usually $8$MB or smaller, and tasks execute in
 %around $100$ ms. 
 % Kay: isn't the following true with MR today?
-%Our execution model also requires that the framework, rather than the
-%task be responsible for fetching inputs from disk, and writing outputs to disk, or transmitting
-%them over the network. This allows the framework to prefetch inputs for tasks, and
-%to optimize whether outputs are written to disk or kept in memory. We envision using
-%a cooperative scheduling model, i.e., tasks must explicitly hand back resources (by finishing)
-%before these resources are reassigned. Task runtimes are limited by limiting input size.
-%Section~\ref{sec:alternate} compares our design to other alternates.
+\panda{Our execution model also requires that the framework, rather than the
+task be responsible for fetching inputs from disk, and writing outputs to disk, or transmitting
+them over the network. This allows the framework to prefetch inputs for tasks, and
+to optimize whether outputs are written to disk or kept in memory. We envision using
+a cooperative scheduling model, i.e., tasks must explicitly hand back resources (by finishing)
+before these resources are reassigned. Task runtimes are limited by limiting input size.
+Section~\ref{sec:alternate} compares our design to other alternates.}
 
 \subsection{Low-latency scheduling}
 Supporting tiny tasks requires a low-latency, high throughput cluster scheduler.
