@@ -6,7 +6,7 @@ recent improvements in distributed file systems and scheduling have eliminated
 these scaling bottlenecks. This paper argues for a move to \emph{tiny tasks}
 that complete in hundreds of milliseconds. Tiny tasks avoid the need for
 complex skew mitigation techniques: by breaking a large job into millions
-of tiny-tasks, work will automatically be evenly spread over avaialable
+of tiny-tasks, work will automatically be evenly spread over available
 resources by the scheduler. Furthermore, tiny tasks alleviate the long wait
 times for interactive, user-facing jobs seen in today's clusters, since even
 tasks for batch jobs complete quickly. Thus, tiny tasks allow for increased
