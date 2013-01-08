@@ -24,10 +24,10 @@ set datafile separator ","
 set output "straggler.pdf"
 set style fill noborder pattern 3
 f(x) = m*x + b
-set xrange [50:10000]
+set xrange [40:10000]
 set yrange [0:140]
 set key top right
-set xtics (50, 100, 250, 500, 1000, 2500, 5000, 10000)
+set xtics (10,50, 100, 250, 500, 1000, 2500, 5000, 10000)
 #fit f(x) "sorted-log" using 5:6 via m, b
 #plot "sorted-log" using 5:6 w points lc -1 lt 1 pt 8  title "Time vs Loss", \
 #     f(x) w lines lc 9 lt 1 title "Fit line"
