@@ -77,13 +77,12 @@ and spill onto a disk, which is a well-known cause of poor MapReduce
 performance~\cite{toddlipconthing}. Tiny tasks fundamentally change the
 resource footprint of tasks: since tasks run for a shorter period of time,
 they generate less output data and thus use less memory. The framework can
-expicitly control the remaining memory, choosing to cache the most important
+explicitly control the remaining memory, choosing to cache the most important
 and most frequently-accessed output data, and store the remaining data on disk
 or on a different machine. Data written to disk can be written in the
 background, while more tasks for the job are run, alleviating the performance
-problems from stalling a task to overflow in-memory data to disk.
-
-Pipelining shifts control of I/O entirely to the framework, allowing for
+problems caused by stalled tasks  while memory is spilled to disk.
+Shifting control of I/O entirely to the framework, also allows for
 powerful optimizations.  For a MapReduce-style job, for instance, the
 framework could store the map outputs that will be used for the first set of
 tiny reduce tasks in memory, and store the remaining outputs on disk. While
