@@ -1,4 +1,25 @@
 \section{Architecting for Tiny Tasks}
+% Argue that we need a new architecture
+While tiny tasks are a useful design principle in existing frameworks, fully
+supporting tiny tasks requires a new framework optimized for scalability and
+low task launch overheads. Figure~\ref{??} demonstrated that new frameworks
+like Spark have low enough task launch overheads to benefit from using much
+smaller tasks than are typically used today. However, tasks that read data
+from a distributed file system have a minimum duration due to the large size
+of today's distributed file system blocks: HDFS, for example, has a default
+block size of 64MB. At today's disk speeds, a task that reads a 64MB block
+from disk and does any minimum amount of computation cannot finish in hundreds of
+milliseconds. Scalability limitations of HDFS prevent smaller block sizes;
+in fact, the Facebook HDFS deployment uses 1GB blocks for scalability reasons.
+This section proposes leveraging recent research on distributed file systems
+to build a file system for tiny tasks. Supporting tiny tasks also requires a
+highly scalable scheduler. We argue for a scheduler that can handle hundreds of
+thousands of scheduling decisions per second, and schedule tasks with fewer
+than $100\mu$s of overhead. Finally, we argue for using a pipelined task
+execution model that ensures low task runtimes and full utilization of CPU
+and I/O resources.
+
+\eat{
 % TODO(josh): maybe the bit about "different kinds" can be made clearer?
 Designing a cluster framework for tiny-tasks requires addressing multiple
 architectural challenges. We argue for a scheduler that can handle hundreds of
@@ -7,7 +28,7 @@ fewer than $100 \mu$s of overhead.  Supporting tiny tasks also requires a
 scalable filesystem that can handle on-disk data blocks of $8$MB or less.
 Finally, a framework for tiny tasks must provide a programming model that
 supports a wide variety of jobs.
-
+}
 \subsection{Execution Model}
 We propose an execution model similar to today's cluster frameworks (e.g.,
 MapReduce~\cite{??}, Spark~\cite{??}). Each job is composed of a large number
@@ -81,19 +102,37 @@ explicitly control the remaining memory, choosing to cache the most important
 and most frequently-accessed output data, and store the remaining data on disk
 or on a different machine. Data written to disk can be written in the
 background, while more tasks for the job are run, alleviating the performance
-problems caused by stalled tasks  while memory is spilled to disk.
-Shifting control of I/O entirely to the framework, also allows for
+problems caused by spilling data to disk during task execution.
+Shifting control of I/O entirely to the framework also allows for
 powerful optimizations.  For a MapReduce-style job, for instance, the
 framework could store the map outputs that will be used for the first set of
 tiny reduce tasks in memory, and store the remaining outputs on disk. While
 the first set of tiny reduce tasks are running, the framework can pipeline
 reading data for the next set of tasks.  Giving frameworks better control over
-I/O has previously been shown~\cite{chowdhury2011managing, cohwdhury2012coflow}
-to greatly improve network utilization and performance in clusters.
+I/O has been shown
+to greatly improve network utilization and performance in
+clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 
 \subsection{Scalable Storage Systems}
 To allow tasks to complete quickly, we propose operating on data blocks of
-at most $8$MB. Even with pipelining, we
+at most $8$MB. Previous work has shown that $8$MB random disk reads achieve
+approximately $88$\% the bandwidth of sequential reads, and that smaller random
+reads see significant performance degredation due to disk
+seeks~\cite{nightingale2012flat}. Thus, consistent with that work, we consider
+$8$MB to be the smallest reasonable file system block size. Assuming disk
+throughput of approximately $100$MB/s, an $8$MB disk block can be read in under
+$100$ms, so is consistent with task runtimes of hundreds of milliseconds,
+particularly when combined with pipelined execution.
+
+Using small data blocks requires a move away from traditional file systems like
+HDFS, which cannot handle the amount of metadata needed to store a large
+number of small blocks.  Recent work on distributed filesystems, e.g., Flat
+Data Center Storage (FDS)~\cite{nightingale2012flat}, addresses HDFS scalability
+concerns by distributing metadata across multiple servers. While FDS can form
+the basis of a filesystem for tiny tasks, fully integrating FDS with a scalable
+scheduler and pilelining requires some modification.
+
+\eat{Even with pipelining, we
 expect a task's inputs to be readable within the runtime of a single task. Current disks exhibit
 throughputs of approximately $100$MB/s, and thus a single tasks inputs can be no more than $10$MB.
 Based
@@ -104,29 +143,64 @@ distributed filesystems like FDS address these concerns by distributing metadata
 servers. While FDS provides the first steps towards a filesystem for tiny tasks, we envision
 one would need to make changes to more fully integrate this system with the scheduler, and
 the pipelining component.
-
+}
 \subsection{Programming model}
 \label{sec:prog}
-While splitting most tasks in a dataparallel framework by reducing input size 
-is relatively straight forward, splitting certain tasks might incur a higher overhead 
-than the corresponding improvements. For instance, consider an all-to-all shuffle, involves
-communication across $O(N^2)$ pairs of senders and receivers. The increased communication cost
-for such tasks might not be offset by the additional degree of parallelism. Aggregation trees are
+Most tasks in a data parallel framework can be split into tiny tasks by
+reducing the input size; however, some types of tasks cannot easily be
+parallelized.
+%While splitting most tasks in a dataparallel framework by reducing input size 
+%is straight forward, splitting certain tasks might incur a higher overhead 
+%than the corresponding improvements.
+For instance, consider an all-to-all shuffle, which involves
+communication across $O(N^2)$ pairs of senders and receivers.
+Using 100x more senders and receivers will increase communication by $10^4$;
+the cost of increased communication may not be offset by benefits from
+using tiny tasks.
+Data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation
+trees to solve similar problems by progressively combining outputs from
+mutliple tasks. Levering aggregation trees will allow a tiny tasks framework
+to reduce task lengths for a wider variety of tasks.
+\eat{
+Aggregation trees are
 commonly used in data parallel frameworks like Dryad~\cite{yu2008dryadlinq} to solve similar
 problems by progressively combining outputs from multiple tasks. We plan on using such trees,
 and extensions to these techniques to provide tools that can allow frameworks to reduce task
 lengths for arbitrary tasks.
+}
 
+Even with the use of aggregation trees, some tasks may remain difficult to
+divide into tiny tasks. For example, tasks that are not associative and
+commutative do not lend themselves to the use of aggregation trees.
+To allow splitting of these tasks, we propose providing a framework-maintained
+temporary state store that can be used to communicate and share data between a
+job's tiny tasks. Such a store could be used to implement a job that computes
+distinct values in a file, for instance, by storing hashes of all values
+seen so far. We emvosopm that this store would provide a key-value interface,
+and would provide strong consistency guarantees.
+
+\eat{
 There might however still remain tasks, which are either not associative and commutative, or
 require temporary state, which might not be easily divided up. We propose providing a 
 framework maintained temporary store that can be used by tasks to communicate, and reuse data
 across invocations. Such a store could for instance be used to implement a task computing distinct
 values for a file. We envision that such a store would provide an interface similar to key-value
 stores, and would provide strong consistency guarantees.
+}
 
-Finally there are those tasks which cannot be split despite these tools. To accommodate these 
-tasks we plan on allowing some large tasks to run on the cluster. To provide the guarantees offered
+Inevitably, some tasks will be impratical to split, despite these tools.
+To accommodate these 
+tasks, we plan on allowing some large tasks to run on the cluster. These tasks
+may need to run on a small part of the cluster reserved for large tasks.
+Alternately, we expect that if a small percentage of tasks remain large, they
+can be run on the same infrastructure as tiny tasks without impacting the
+performance of remaining tasks. Exploring the effects of such sharing is
+the subject of ongoing research.
+
+\eat{
+To provide the guarantees offered
 by tiny tasks, such tasks would be required to run on a small part of the cluster reserved for large
 tasks. Larger reservations allow such tasks to finish quicker, while potentially reducing cluster 
 utilization. We envision providing the cluster administrator with controls to change the precise mixture.
 Exploring the effects of such sharing, and the tradeoff space offered by such control is subject of ongoing research.
+}

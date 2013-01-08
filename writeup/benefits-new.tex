@@ -19,10 +19,11 @@ Prior studies~\cite{ananthanarayanan2010reining,zaharia2008improving} have noted
 task lengths in data parallel workloads are highly variable and that outlier
 tasks negatively impact job completion time.
 Outliers occur for one of two reasons. 
-First, outliers may be caused by poorly performing resources; e.g.,
+First, outliers may be caused by poorly performing resources that cause the
+task to take longer than if it had been run on a different machine; e.g.,
 malfunctioning disks, contended CPUs, swapping memory, or congested networks.
 Second, work may have been unevenly
-divided across tasks due to
+divided across tasks, either due to
 partitioning skew, where data was unevenly allocated to tasks, or due to
 computational skew, where some data is more expensive to process.
 
@@ -100,7 +101,7 @@ improves response time by \fixme{20x} compared to using the same number
 of tasks as machines in the cluster, because the slow machines will be
 assigned approximately $\frac{1}{21}$ as many tasks. At some point, due to
 task launch overheads, using more tasks increases response time; we discuss
-how to avoid this problem in \S\ref{??}.
+how to avoid this problem with a new cluster framework in \S\ref{??}.
 
 \begin{figure*}[!t]
 \centering
@@ -127,13 +128,13 @@ jobs, allowing the grey job to complete more quickly.}
 \subsection{Response Time}
 Today, sharing a cluster between interactive and batch jobs involves trading off
 responsiveness and utilization. If a cluster is highly utilized,
-an interactive job may need to wait wait for long-running batch tasks to
+an interactive job may need to wait for long-running batch tasks to
 complete before it can be serviced; reserving slots for
 interactive slots avoids this problem but results in lower utilization.
 Using tiny tasks for all jobs avoids this tradeoff: the cluster can run at
 high utilization, while
 simultaneously guaranteeing that interactive jobs will only need to wait for
-a short time before being serviced. Figure~\ref{??} depicts a simple example
+a short time before being serviced. Figure~\ref{fig:slot_diagram} depicts a simple example
 with only two jobs, and demonstrates that with tiny tasks, a newly arriving
 job can quickly gain its fair share of resources, even in the presence
 of large, batch jobs.

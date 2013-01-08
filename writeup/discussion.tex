@@ -1,12 +1,25 @@
-\section{Discussion}
+\section{Alternate Designs and Related Work}
 
-\subsection{Alternate Design Schemes}
+Tiny tasks solve two major problems in data centers: outliers, and sharing
+a cluster between batch and interactive or user-facing jobs. A variety of
+approaches solve one of the two problems in isolation; e.g., skew handling
+techniques mitigate outliers, and process migration allows improved
+sharing between long and short jobs.  Unlike these approaches, tiny tasks
+provides a simple design paradigm that solves both problems.
+
+\subsection{Preemption and Process Migration}
+%\subsection{Alternate Design Schemes}
 \label{sec:alternate}
+
 Our choice of a cooperative multi-tasking scheme is in contrast to
 preemption based schemes commonly used in operating systems. The benefits of 
 preemption and short quanta are well studied in operating
 systems literature; for instance~\cite{sherman1972trace} shows the benefits
-of short scheduling quanta. We however find that preemptive mechanisms are
+of short scheduling quanta. A large body of work in distributed 
+operating systems~\cite{douglis1991transparent,milojivcic2000process,rozier1991overview} and virtual machines~\cite{tanenbaum1990experiences}
+has applied preemption in a distributed context by exploring migrating
+processes between machines.
+We find that preemptive mechanisms are
 ill-suited to data parallel jobs running on a cluster as discussed below.\\
 %However achieveing low overhead task-switching is more expensive in the distributed setting. 
 \textbf{Cost of task-switching}: Work on process
@@ -29,16 +42,38 @@ and fault recovery cannot be executed in parallel. \\
 
 \textbf{Enforcing tiny tasks:} Preemption allows a framework to finely control
 task lengths. However controlling task inputs, and minor modifications to the 
-framework should allow us to effectively control task lengths.\\
+framework will ensure that all tasks are short.
 
-\subsection{Skew-Handling in Clusters}
+Recent work proposed Amoeba~\cite{ananthanarayanan2012true}, a system that identifies safe points in MapReduce-style
+jobs where a task can be migrated. At safe points, a task can checkpoint its
+output and a new task is spawned to process remaining inputs. The Amoeba authors
+choose preemtability rather than small tasks because they note that creating
+\emph{uniformly} sized small tasks is difficult. We emphasize that tasks need
+not be unfiformly sized to see the benefits of tiny tasks; task lengths
+should generally be sub-second, but may span 2-3 orders of magnitude.
+Furthermore, while Amoeba allows better sharing of batch and interactive
+workloads, it does not mitigate skew or outliers.
+
+\subsection{Static Partitioning}
+Omega, Google's newest cluster scheduler~\cite{melnik2010dremel},
+was designed to share cluster
+resources between batch and interactive workloads. However, Omega achieves
+this by
+statically partitioning cluster resources.  
+Interactive services like Dremel~\cite{melnik2010dremel} spin up long-running
+agents that serve incoming queries, rather than scheduling new resources for
+each request.  Static partitioning limits utilization because each service
+must be provisioned to handle peak load, and one service's extra capacity
+cannot easily be reallocated to another service.
+
+\subsection{Skew-Handling}
 A separate line of research has focused on skew-mitigation to improve job
 performance in datacenters. Examples of such work include
 Mantri~\cite{ananthanarayanan2010reining}, SkewTune~\cite{kwon2012skewtune},
-Scarlett~\cite{ananthanarayanan2011scarlett}, and the work on task
-speculation~\cite{zaharia2008improving}. Mantri, and Scarlett, attempt to
-mitigate task runtime skew by modeling the causes for skew, and accounting for
-these. In particular Mantri performs resource aware scheduling to decrease the
+Scarlett~\cite{ananthanarayanan2011scarlett}, and work on task
+speculation~\cite{zaharia2008improving}. Mantri and Scarlett attempt to
+mitigate task runtime skew by modeling the causes for skew and accounting for
+these causes when scheduling tasks. In particular Mantri performs resource aware scheduling to decrease the
 probability of observing task skews, while Scarlett replicates storage blocks
 based on their probability to decrease the wait time for a popular block. While
 both of these systems moderately reduce task skew, they rely on a fragile set of
