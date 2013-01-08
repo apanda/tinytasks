@@ -8,7 +8,7 @@ when new jobs are submitted.}
 
 Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
 available to the scheduler: tiny tasks occupy resources for a very small
-duration, so resources are allocated at a very fine granularity. This 
+duration, so resources are allocated at a very fine granularity. This
 allows resources to be dynamically reallocated between jobs, allowing greater
 cluster utilization without sacrificing request latency, and to be dynamically
 reallocated between tasks within a job, eliminating problems caused
@@ -18,7 +18,7 @@ by straggling tasks and data skew.
 Prior studies~\cite{ananthanarayanan2010reining,zaharia2008improving} have noted that
 task lengths in data parallel workloads are highly variable and that outlier
 tasks negatively impact job completion time.
-Outliers occur for one of two reasons. 
+Outliers occur for one of two reasons.
 First, outliers may be caused by poorly performing resources that cause the
 task to take longer than if it had been run on a different machine; e.g.,
 malfunctioning disks, contended CPUs, swapping memory, or congested networks.
@@ -69,7 +69,7 @@ machines.
 \hspace{2ex}
 \includegraphics[width=0.5\textwidth]{figures/binpacked1-sep}
 \vspace{-4ex}
-\caption{Improvement from perfectly balancing the total machine time for the 
+\caption{Improvement from perfectly balancing the total machine time for the
 job across tasks.}
 \vspace{-2ex}
 \label{fig:binpacked}

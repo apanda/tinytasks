@@ -38,7 +38,7 @@ inputs and code that operates on these inputs, and each task runs on a single
 machine.
 %In our
 %model, inputs for a task are small, usually $8$MB or smaller, and tasks execute in
-%around $100$ ms. 
+%around $100$ ms.
 % Kay: isn't the following true with MR today?
 \panda{Our execution model also requires that the framework, rather than the
 task be responsible for fetching inputs from disk, and writing outputs to disk, or transmitting
@@ -64,7 +64,7 @@ Our proposed system relies on the use of such distributed schedulers.
 %on the use such distributed schedulers, and extensions supporting fairness guarantees, utilization
 %guarantees, and other such properties. To reduce additional task latency due to data movement, our
 %proposed scheduler will also support task constraints, and it has already been demonstrated that
-%these constraints can be enforced by techniques like batch sampling. 
+%these constraints can be enforced by techniques like batch sampling.
 
 In addition to providing high throughput scheduling decisions, a framework for
 tiny tasks must also reduce the overhead
@@ -117,7 +117,7 @@ clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 To allow tasks to complete quickly, we propose operating on data blocks of
 at most $8$MB. Previous work has shown that $8$MB random disk reads achieve
 approximately $88$\% the bandwidth of sequential reads, and that smaller random
-reads see significant performance degredation due to disk
+reads see significant performance degradation due to disk
 seeks~\cite{nightingale2012flat}. Thus, consistent with that work, we consider
 $8$MB to be the smallest reasonable file system block size. Assuming disk
 throughput of approximately $100$MB/s, an $8$MB disk block can be read in under
@@ -130,7 +130,7 @@ number of small blocks.  Recent work on distributed filesystems, e.g., Flat
 Data Center Storage (FDS)~\cite{nightingale2012flat}, addresses HDFS scalability
 concerns by distributing metadata across multiple servers. While FDS can form
 the basis of a filesystem for tiny tasks, fully integrating FDS with a scalable
-scheduler and pilelining requires some modification.
+scheduler and pipelining requires some modification.
 
 \eat{Even with pipelining, we
 expect a task's inputs to be readable within the runtime of a single task. Current disks exhibit
@@ -149,8 +149,8 @@ the pipelining component.
 Most tasks in a data parallel framework can be split into tiny tasks by
 reducing the input size; however, some types of tasks cannot easily be
 parallelized.
-%While splitting most tasks in a dataparallel framework by reducing input size 
-%is straight forward, splitting certain tasks might incur a higher overhead 
+%While splitting most tasks in a dataparallel framework by reducing input size
+%is straight forward, splitting certain tasks might incur a higher overhead
 %than the corresponding improvements.
 For instance, consider an all-to-all shuffle, which involves
 communication across $O(N^2)$ pairs of senders and receivers.
@@ -176,20 +176,20 @@ To allow splitting of these tasks, we propose providing a framework-maintained
 temporary state store that can be used to communicate and share data between a
 job's tiny tasks. Such a store could be used to implement a job that computes
 distinct values in a file, for instance, by storing hashes of all values
-seen so far. We emvosopm that this store would provide a key-value interface,
+seen so far. We envision that this store would provide a key-value interface,
 and would provide strong consistency guarantees.
 
 \eat{
 There might however still remain tasks, which are either not associative and commutative, or
-require temporary state, which might not be easily divided up. We propose providing a 
+require temporary state, which might not be easily divided up. We propose providing a
 framework maintained temporary store that can be used by tasks to communicate, and reuse data
 across invocations. Such a store could for instance be used to implement a task computing distinct
 values for a file. We envision that such a store would provide an interface similar to key-value
 stores, and would provide strong consistency guarantees.
 }
 
-Inevitably, some tasks will be impratical to split, despite these tools.
-To accommodate these 
+Inevitably, some tasks will be impractical to split, despite these tools.
+To accommodate these
 tasks, we plan on allowing some large tasks to run on the cluster. These tasks
 may need to run on a small part of the cluster reserved for large tasks.
 Alternately, we expect that if a small percentage of tasks remain large, they
@@ -200,7 +200,7 @@ the subject of ongoing research.
 \eat{
 To provide the guarantees offered
 by tiny tasks, such tasks would be required to run on a small part of the cluster reserved for large
-tasks. Larger reservations allow such tasks to finish quicker, while potentially reducing cluster 
+tasks. Larger reservations allow such tasks to finish quicker, while potentially reducing cluster
 utilization. We envision providing the cluster administrator with controls to change the precise mixture.
 Exploring the effects of such sharing, and the tradeoff space offered by such control is subject of ongoing research.
 }
