@@ -1,10 +1,29 @@
 \begin{abstract}
-In data-parallel computing frameworks, certain engineering limitations such as scalability
-of the name node and scheduling dictates that users should use tasks with long task runtimes.
-However, long-running tasks result in
+In current data-parallel
+computing frameworks, engineering limitations such as scalability of the
+name node and scheduler prevent users from running short tasks. However,
+recent improvements in distributed file systems and scheduling have eliminated
+these scaling bottlenecks. This paper argues for a move to \emph{tiny tasks}
+that complete in hundreds of milliseconds. Tiny tasks avoid the need for
+complex skew mitigation techniques: by breaking a large job into millions
+of tiny-tasks, work will automatically be evenly spread over avaialable
+resources by the scheduler. Furthermore, tiny tasks alleviate the long wait
+times for interactive, user-facing jobs seen in today's clusters, since even
+tasks for batch jobs complete quickly. Thus, tiny tasks allow for increased
+utilization without sacrificing responsiveness or fairness. We demonstrate
+that smaller tasks can improve response times by a factor of \fixme{5},
+and discuss challenges of building a system that supports tiny tasks.
+\end{abstract}
+\eat{
+
+\begin{abstract}
+In data-parallel computing frameworks, engineering limitations (e.g., scalability
+of the name node and scheduler) dictate that users should use tasks with long
+task runtimes.
+However, long tasks result in
 long wait-times for interactive, user-facing jobs in mixed use clusters.
 Furthermore, despite the use of elaborate skew mitigation
-techniques, system designers continue to struggle with more evenly distributing
+techniques, system designers continue to struggle with evenly distributing
 the work required for a job across tasks.
 Recent improvements in distributed file systems and scheduling have eliminated
 many of the reasons why long task runtimes have been historically preferred.
@@ -19,3 +38,4 @@ We quantify these simulations, and show that smaller tasks can improve
 response time by a factor of \fixme{5}. We also discuss some challenges
 faced in building a system using tiny tasks.
 \end{abstract}
+}

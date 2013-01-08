@@ -6,37 +6,70 @@ resources become available, eliminating stragglers and issues of data skew,
 and allowing jobs to use available resources without sacrificing fairness
 when new jobs are submitted.}
 
-Tiny tasks benefit datacenter workload by increasing the amount of elasticity
-available to the scheduler, as resources are occupied for a very small duration,
-resources can be allocated to fine grained tasks at a very fine granularity. This 
-allows resources to be dynamically reallocated to jobs, eliminating problems caused
-by straggling tasks, data skew, and allowing greater cluster utilization without
-sacrificing request latency.
+Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
+available to the scheduler: tiny tasks occupy resources for a very small
+duration, so resources are allocated at a very fine granularity. This 
+allows resources to be dynamically reallocated between jobs, allowing greater
+cluster utilization without sacrificing request latency, and to be dynamically
+reallocated between tasks within a job, eliminating problems caused
+by straggling tasks and data skew.
 
 \subsection{Handling of skew and stragglers}
 Prior studies~\cite{ananthanarayanan2010reining,zaharia2008improving} have noted that
-task lengths in dataparallel workloads are highly variable, and the negative impact outlier
-tasks have on job completion time. Outliers occur for a variety of reasons, including an
-uneven division of work across tasks (data skew), the state of a machine, network congestion
-and others. 
+task lengths in data parallel workloads are highly variable and that outlier
+tasks negatively impact job completion time.
+Outliers occur for one of two reasons. 
+First, outliers may be caused by poorly performing resources; e.g.,
+malfunctioning disks, contended CPUs, swapping memory, or congested networks.
+Second, work may have been unevenly
+divided across tasks due to
+partitioning skew, where data was unevenly allocated to tasks, or due to
+computational skew, where some data is more expensive to process.
 
-Tiny tasks help mitigate the effect of outliers in two ways: firstly splitting total work
-across a larger set of tasks more evenly partitions records across tasks, reducing data skew;
+Tiny tasks transform both the slow resources and the data skew problem
+into a scheduling problem.  Rather than needing to predict which resources
+are slow or statically partition data across tasks, a job is divided into
+thosuands or millions of sub-second tiny tasks, and each task is scheduled
+as resources become available.  In this manner, work is automatically
+distributed evenly over available resources, without requiring complex skew
+mitigation techniques: if a machine runs a computationally expensive task, it
+will simply be assigned fewer total tasks.  Similarly, slow resources will
+automatically be assigned less work, wihtout needing to predict which
+resources are slow or which part of the network is congested.
+
+\eat{
+Tiny tasks help mitigate the effect of outliers in two ways. First, splitting
+total work across a larger set of tasks more evenly partitions records across tasks, reducing data skew;
 secondly, individual tasks can be moved in response to slow machines, network congestions, or
 other cluster conditions, and run on other, faster machines.
+}
 
-To quantify these benefits, we start by simulating the effects of even load balancing. We obtained
-a trace from a cluster at Facebook, and simulated these effects by evenly spreading total task time
-for a job across all the slots that were originally assigned to the job. Our results are shown in
-Figure~\ref{fig:binpacked}, where it can be seen that about $30\%$ of small jobs, and $60\%$ of 
-large tasks benefit from more evenly spreading the load. 
+To quantify these benefits, we used a Facebook trace to determine how much
+job response time would improve if work were perfectly partitioned across
+machines. For each job, we divided the total runtime for all tasks in the
+job by the average number of slots used, and compare this ``binpacked''
+completion time to the job's original completion time.
+Figure~\ref{fig:binpacked}
+demonstrates that jobs with 100 or more tasks benefit substantially from
+balancing work more evenly across tasks: at the median, large jobs see
+a \fixme{2.1}x reduction in response time from evenly spreading load
+across tasks, and
+jobs at the 95th percentile see a \fixme{5x} reduction in response time.
+This experiment provides a conservative upper bound for two reasons. First, jobs
+may have been using fewer than their fair share of slots in the original trace,
+simply because there were not enough tasks to occupy more slots; in this case,
+tiny tasks will further improve performance by increasing parallelism. Second,
+if a task is running on a slow machine, it will take less total time when
+broken into tiny tasks, because some of the tiny tasks will be run on faster
+machines.
 
-\begin{figure}[!ht]
+\begin{figure}[!t]
 \centering
 \hspace{2ex}
 \includegraphics[width=0.5\textwidth]{figures/binpacked1-sep}
 \vspace{-4ex}
-\caption{Ideal improvement from binpacking tasks.}
+\caption{Improvement from perfectly balancing the total machine time for the 
+job across tasks.}
 \vspace{-2ex}
 \label{fig:binpacked}
 \end{figure}
@@ -44,34 +77,63 @@ large tasks benefit from more evenly spreading the load.
 \eat{Figure~\ref{fig:sparkskew} demonstrates the improvement offered by tiny tasks on a Spark MapReduce job with data skew and machines that exhibited a random 5x performance variance.
 With tiny tasks, Spark is able to mitigate both skew and stragglers without explicit knowledge of machines' speeds or records' processing costs.}
 
-We next analyzed the straggler mitigation benefits offered by tiny tasks. Our analysis was based on running
-Spark jobs on $50$ m1.medium EC2 machines, explicitly introducing data skew, and introducing random delays
-so that task times varied by over 5x. We vary the number of tasks launched (and therefore the data that
-needs to be processed per task) and show (Figure~\ref{fig:sparkskew}) both improvements in job time,
-and reduction in task variance, without providing the scheduler with any additional information.
 
-\begin{figure}[!ht]
+\begin{figure}[!t]
 \centering
 \hspace{2ex}
 \includegraphics[width=0.5\textwidth]{figures/spark-skew-results}
 \vspace{-4ex}
-\caption{Improvement from using tiny tasks in the presence of skew and heterogeneous machines. Error bars depict standard deviation.}
+\caption{Improvement from using tiny tasks in a cluster where 20\% of machines
+take 21x longer to run each task. Error bars depict standard deviation.}
 \vspace{-2ex}
 \label{fig:sparkskew}
 \end{figure}
 
 
 
-\subsection{Response Time}
-Sharing a cluster between interactive and batch jobs requires that one to make a
-tradeoff between responsiveness and utilization. If a cluster is highly utilized
-an interactive request must wait for running tasks to complete before it can be
-serviced, while reserving slots for interactive jobs results in lower utilization. Tiny
-tasks allow one to pick a point between these two extremes. Since tasks run for a much
-shorter duration, batch jobs can use a larger percentage of the cluster, increasing
-utilization, while simultaneously guaranteeing that interactive jobs must wait for 
-a reasonably short time before being serviced.
+To demonstrate that using tiny tasks automatically avoids slow machines,
+we modified some machines in a cluster to run more slowly, and then
+ran a Spark job using different numbers of tasks. We used $50$ m1.medium EC2
+instances, 10 of which were modified to take 21x longer to run each task.
+Figure~\ref{fig:sparkskew} demonstrates that using a larger number of tasks
+improves response time by \fixme{20x} compared to using the same number
+of tasks as machines in the cluster, because the slow machines will be
+assigned approximately $\frac{1}{21}$ as many tasks. At some point, due to
+task launch overheads, using more tasks increases response time; we discuss
+how to avoid this problem in \S\ref{??}.
 
-In Figure~\ref{fig:kay} we show these gains in responsiveness using a simulation. Our
-simulation measures the time a job must wait before the first of its tasks starts running
-at varying utilization values.
+\begin{figure*}[!t]
+\centering
+\subfigure[Today's tasks] {
+    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_before}
+    \label{fig:slot_diagram_original}
+}
+\subfigure[Tiny tasks] {
+    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_after}
+    \label{fig:slot_diagram_tiny}
+}
+\caption{Two jobs running in a cluster with four slots. With today's tasks,
+tasks for the grey job need to wait for long-running tasks from the black job to
+complete before they are launched, shown in (a).
+On the other hand, with tiny tasks (shown in (b)), resource
+allocation is fine-grained, so resources will quickly be allocated to new
+jobs, allowing the grey job to complete more quickly.}
+\vspace{-2ex}
+\label{fig:slot_diagram}
+\end{figure*}
+
+
+
+\subsection{Response Time}
+Today, sharing a cluster between interactive and batch jobs involves trading off
+responsiveness and utilization. If a cluster is highly utilized,
+an interactive job may need to wait wait for long-running batch tasks to
+complete before it can be serviced; reserving slots for
+interactive slots avoids this problem but results in lower utilization.
+Using tiny tasks for all jobs avoids this tradeoff: the cluster can run at
+high utilization, while
+simultaneously guaranteeing that interactive jobs will only need to wait for
+a short time before being serviced. Figure~\ref{??} depicts a simple example
+with only two jobs, and demonstrates that with tiny tasks, a newly arriving
+job can quickly gain its fair share of resources, even in the presence
+of large, batch jobs.
