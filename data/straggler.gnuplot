@@ -24,15 +24,16 @@ set datafile separator ","
 set output "straggler.pdf"
 set style fill noborder pattern 3
 f(x) = m*x + b
-set xrange [50:6400]
-set yrange [0:120]
+set xrange [50:10000]
+set yrange [0:140]
 set key top right
 #fit f(x) "sorted-log" using 5:6 via m, b
 #plot "sorted-log" using 5:6 w points lc -1 lt 1 pt 8  title "Time vs Loss", \
 #     f(x) w lines lc 9 lt 1 title "Fit line"
 #set log x
 # processed_stragglers.csv
-plot "procstragglers" using 1:2 w linespoints pt 1 lc -1 lt 1 lw 2 title "Time per Task"
-#plot "procstragglers" using 1:2:3 w yerrorbars pt -1 lc -1 lt 2 lw 2 title "",\
-#  "procstragglers" using 1:2 w lines pt 1 lc -1 lt 1 lw 2 title "Straggler"
+set log x
+#plot "procstragglers" using 1:2 w linespoints pt 1 lc -1 lt 1 lw 2 title "Time per Task"
+plot "procstragglers" using 1:2:3 w yerrorbars lc -1 lt -1 lw 1 title "",\
+  "procstragglers" using 1:2 w linespoints pt 12 lc -1 lt 0 lw 2 title "Time per Task"
 #plot "procstragglers" using 1:3:2 w yerrorbars lc -1
