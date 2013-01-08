@@ -377,8 +377,8 @@
 			<integer>28</integer>
 			<key>Points</key>
 			<array>
-				<string>{149.88221874638882, 28.999999999999975}</string>
-				<string>{152.06035903896759, 296.24000000000024}</string>
+				<string>{134.88221874638882, 28.999999999999975}</string>
+				<string>{137.06035903896759, 296.24000000000024}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -1063,7 +1063,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-01-08 20:32:01 +0000</string>
+	<string>2013-01-08 23:20:02 +0000</string>
 	<key>Modifier</key>
 	<string>Aurojit Panda</string>
 	<key>NotesVisible</key>
@@ -1144,7 +1144,7 @@
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{3360, -106}, {698, 872}}</string>
+		<string>{{229, 131}, {698, 872}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
