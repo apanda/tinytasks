@@ -12,15 +12,17 @@ provides a simple design paradigm that solves both problems.
 %\subsection{Alternate Design Schemes}
 
 Our choice of a cooperative multi-tasking scheme is in contrast to
-preemption based schemes commonly used in operating systems. The benefits of
-preemption and short quanta are well studied in operating
+preemption based schemes commonly used in operating systems. 
+The benefits of
+preemption are well studied in operating
 systems literature; for instance~\cite{sherman1972trace} shows the benefits
-of short scheduling quanta. A large body of work in distributed
+of short scheduling quanta. Work in distributed
 operating systems~\cite{douglis1991transparent,milojivcic2000process,rozier1991overview} and virtual machines~\cite{tanenbaum1990experiences}
 has applied preemption in a distributed context by exploring migrating
 processes between machines.
-We find that preemptive mechanisms are
-ill-suited to data parallel jobs running on a cluster as discussed below.
+Compared to tiny tasks, one advance of preemption is that scheduling quanta
+can be tightly controlled, since the framework (or operating system) controls
+when the task is preempted. However, preemption has other disadvantages:
 
 %However achieveing low overhead task-switching is more expensive in the distributed setting.
 \vspace{4pt}\noindent\textbf{Cost of task-switching:}
@@ -32,9 +34,9 @@ migrating a task involves transferring both task context, a task's intermediate
 data, and its inputs. For data parallel applications, input data, and intermediate
 data can be several gigabytes, incurring very high overheads.
 
-Cooperative multitasking, by contrast, eliminates the need to migrate such data. In
-addition, we envision moving shared state into a framework-maintained scratch space.
-By explicitly differentiating such state, we envision that it can be more easily migrated.
+%Cooperative multitasking, by contrast, eliminates the need to migrate such data. In
+%addition, we envision moving shared state into a framework-maintained scratch space.
+%By explicitly differentiating such state, we envision that it can be more easily migrated.
 
 \vspace{4pt}\noindent\textbf{Fault tolerance:}
 In a data center setting, tiny tasks are better suited for
@@ -43,20 +45,20 @@ deterministic unit of work, tasks can be executed in parallel during recovery.
 In contrast, using preemption one would need to maintain redundant checkpoints
 and fault recovery cannot be executed in parallel.
 
-\vspace{4pt}\noindent\textbf{Enforcing tiny tasks:}
-Preemption allows a framework to finely control
-task lengths. However controlling task inputs, and minor modifications to the
-framework will ensure that all tasks are short.
-
-Recent work proposed Amoeba~\cite{ananthanarayanan2012true}, a system that identifies safe points in MapReduce-style
-jobs where a task can be migrated. At safe points, a task can checkpoint its
-output and a new task is spawned to process remaining inputs. The Amoeba authors
-choose preemtability rather than small tasks because they note that creating
-\emph{uniformly} sized small tasks is difficult. We emphasize that tasks need
-not be uniformly sized to see the benefits of tiny tasks; task lengths
-should generally be sub-second, but may span 2-3 orders of magnitude.
-Furthermore, while Amoeba allows better sharing of batch and interactive
-workloads, it does not mitigate skew or outliers.
+In spite of these challenges, recent work proposed Amoeba, a system that
+uses preemption
+in the context of MapReduce-like cluster computing frameworks~\cite{anathanarayanan2012true}. Amoeba
+identifies safe-points where a task can be paused and restarted elsewhere
+without wasted work. The main drawback of Amoeba is that it does not provide a mechanism for determining
+such safe-points, which is difficult for general tasks (even tasks that
+use the MapReduce programming model).
+The Amoeba authors choose preemptability rather than small tasks for two
+reasons. First, they cite high task launch overheads in systems like
+Hadoop; as described in~\S\ref{??}, these overheads are not fundamental and
+can be solved with improved engineering. Second, they note that creating
+\emph{uniformly} sized small tasks is difficult. Tasks need not be uniformly
+sized for the benefits of tiny tasks to hold; rather, tasks must be
+orders of magnitude smaller than today's tasks.
 
 \subsection{Static Partitioning}
 Omega, Google's newest cluster scheduler~\cite{melnik2010dremel},
@@ -81,11 +83,12 @@ these causes when scheduling tasks. In particular, Mantri performs resource awar
 probability of observing task skews, while Scarlett replicates storage blocks
 based on their probability to decrease the wait time for a popular block. While
 both of these systems moderately reduce task skew, they rely on a fragile set of
-signals, and do not work in all cases. Using tiny tasks naturally overcomes data
-skew among reduce tasks as fine-grained hash partitioning ensures that the data is
-more evenly spread across tasks. As shown in
-Section~\ref{sec:benefits}, using tiny tasks also allows work to be balanced across
-different machines thereby overcoming skew due to slow machines.
+signals, and do not work in all cases.
+%Using tiny tasks naturally overcomes data
+%skew among reduce tasks as fine-grained hash partitioning ensures that the data is
+%more evenly spread across tasks. As shown in
+%Section~\ref{sec:benefits}, using tiny tasks also allows work to be balanced across
+%different machines thereby overcoming skew due to slow machines.
 Furthermore, existing skew mitigation techniques trade-off cluster resources to
 gain more predictable task runtimes. This limits the applicability of these
 techniques under situations of high load, where such guarantees might be most
