@@ -1,18 +1,29 @@
 \section{Introduction}
-Today's systems accept work in discrete units: networks process flows of data
+Computer systems schedule and manage a variety of tasks:
+%Today's systems accept work in discrete units:
+networks process flows of data
 between two endpoints, operating systems execute individual applications, and
 data centers process data in individual jobs.  In the context of networks and
-operating systems, system designers have found that large, indivisible units of work are
-inconvenient: they limit utilization and load balancing,
+operating systems, system designers have found that large, indivisible units of work limit utilization and load balancing,
 and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a
 few milliseconds.  This paper argues for
 applying a similar model to data centers by breaking jobs into
-several ``tiny tasks'', each of which runs for a few hundred milliseconds.
+a large number of ``tiny tasks'', each of which runs for a few hundred
+milliseconds.
 
-Decreased task runtimes solve two major problems in today's datacenters:
+Tiny tasks solve two major problems in today's datacenters:
+%Decreased task runtimes solve two major problems in today's datacenters:
 
 \vspace{4pt}\noindent\textbf{Batch and interactive sharing:}
+Current clusters are forced to tradeoff utilization and responsiveness:
+if a cluster is highly utilized and a high priority job arrives, the
+high priority job may
+need to wait for long-running tasks to complete before it can be launched.
+Tiny tasks allow a cluster to be \emph{both} highly utilized and highly
+responsive, since small tasks ensure frequent opportunities for new,
+higher priority jobs to be launched.
+\eat{
 Long task runtimes make it challenging to run both batch and interactive
 jobs on the same cluster. In particular, task lengths place a lower bound on
 the time before resources allocated to a running task can be recovered. A new
@@ -25,8 +36,19 @@ cluster utilization and responsiveness, limiting the benefits of sharing
 a cluster. By reducing task runtimes to an acceptably small value, tiny
 tasks allow batch and interactive jobs share the same resources, without
 trading off request latency.
+}
 
 \vspace{4pt}\noindent\textbf{Straggler mitigation:}
+Prior work has shown that job runtimes are largely determined by
+stragglers: tasks that take much longer to complete than other tasks in the
+job. This problem has led to a wide variety of techniques to ensure that
+work is evenly balanced across tasks, and to speculatively launch
+redundant tasks when a task appears to be running on a slow machine.
+Tiny tasks eliminate the straggler problem because work is allocated to
+machines at fine granularity, so work will automatically be evenly spread
+over available resources, and slower machines will automatically be assigned
+less work.
+\eat{
 Prior work has shown that tasks runtimes exhibit a long
 tailed distribution, and are highly variable. This variance can be caused by
 a number of factors, including slow machines, congested networks, a single task
@@ -37,7 +59,7 @@ long task runtimes, or by speculatively launching additional tasks in response t
 By providing the scheduler with fine grained control over job execution, tiny
 tasks makes such mitigation easier, allowing the scheduler to change the resources
 allocated to a job in response to outliers.\\
-
+}
 
 Existing data-parallel systems have engineering limitations in their distributed
 file systems and cluster schedulers that prevent short task runtimes. For example, in
