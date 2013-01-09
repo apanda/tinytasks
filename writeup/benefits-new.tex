@@ -1,5 +1,6 @@
 \section{Benefits of Tiny Tasks}
 \label{sec:benefits}
+
 \eat{Tiny tasks benefit data center workloads by providing inherent elasticity:
 fine-grained units of work can be dynamically allocated to machines as
 resources become available, eliminating stragglers and issues of data skew,
@@ -44,6 +45,27 @@ total work across a larger set of tasks more evenly partitions records across ta
 secondly, individual tasks can be moved in response to slow machines, network congestions, or
 other cluster conditions, and run on other, faster machines.
 }
+\begin{figure*}[!ht]
+\centering
+\subfigure[] {
+    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_before}
+    \label{fig:slot_diagram_original}
+}
+\hspace{0.5in}
+\subfigure[] {
+    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_after}
+    \label{fig:slot_diagram_tiny}
+}
+
+\caption{Two jobs running in a cluster with four slots. With today's tasks,
+tasks for the grey job need to wait for long-running tasks from the black job to
+complete before they are launched, shown in (a).
+On the other hand, with tiny tasks (shown in (b)), resource
+allocation is fine-grained, so resources will quickly be allocated to new
+jobs, allowing the grey job to complete more quickly.}
+\vspace{-2ex}
+\label{fig:slot_diagram}
+\end{figure*}
 
 To quantify these benefits, we used a Facebook trace to determine how much
 job response time would improve if work were perfectly partitioned across
@@ -64,33 +86,9 @@ if a task is running on a slow machine, it will take less total time when
 broken into tiny tasks, because some of the tiny tasks will be run on faster
 machines.
 
-\begin{figure}[!t]
-\centering
-\hspace{2ex}
-\includegraphics[width=0.5\textwidth]{figures/binpacked1-sep}
-\vspace{-4ex}
-\caption{Improvement from perfectly balancing the total machine time for the
-job across tasks.}
-\vspace{-2ex}
-\label{fig:binpacked}
-\end{figure}
 
 \eat{Figure~\ref{fig:sparkskew} demonstrates the improvement offered by tiny tasks on a Spark MapReduce job with data skew and machines that exhibited a random 5x performance variance.
 With tiny tasks, Spark is able to mitigate both skew and stragglers without explicit knowledge of machines' speeds or records' processing costs.}
-
-
-\begin{figure}[!t]
-\centering
-\hspace{2ex}
-\includegraphics[width=0.5\textwidth]{figures/spark-skew-results}
-\vspace{-4ex}
-\caption{Improvement from using tiny tasks in a cluster where 20\% of machines
-take 21x longer to run each task. Error bars depict standard deviation.}
-\vspace{-2ex}
-\label{fig:sparkskew}
-\end{figure}
-
-
 
 To demonstrate that using tiny tasks automatically avoids slow machines,
 we modified some machines in a cluster to run more slowly, and then
@@ -102,26 +100,6 @@ of tasks as machines in the cluster, because the slow machines will be
 assigned approximately $\frac{1}{21}$ as many tasks. At some point, due to
 task launch overheads, using more tasks increases response time; we discuss
 how to avoid this problem with a new cluster framework in \S\ref{sec:prog}.
-
-\begin{figure*}[!t]
-\centering
-\subfigure[] {
-    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_before}
-    \label{fig:slot_diagram_original}
-}
-\subfigure[] {
-    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_after}
-    \label{fig:slot_diagram_tiny}
-}
-\caption{Two jobs running in a cluster with four slots. With today's tasks,
-tasks for the grey job need to wait for long-running tasks from the black job to
-complete before they are launched, shown in (a).
-On the other hand, with tiny tasks (shown in (b)), resource
-allocation is fine-grained, so resources will quickly be allocated to new
-jobs, allowing the grey job to complete more quickly.}
-\vspace{-2ex}
-\label{fig:slot_diagram}
-\end{figure*}
 
 
 

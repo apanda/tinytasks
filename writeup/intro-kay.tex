@@ -55,6 +55,24 @@ frameworks take on the order of several hundred milliseconds to a second to laun
 many of the gains provided by a system with sub-second task lengths. Similarly, any system
 supporting tiny tasks must provide additional architectural support for more easily dividing tasks.
 
+\begin{figure*}[!ht]
+\centering
+\subfigure[] {\includegraphics[width=0.45\textwidth]{figures/binpacked1-sep}
+\vspace{-1.5in}
+\label{fig:binpacked}
+}
+\hspace{0.2in}
+\subfigure[] {
+\includegraphics[width=0.45\textwidth]{figures/spark-skew-results}
+\vspace{-1.5in}
+\label{fig:sparkskew}
+}
+\caption{\subref{fig:binpacked} Improvement from perfectly balancing the total machine time for the
+job across tasks. \subref{fig:sparkskew} Improvement from using tiny tasks in a cluster where 20\% of machines
+take 21x longer to run each task. Error bars depict standard deviation.}
+\vspace{-0.1in}
+\end{figure*}
+
 In this paper we present arguments and results motivating a move towards tiny tasks,
 and we present preliminary design for a system supporting tiny tasks. In particular,
 we propose a system that supports $100$ microsecond task launches, and an architecture
