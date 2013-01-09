@@ -1,106 +1,57 @@
 \section{Architecting for Tiny Tasks}
+\label{sec:architecture}
 % Argue that we need a new architecture
-As demonstrated in Figure~\ref{fig:sparkskew}, while existing frameworks like Spark
-benefit from using smaller tasks, we believe there is need for a new task
-execution framework to support tiny tasks across all the jobs in a datacenter.
+While existing frameworks like Spark benefit from the use of smaller tasks, Figure~\ref{fig:sparkskew}
+shows the need for a new task execution framework to truly support tiny tasks across a wide
+variety of jobs.
 Supporting tiny tasks requires a highly scalable scheduler that can handle hundreds 
-of thousands of scheduling decisions per second, and we argue that task launch overheads 
-need to be reduced by two orders of magnitude to around $100\mu$s. To
-efficiently utilize CPU and I/O resources with low task runtimes, we argue for
+of thousands of scheduling decisions per seconds. We also argue that efficiently using
+tiny tasks requires task launch overheads be reduced by two orders of magnitude to around $100\mu$s.
+Efficiently utilizing CPU and I/O resources with low task runtimes, requires
 a pipelined task execution model where the execution framework manages I/O
-requests for input, output and intermediate data. Finally, we discuss the
-challenges in converting all jobs to use tiny tasks and propose changes to
-enable this.
+requests for input, output and intermediate data. In this section
+we discuss these components and other changes required to allow all jobs to use
+tiny tasks, and discuss challenges associated with converting certain jobs.
 
-\eat{While smaller tasks are useful in existing frameworks, fully supporting tiny
-tasks across the datacente has many challenges. }
-
-\eat{However, tasks that read data
-from a distributed file system have a minimum duration due to the large size
-of today's distributed file system blocks: HDFS, for example, has a default
-block size of 64MB. At today's disk speeds, a task that reads a 64MB block
-from disk and does any minimum amount of computation cannot finish in hundreds of
-milliseconds. Scalability limitations of HDFS prevent smaller block sizes;
-in fact, the Facebook HDFS deployment uses 1GB blocks for scalability reasons.
-This section proposes leveraging recent research on distributed file systems
-to build a file system for tiny tasks. }
-
-\eat{Supporting tiny tasks also requires a
-highly scalable scheduler. We argue for a scheduler that can handle hundreds of
-thousands of scheduling decisions per second, and schedule tasks with fewer
-than $100\mu$s of overhead. execution model that ensures low task runtimes and 
-full utilization of CPU and I/O resources.}
-
-
-\eat{
-% TODO(josh): maybe the bit about "different kinds" can be made clearer?
-Designing a cluster framework for tiny-tasks requires addressing multiple
-architectural challenges. We argue for a scheduler that can handle hundreds of
-thousands of scheduling decisions per second, and schedule tasks with
-fewer than $100 \mu$s of overhead.  Supporting tiny tasks also requires a
-scalable filesystem that can handle on-disk data blocks of $8$MB or less.
-Finally, a framework for tiny tasks must provide a programming model that
-supports a wide variety of jobs.
-}
 \subsection{Architecture Overview}
-We propose a tiny task execution model that can support computations expressed using 
-commonly used programming frameworks (e.g., MapReduce~\cite{dean2008mapreduce},
+We propose a tiny task execution model that supports computations expressed using 
+a variety of popular programming frameworks (e.g., MapReduce~\cite{dean2008mapreduce},
 Spark~\cite{zaharia2010spark}, DryadLINQ~\cite{yu2008dryadlinq}). 
-Each job is composed of a large number of tasks that each represent an indivisible
-and idempotent unit of execution. A task is comprised of a set of named inputs
-and code that operates on these inputs, and each task runs on a single machine.
-Each input is restricted to around 8MB. The task execution framework
-pre-fetches the inputs before running a task and is responsible for saving
+A job is composed of a number of tasks, each representing an indivisible
+and idempotent unit of execution. A task consists of a set of named inputs
+and code that operates on these inputs, and runs on a single machine.
+A tasks inputs are restricted to around 8MB. The task execution framework
+pre-fetches inputs before running a task and is responsible for saving
 outputs to disk or transferring them over the network.  We use a cooperative 
 scheduling model, i.e., resources are reassigned after tasks explicitly release 
 them on finishing. Task runtimes are limited by limiting input size and
 appropriate modifications to programming frameworks. Section~\ref{sec:alternate} 
 compares our design to other alternatives.
 
-%In our
-%model, inputs for a task are small, usually $8$MB or smaller, and tasks execute in
-%around $100$ ms.
-% Kay: isn't the following true with MR today?
-\eat{
-\panda{Our execution model also requires that the framework, rather than the
-task be responsible for fetching inputs from disk, and writing outputs to disk, or transmitting
-them over the network. This allows the framework to prefetch inputs for tasks, and
-to optimize whether outputs are written to disk or kept in memory. 
-
-We envision using
-a cooperative scheduling model, i.e., tasks must explicitly hand back resources (by finishing)
-before these resources are reassigned. Task runtimes are limited by limiting input size.
-Section~\ref{sec:alternate} compares our design to other alternates.}
-}
-
 \subsection{Low-latency scheduling}
 Supporting tiny tasks requires a low-latency, high throughput cluster scheduler.
-In a cluster with a $10,000$ slots (e.g., 1250 8-core machines),
-supporting $100$ms tasks implies that the scheduler must make $10^5$ scheduling
-decisions per second, on average.
-While today's centralized schedulers have well-known scalability
+For instance, supporting $100$ms tasks in a cluster with $10,000$ cores
+(e.g., 1250 8-core machines),
+requires a scheduler that can, on average, make $10^5$ scheduling
+decisions per second.
+Today's centralized schedulers have well-known scalability
 limits~\cite{wilkesberkeley} that
-would prevent them from supporting tiny tasks in a large cluster,
-recently proposed distributed scheduling techniques like batch
-sampling~\cite{ousterhoutbatch} provide a near-optimal and far more scalable
-alterative to centralized techniques.
+hinder their ability to support tiny tasks in a large cluster/
+Recently proposed distributed scheduling techniques including batch
+sampling~\cite{ousterhoutbatch} provide a scalable alternative, and provide
+near-optimal scheduling.
 Our proposed system relies on the use of such distributed schedulers.
-%near optimal scheduling, while also exhibiting better scalability. Our proposed system relies
-%on the use such distributed schedulers, and extensions supporting fairness guarantees, utilization
-%guarantees, and other such properties. To reduce additional task latency due to data movement, our
-%proposed scheduler will also support task constraints, and it has already been demonstrated that
-%these constraints can be enforced by techniques like batch sampling.
 
 In addition to providing high throughput scheduling decisions, a framework for
 tiny tasks must also reduce the overhead
-for launching individual tasks. Existing frameworks like Hadoop MapReduce
-have task launch overheads of many seconds, because they launch a new Java
-Virtual Machine (JVM) for each task. Newer frameworks, e.g., Spark, reduce task
-launch overhead to tens of milliseconds by instead running tasks in an
-existing JVM.  In order to support sub-second tasks while also ensuring that
+for launching individual tasks. Popular frameworks like Hadoop MapReduce
+have task launch overheads of many seconds, while newer frameworks like Spark,
+reduce task launch overhead to tens of milliseconds. The time required to 
+ship binaries across the network is the dominant cause of this overhead.
+In order to support sub-second tasks while also ensuring that
 task launch overhead is not a significant fraction of task runtime, we propose a system
-that provides task launch overheads of $100 \mu$s. While significantly
-lower than overheads provided in current systems, we believe that this low
+that caches binaries, and provides task launch overheads of $100 \mu$s. While significantly
+lower than current overheads, we believe that this low
 overhead is attainable in a well-engineered system:
 studies of network round
 trip times in datacenters have demonstrated that round trip times of 10$\mu$s
@@ -110,10 +61,9 @@ reusing a running thread requires less than $1\mu$s
 \subsection{Pipelined Execution}
 \label{sec:pipeline}
 To optimize for short tasks, we propose pipelining the phases of task execution.
-Current task execution generally consists of three phases: the fetch phase where
-inputs are fetched from disk or over the network; the compute phase where task's
-code is executed; and the output phase where the task outputs are stored either
-in memory or on disk.  We propose pipelining these phases such that one task's
+Current task execution involves a task fetching data from the disk, or over the network,
+processing this data, and storing the output either on memory or on disk. We observe
+that these three steps are independent phases. We propose pipelining these phases such that one task's
 input is fetched while another task is running, thus more fully utilizing both
 the CPU and the I/O bus.
 
@@ -142,49 +92,23 @@ clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 \subsection{Scalable Storage Systems}
 To allow tasks to complete quickly, we propose operating on data blocks of
 at most $8$MB. Previous work has shown that $8$MB random disk reads achieve
-approximately $88$\% the bandwidth of sequential reads, and that smaller random
-reads see significant performance degradation due to disk
-seeks~\cite{nightingale2012flat}. Thus, consistent with that work, we consider
-$8$MB to be the smallest reasonable file system block size.
+approximately $88$\% of the bandwidth of sequential reads, and that smaller random
+reads cause significant performance degradation due to disk
+seeks~\cite{nightingale2012flat}. 
 
 Using small data blocks requires a move away from traditional file systems like
-HDFS, which cannot handle the amount of metadata needed to store a large number
-of small blocks.  Recent work on distributed filesystems, e.g., Flat Data Center
-Storage (FDS)~\cite{nightingale2012flat}, addresses HDFS scalability concerns by
-distributing metadata across multiple servers. We believe that while FDS can
-form the basis of a storage system that is suitable for tiny tasks, we require
-an integrated approach where the storage system closely interacts with the
-execution framework about where and how data blocks are stored. In particular,
-we believe that the problems of scheduling for locality, pipelining data access,
-caching recently used blocks and transferring blocks over the network are all
-closely related and a wholistic approach to reasoning about them together will
-be required to optimize utilization and response time. We propose building a 
-globally aware but distributed component in our scheduler to address this
-problem.
+HDFS, where scalability limitations prevent the use of small blocks.
+Recent work on distributed filesystems, e.g., Flat Data Center
+Storage (FDS)~\cite{nightingale2012flat}, address HDFS scalability concerns by
+distributing metadata across multiple servers. While FDS addresses the scalability
+concerns, effective use of tiny tasks requires close coordination between the file
+system, the scheduler and the caching layer.
+In particular, locality based scheduling, pipelined data access, caching blocks in 
+memory, and effective coordination of network traffic are closely linked, and 
+must be considered holistically. We propose building a globally aware, distributed
+component which accounts for these factors, and provides additional information to
+both the scheduler, and the filesystem.
 
-
-\eat{While FDS can form
-the basis of a filesystem for tiny tasks, fully integrating FDS with a scalable
-scheduler and pipelining requires some modification.}
-
-
-\eat{Assuming disk
-throughput of approximately $100$MB/s, an $8$MB disk block can be read in under
-$100$ms, so is consistent with task runtimes of hundreds of milliseconds,
-particularly when combined with pipelined execution.}
-
-\eat{Even with pipelining, we
-expect a task's inputs to be readable within the runtime of a single task. Current disks exhibit
-throughputs of approximately $100$MB/s, and thus a single tasks inputs can be no more than $10$MB.
-Based
-on these calculations, and results from FDS~\cite{nightingale2012flat} we require using data blocks
-that are no more than $8$MB. Reducing blocks to this size negatively impacts the performance for
-existing distributed filesystems like HDFS which use a centralized metadata server. Recent work on
-distributed filesystems like FDS address these concerns by distributing metadata cross multiple
-servers. While FDS provides the first steps towards a filesystem for tiny tasks, we envision
-one would need to make changes to more fully integrate this system with the scheduler, and
-the pipelining component.
-}
 \subsection{Programming model}
 \label{sec:prog}
 Most tasks in a data parallel framework can be split into tiny tasks by
@@ -200,34 +124,18 @@ the cost of increased communication may not be offset by benefits from
 using tiny tasks.
 Data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation
 trees to solve similar problems by progressively combining outputs from
-mutliple tasks. Levering aggregation trees will allow a tiny tasks framework
+multiple tasks. Leveraging aggregation trees will allow a tiny tasks framework
 to reduce task lengths for a wider variety of tasks.
-\eat{
-Aggregation trees are
-commonly used in data parallel frameworks like Dryad~\cite{yu2008dryadlinq} to solve similar
-problems by progressively combining outputs from multiple tasks. We plan on using such trees,
-and extensions to these techniques to provide tools that can allow frameworks to reduce task
-lengths for arbitrary tasks.
-}
 
-Even with the use of aggregation trees, some tasks may remain difficult to
+Despite the use of aggregation trees, some tasks may remain difficult to
 divide into tiny tasks. For example, tasks that are not associative and
 commutative do not lend themselves to the use of aggregation trees.
-To allow splitting of these tasks, we propose providing a framework-maintained
+To allow splitting these tasks, we propose providing a framework-maintained
 temporary state store that can be used to communicate and share data between a
 job's tiny tasks. Such a store could be used to implement a job that computes
 distinct values in a file, for instance, by storing hashes of all values
 seen so far. We envision that this store would provide a key-value interface,
 and would provide strong consistency guarantees.
-
-\eat{
-There might however still remain tasks, which are either not associative and commutative, or
-require temporary state, which might not be easily divided up. We propose providing a
-framework maintained temporary store that can be used by tasks to communicate, and reuse data
-across invocations. Such a store could for instance be used to implement a task computing distinct
-values for a file. We envision that such a store would provide an interface similar to key-value
-stores, and would provide strong consistency guarantees.
-}
 
 Inevitably, some tasks will be impractical to split, despite these tools.
 To accommodate these
@@ -237,11 +145,3 @@ Alternately, we expect that if a small percentage of tasks remain large, they
 can be run on the same infrastructure as tiny tasks without impacting the
 performance of remaining tasks. Exploring the effects of such sharing is
 the subject of ongoing research.
-
-\eat{
-To provide the guarantees offered
-by tiny tasks, such tasks would be required to run on a small part of the cluster reserved for large
-tasks. Larger reservations allow such tasks to finish quicker, while potentially reducing cluster
-utilization. We envision providing the cluster administrator with controls to change the precise mixture.
-Exploring the effects of such sharing, and the tradeoff space offered by such control is subject of ongoing research.
-}
