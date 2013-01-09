@@ -1,5 +1,5 @@
 \section{Introduction}
-Computer systems schedule and manage a variety of tasks:
+Computer systems schedule and manage a variety of types of work:
 %Today's systems accept work in discrete units:
 networks process flows of data
 between two endpoints, operating systems execute individual applications, and
@@ -8,9 +8,10 @@ operating systems, system designers have found that large, indivisible units of 
 and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a
 few milliseconds.  This paper argues for
-applying a similar model to data centers by breaking jobs into
-a large number of ``tiny tasks,'' each of which runs for a few hundred
-milliseconds.
+applying a similar model to data centers by breaking all jobs into
+``tiny tasks,'' each of which runs for a few hundred
+milliseconds. We argue that even batch jobs that take hours to complete
+should be broken into tiny units of work that each complete quickly.
 
 Tiny tasks solve two major problems in current data-parallel frameworks:
 %Decreased task runtimes solve two major problems in today's datacenters:
