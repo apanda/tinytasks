@@ -47,14 +47,14 @@ and fault recovery cannot be executed in parallel.
 
 In spite of these challenges, recent work proposed Amoeba, a system that
 uses preemption
-in the context of MapReduce-like cluster computing frameworks~\cite{anathanarayanan2012true}. Amoeba
+in the context of MapReduce-like cluster computing frameworks~\cite{ananthanarayanan2012true}. Amoeba
 identifies safe-points where a task can be paused and restarted elsewhere
 without wasted work. The main drawback of Amoeba is that it does not provide a mechanism for determining
 such safe-points, which is difficult for general tasks (even tasks that
 use the MapReduce programming model).
 The Amoeba authors choose preemptability rather than small tasks for two
 reasons. First, they cite high task launch overheads in systems like
-Hadoop; as described in~\S\ref{??}, these overheads are not fundamental and
+Hadoop; as described in~\S\ref{sec:prog}, these overheads are not fundamental and
 can be solved with improved engineering. Second, they note that creating
 \emph{uniformly} sized small tasks is difficult. Tasks need not be uniformly
 sized for the benefits of tiny tasks to hold; rather, tasks must be

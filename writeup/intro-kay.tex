@@ -12,14 +12,13 @@ applying a similar model to data centers by breaking jobs into
 a large number of ``tiny tasks,'' each of which runs for a few hundred
 milliseconds.
 
-Tiny tasks solve two major problems in today's datacenters:
+Tiny tasks solve two major problems in current data-parallel frameworks:
 %Decreased task runtimes solve two major problems in today's datacenters:
 
 \vspace{4pt}\noindent\textbf{Batch and interactive sharing:}
 Current clusters are forced to tradeoff utilization and responsiveness:
-if a cluster is highly utilized and a high priority job arrives, the
-high priority job may
-need to wait for long-running tasks to complete before it can be launched.
+a high priority job in a highly utilized cluster might
+need to wait for long-running tasks to complete before being run.
 Tiny tasks allow a cluster to be \emph{both} highly utilized and highly
 responsive, since small tasks ensure frequent opportunities for new,
 higher priority jobs to be launched.
@@ -102,32 +101,21 @@ many of the gains provided by a system with sub-second task lengths. Similarly, 
 supporting tiny tasks must provide additional architectural support for more easily dividing tasks.
 }
 \begin{figure*}[!ht]
-\centering
-\subfigure[] {\includegraphics[width=0.45\textwidth]{figures/binpacked1-sep}
-\vspace{-1.5in}
-\label{fig:binpacked}
-}
-\hspace{0.2in}
-\subfigure[] {
-\includegraphics[width=0.45\textwidth]{figures/spark-skew-results}
-\vspace{-1.5in}
-\label{fig:sparkskew}
-}
-\caption{\subref{fig:binpacked} Improvement from perfectly balancing the total machine time for the
-job across tasks. \subref{fig:sparkskew} Improvement from using tiny tasks in a cluster where 20\% of machines
+  \centering
+  \vspace{-0.2in}
+  \begin{minipage}[t]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{figures/binpacked1-sep}
+    \vspace{-4ex}
+    \caption{ Improvement from perfectly balancing the total machine time for the job across tasks. }
+    \label{fig:binpacked}
+  \end{minipage}
+  \hspace{1.2em}
+  \begin{minipage}[t]{0.45\textwidth}
+    \includegraphics[width=\textwidth]{figures/spark-skew-results}
+    \vspace{-4ex}
+    \caption{Improvement from using tiny tasks in a cluster where 20\% of machines
 take 21x longer to run each task. Error bars depict standard deviation.}
-\vspace{-0.1in}
+    \label{fig:tpc-h-qlat}
+  \end{minipage}
+  \hspace{.5em}
 \end{figure*}
-
-\eat{
-In this paper we present arguments and results motivating a move towards tiny tasks,
-and we present preliminary design for a system supporting tiny tasks. In particular,
-we propose a system that supports $100$ microsecond task launches, and an architecture
-that allows most general applications to be expressed in terms of a set of tiny tasks.
-}
-\eat{We begin by quantifying the benefits of tiny tasks, using a series of simulations,
-and application built on Spark\cite{zaharia2010spark} demonstrating the potential benefits
-of using Spark. In Section~\ref{something} we outline the architecture for our system supporting tiny tasks, and
-try and determine an appropriate task length based on task launch overheads, and other factors.
-Next in Section~\ref{somethingelse} we discuss how to convert arbitrary jobs to better take advantage of tiny tasks, following
-hich we discuss related work in Section~\ref{something}. Finally we conclude in Section~\ref{conclusion}.}
