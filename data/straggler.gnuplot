@@ -36,5 +36,5 @@ set xtics (10,50, 100, 250, 500, 1000, 2500, 5000, 10000)
 set log x
 #plot "procstragglers" using 1:2 w linespoints pt 1 lc -1 lt 1 lw 2 title "Time per Task"
 plot "procstragglers" using 1:2:3 w yerrorbars lc -1 lt -1 lw 1 title "",\
-  "procstragglers" using 1:2 w linespoints pt 12 lc -1 lt 0 lw 2 title "Time per Task"
+  "procstragglers" using 1:2 w linespoints pt 12 lc -1 lt 0 lw 2 title "Job Completion Time"
 #plot "procstragglers" using 1:3:2 w yerrorbars lc -1
