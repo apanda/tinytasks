@@ -9,7 +9,7 @@ and complicate fair sharing.  Instead, networks divide large flows into small
 packets, and operating systems run applications in pre-emptable units of a
 few milliseconds.  This paper argues for
 applying a similar model to data centers by breaking jobs into
-a large number of ``tiny tasks'', each of which runs for a few hundred
+a large number of ``tiny tasks,'' each of which runs for a few hundred
 milliseconds.
 
 Tiny tasks solve two major problems in today's datacenters:
@@ -47,7 +47,9 @@ redundant tasks when a task appears to be running on a slow machine.
 Tiny tasks eliminate the straggler problem because work is allocated to
 machines at fine granularity, so work will automatically be evenly spread
 over available resources, and slower machines will automatically be assigned
-less work.
+less work. Preliminary simulations and evaluation using Spark demonstrate
+that by eliminating the straggler problem, tiny tasks can improve response
+times by a factor of \fixme{5}.
 \eat{
 Prior work has shown that tasks runtimes exhibit a long
 tailed distribution, and are highly variable. This variance can be caused by
@@ -61,6 +63,28 @@ tasks makes such mitigation easier, allowing the scheduler to change the resourc
 allocated to a job in response to outliers.\\
 }
 
+
+Using smaller task durations offers performance improvements even in
+today's frameworks.  However, we propose task durations of at most
+hundreds of milliseconds, which cannot be fully supported without addressing
+numerous challenges. First, small tasks require a highly scalable scheduler
+that can make frequent scheduling decisions. Second,
+task launch overheads must be small enough so as not to counteract the
+benefits from using small tasks.
+Third, tiny tasks must operate on correspondingly tiny amounts
+of data, which requires a file system that can handle a large number of tiny
+file blocks. Finally, tiny tasks require modifications to current programming
+models to allow \emph{all} jobs to be split into tiny tasks. We propose a system
+that addresses these challenges using a distributed scheduler, a distributed
+file system, and a pipelined execution model. Our proposed system supports
+100 microsecond task launches, and allows most applications to be
+expressed in terms of a set of tiny tasks.
+
+This paper begins by quantifying the benefits of tiny tasks in~\S\ref{sec:benefits}.
+We present a preliminary system design that addresses the challenges of
+supporting tiny tasks in~\S\ref{sec:architecture},
+and explore design alternatives and related work in~\S\ref{sec:alternate}.
+\eat{
 Existing data-parallel systems have engineering limitations in their distributed
 file systems and cluster schedulers that prevent short task runtimes. For example, in
 large Hadoop clusters, a larger block size is advised to avoid overflowing the name node.
@@ -76,7 +100,7 @@ efficient use of tiny tasks requires that the overhead for launching a task is s
 frameworks take on the order of several hundred milliseconds to a second to launch a task, negating
 many of the gains provided by a system with sub-second task lengths. Similarly, any system
 supporting tiny tasks must provide additional architectural support for more easily dividing tasks.
-
+}
 \begin{figure*}[!ht]
 \centering
 \subfigure[] {\includegraphics[width=0.45\textwidth]{figures/binpacked1-sep}
@@ -95,11 +119,12 @@ take 21x longer to run each task. Error bars depict standard deviation.}
 \vspace{-0.1in}
 \end{figure*}
 
+\eat{
 In this paper we present arguments and results motivating a move towards tiny tasks,
 and we present preliminary design for a system supporting tiny tasks. In particular,
 we propose a system that supports $100$ microsecond task launches, and an architecture
 that allows most general applications to be expressed in terms of a set of tiny tasks.
-
+}
 \eat{We begin by quantifying the benefits of tiny tasks, using a series of simulations,
 and application built on Spark\cite{zaharia2010spark} demonstrating the potential benefits
 of using Spark. In Section~\ref{something} we outline the architecture for our system supporting tiny tasks, and
