@@ -9,7 +9,7 @@ when new jobs are submitted.}
 
 Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
 available to the scheduler: tiny tasks occupy resources for a very small
-duration, so resources are allocated at a very fine granularity. This
+duration, so resources can be allocated at a very fine granularity. This
 allows resources to be dynamically reallocated between jobs, allowing greater
 cluster utilization without sacrificing request latency, and to be dynamically
 reallocated between tasks within a job, eliminating problems caused
@@ -20,7 +20,7 @@ Prior studies~\cite{ananthanarayanan2010reining,zaharia2008improving} have noted
 task lengths in data parallel workloads are highly variable and that outlier
 tasks negatively impact job completion time.
 Outliers occur for one of two reasons.
-First, outliers may be caused by poorly performing resources that cause the
+First, outliers may be caused by poorly performing machines that cause the
 task to take longer than if it had been run on a different machine; e.g.,
 malfunctioning disks, contended CPUs, swapping memory, or congested networks.
 Second, work may have been unevenly
@@ -78,13 +78,14 @@ balancing work more evenly across tasks: at the median, large jobs see
 a \fixme{2.1}x reduction in response time from evenly spreading load
 across tasks, and
 jobs at the 95th percentile see a \fixme{5x} reduction in response time.
-This experiment provides a conservative upper bound for two reasons. First, jobs
+This experiment provides a conservative bound on the speedup for two reasons. First, jobs
 may have been using fewer than their fair share of slots in the original trace,
 simply because there were not enough tasks to occupy more slots; in this case,
 tiny tasks will further improve performance by increasing parallelism. Second,
-if a task is running on a slow machine, it will take less total time when
+if a task is running on a slow machine, it may take less total time when
 broken into tiny tasks, because some of the tiny tasks will be run on faster
-machines.
+machines. However, we note that this simulation ignores any overheads associated with 
+tiny tasks and we measure the effects in our next experiment.
 
 
 \eat{Figure~\ref{fig:sparkskew} demonstrates the improvement offered by tiny tasks on a Spark MapReduce job with data skew and machines that exhibited a random 5x performance variance.
@@ -92,15 +93,16 @@ With tiny tasks, Spark is able to mitigate both skew and stragglers without expl
 
 To demonstrate that using tiny tasks automatically avoids slow machines,
 we modified some machines in a cluster to run more slowly, and then
-ran a Spark job using different numbers of tasks. We used $50$ m1.medium EC2
+ran a Spark~\cite{zaharia2010spark} job using different numbers of tasks. 
+We used $50$ m1.medium EC2
 instances, 10 of which were modified to take 21x longer to run each task.
 Figure~\ref{fig:sparkskew} demonstrates that using a larger number of tasks
-improves response time by \fixme{20x} compared to using the same number
-of tasks as machines in the cluster, because the slow machines will be
-assigned approximately $\frac{1}{21}$ as many tasks. At some point, due to
+improves response time by \fixme{8x} compared to using the same number
+of tasks as machines in the cluster, because the slow machines are
+\eat{assigned approximately $\frac{1}{21}$ as many tasks}assigned fewer tasks
+compared to the other machines. Beyond $2000$ tasks, due to
 task launch overheads, using more tasks increases response time; we discuss
 how to avoid this problem with a new cluster framework in \S\ref{sec:prog}.
-
 
 
 \subsection{Response Time}

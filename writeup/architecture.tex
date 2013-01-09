@@ -1,10 +1,21 @@
 \section{Architecting for Tiny Tasks}
 % Argue that we need a new architecture
-While tiny tasks are a useful design principle in existing frameworks, fully
-supporting tiny tasks requires a new framework optimized for scalability and
-low task launch overheads. Figure~\ref{??} demonstrated that new frameworks
-like Spark have low enough task launch overheads to benefit from using much
-smaller tasks than are typically used today. However, tasks that read data
+As demonstrated in Figure~\ref{fig:sparkskew}, while existing frameworks like Spark
+benefit from using smaller tasks, we believe there is need for a new task
+execution framework to support tiny tasks across all the jobs in a datacenter.
+Supporting tiny tasks requires a highly scalable scheduler that can handle hundreds 
+of thousands of scheduling decisions per second, and we argue that task launch overheads 
+need to be reduced by two orders of magnitude to around $100\mu$s. To
+efficiently utilize CPU and I/O resources with low task runtimes, we argue for
+a pipelined task execution model where the execution framework manages I/O
+requests for input, output and intermediate data. Finally, we discuss the
+challenges in converting all jobs to use tiny tasks and propose changes to
+enable this.
+
+\eat{While smaller tasks are useful in existing frameworks, fully supporting tiny
+tasks across the datacente has many challenges. }
+
+\eat{However, tasks that read data
 from a distributed file system have a minimum duration due to the large size
 of today's distributed file system blocks: HDFS, for example, has a default
 block size of 64MB. At today's disk speeds, a task that reads a 64MB block
@@ -12,12 +23,14 @@ from disk and does any minimum amount of computation cannot finish in hundreds o
 milliseconds. Scalability limitations of HDFS prevent smaller block sizes;
 in fact, the Facebook HDFS deployment uses 1GB blocks for scalability reasons.
 This section proposes leveraging recent research on distributed file systems
-to build a file system for tiny tasks. Supporting tiny tasks also requires a
+to build a file system for tiny tasks. }
+
+\eat{Supporting tiny tasks also requires a
 highly scalable scheduler. We argue for a scheduler that can handle hundreds of
 thousands of scheduling decisions per second, and schedule tasks with fewer
-than $100\mu$s of overhead. Finally, we argue for using a pipelined task
-execution model that ensures low task runtimes and full utilization of CPU
-and I/O resources.
+than $100\mu$s of overhead. execution model that ensures low task runtimes and 
+full utilization of CPU and I/O resources.}
+
 
 \eat{
 % TODO(josh): maybe the bit about "different kinds" can be made clearer?
@@ -29,24 +42,36 @@ scalable filesystem that can handle on-disk data blocks of $8$MB or less.
 Finally, a framework for tiny tasks must provide a programming model that
 supports a wide variety of jobs.
 }
-\subsection{Execution Model}
-We propose an execution model similar to today's cluster frameworks (e.g.,
-MapReduce~\cite{dean2008mapreduce}, Spark~\cite{zaharia2010spark}). Each job is composed of a large number
-of tasks that each represent an indivisible and idempotent unit of
-execution. A task is comprised of a set of named
-inputs and code that operates on these inputs, and each task runs on a single
-machine.
+\subsection{Architecture Overview}
+We propose a tiny task execution model that can support computations expressed using 
+commonly used programming frameworks (e.g., MapReduce~\cite{dean2008mapreduce},
+Spark~\cite{zaharia2010spark}, DryadLINQ~\cite{yu2008dryadlinq}). 
+Each job is composed of a large number of tasks that each represent an indivisible
+and idempotent unit of execution. A task is comprised of a set of named inputs
+and code that operates on these inputs, and each task runs on a single machine.
+Each input is restricted to around 8MB. The task execution framework
+pre-fetches the inputs before running a task and is responsible for saving
+outputs to disk or transferring them over the network.  We use a cooperative 
+scheduling model, i.e., resources are reassigned after tasks explicitly release 
+them on finishing. Task runtimes are limited by limiting input size and
+appropriate modifications to programming frameworks. Section~\ref{sec:alternate} 
+compares our design to other alternatives.
+
 %In our
 %model, inputs for a task are small, usually $8$MB or smaller, and tasks execute in
 %around $100$ ms.
 % Kay: isn't the following true with MR today?
+\eat{
 \panda{Our execution model also requires that the framework, rather than the
 task be responsible for fetching inputs from disk, and writing outputs to disk, or transmitting
 them over the network. This allows the framework to prefetch inputs for tasks, and
-to optimize whether outputs are written to disk or kept in memory. We envision using
+to optimize whether outputs are written to disk or kept in memory. 
+
+We envision using
 a cooperative scheduling model, i.e., tasks must explicitly hand back resources (by finishing)
 before these resources are reassigned. Task runtimes are limited by limiting input size.
 Section~\ref{sec:alternate} compares our design to other alternates.}
+}
 
 \subsection{Low-latency scheduling}
 Supporting tiny tasks requires a low-latency, high throughput cluster scheduler.
@@ -80,22 +105,23 @@ overhead is attainable in a well-engineered system:
 studies of network round
 trip times in datacenters have demonstrated that round trip times of 10$\mu$s
 are attainable today, and launching a task in Java by simply
-spawning a new thread requires less than $1\mu$s
+reusing a running thread requires less than $1\mu$s
 
 \subsection{Pipelined Execution}
 \label{sec:pipeline}
 To optimize for short tasks, we propose pipelining the phases of task execution.
-Current task execution generally happens in three phases: the fetch phase fetches inputs from a file or over the network; the compute phase executes the code
-for the task; and the output phase stores the outputs in memory or on disk.
-We propose pipelining these phases such that one task's input is fetched while
-another task is running, thus more fully utilizing both the CPU and the I/O
-bus.
+Current task execution generally consists of three phases: the fetch phase where
+inputs are fetched from disk or over the network; the compute phase where task's
+code is executed; and the output phase where the task outputs are stored either
+in memory or on disk.  We propose pipelining these phases such that one task's
+input is fetched while another task is running, thus more fully utilizing both
+the CPU and the I/O bus.
 
 Pipelining is particularly powerful when combined with small tasks. With
 today's large tasks, tasks accumulate large amount of output data in memory.
 Often, a task's output data will overflow the available space in memory
 and spill onto a disk, which is a well-known cause of poor MapReduce
-performance~\cite{toddlipconthing}. Tiny tasks fundamentally change the
+performance~\cite{lipcon2012optimizing}. Tiny tasks fundamentally change the
 resource footprint of tasks: since tasks run for a shorter period of time,
 they generate less output data and thus use less memory. The framework can
 explicitly control the remaining memory, choosing to cache the most important
@@ -119,18 +145,33 @@ at most $8$MB. Previous work has shown that $8$MB random disk reads achieve
 approximately $88$\% the bandwidth of sequential reads, and that smaller random
 reads see significant performance degradation due to disk
 seeks~\cite{nightingale2012flat}. Thus, consistent with that work, we consider
-$8$MB to be the smallest reasonable file system block size. Assuming disk
-throughput of approximately $100$MB/s, an $8$MB disk block can be read in under
-$100$ms, so is consistent with task runtimes of hundreds of milliseconds,
-particularly when combined with pipelined execution.
+$8$MB to be the smallest reasonable file system block size.
 
 Using small data blocks requires a move away from traditional file systems like
-HDFS, which cannot handle the amount of metadata needed to store a large
-number of small blocks.  Recent work on distributed filesystems, e.g., Flat
-Data Center Storage (FDS)~\cite{nightingale2012flat}, addresses HDFS scalability
-concerns by distributing metadata across multiple servers. While FDS can form
+HDFS, which cannot handle the amount of metadata needed to store a large number
+of small blocks.  Recent work on distributed filesystems, e.g., Flat Data Center
+Storage (FDS)~\cite{nightingale2012flat}, addresses HDFS scalability concerns by
+distributing metadata across multiple servers. We believe that while FDS can
+form the basis of a storage system that is suitable for tiny tasks, we require
+an integrated approach where the storage system closely interacts with the
+execution framework about where and how data blocks are stored. In particular,
+we believe that the problems of scheduling for locality, pipelining data access,
+caching recently used blocks and transferring blocks over the network are all
+closely related and a wholistic approach to reasoning about them together will
+be required to optimize utilization and response time. We propose building a 
+globally aware but distributed component in our scheduler to address this
+problem.
+
+
+\eat{While FDS can form
 the basis of a filesystem for tiny tasks, fully integrating FDS with a scalable
-scheduler and pipelining requires some modification.
+scheduler and pipelining requires some modification.}
+
+
+\eat{Assuming disk
+throughput of approximately $100$MB/s, an $8$MB disk block can be read in under
+$100$ms, so is consistent with task runtimes of hundreds of milliseconds,
+particularly when combined with pipelined execution.}
 
 \eat{Even with pipelining, we
 expect a task's inputs to be readable within the runtime of a single task. Current disks exhibit

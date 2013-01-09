@@ -20,9 +20,11 @@ operating systems~\cite{douglis1991transparent,milojivcic2000process,rozier1991o
 has applied preemption in a distributed context by exploring migrating
 processes between machines.
 We find that preemptive mechanisms are
-ill-suited to data parallel jobs running on a cluster as discussed below.\\
+ill-suited to data parallel jobs running on a cluster as discussed below.
+
 %However achieveing low overhead task-switching is more expensive in the distributed setting.
-\textbf{Cost of task-switching}: Work on process
+\vspace{4pt}\noindent\textbf{Cost of task-switching:}
+Work on process
 migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
 machine migration~\cite{clark2005live} has shown mechanisms to transparently
 move tasks across machines. Such methods, however, involve a high overhead, as
@@ -34,13 +36,15 @@ Cooperative multitasking, by contrast, eliminates the need to migrate such data.
 addition, we envision moving shared state into a framework-maintained scratch space.
 By explicitly differentiating such state, we envision that it can be more easily migrated.
 
-\textbf{Fault tolerance:} In a data center setting, tiny tasks are better suited for
+\vspace{4pt}\noindent\textbf{Fault tolerance:}
+In a data center setting, tiny tasks are better suited for
 fault tolerance when compared to task preemption. Since each tiny task is a
 deterministic unit of work, tasks can be executed in parallel during recovery.
 In contrast, using preemption one would need to maintain redundant checkpoints
-and fault recovery cannot be executed in parallel. \\
+and fault recovery cannot be executed in parallel.
 
-\textbf{Enforcing tiny tasks:} Preemption allows a framework to finely control
+\vspace{4pt}\noindent\textbf{Enforcing tiny tasks:}
+Preemption allows a framework to finely control
 task lengths. However controlling task inputs, and minor modifications to the
 framework will ensure that all tasks are short.
 
