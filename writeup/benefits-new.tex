@@ -129,7 +129,7 @@ instances, 10 of which were modified to take 20x longer to run each task.
 Figure~\ref{fig:sparkskew} demonstrates that using a larger number of tasks
 improves response time by 8x compared to using the same number
 of tasks as machines in the cluster, because the slow machines are
-\eat{assigned approximately $\frac{1}{20}$ as many tasks}assigned fewer tasks. Beyond $2000$ tasks, task launch overheads cause response time; we discuss
+\eat{assigned approximately $\frac{1}{20}$ as many tasks}assigned fewer tasks. Beyond $2000$ tasks, task launch overheads cause increased response time; we discuss
 how to decrease overheads in \S\ref{sec:prog}.
 
 %\begin{figure*}[!ht]
