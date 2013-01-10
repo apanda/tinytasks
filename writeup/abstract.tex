@@ -1,10 +1,30 @@
 \begin{abstract}
+Operating systems and network designs have shown that small units of work
+improve utilization and responsiveness. This paper argues for a similar model to
+be used in datacenters by using \textit{tiny tasks} that complete in hundreds of
+milliseconds.  Tiny tasks alleviate the long wait times for interactive,
+user-facing jobs seen in today's clusters and avoid the need for complex skew
+mitigation techniques by evenly spreading work across available resources. 
+In current data-parallel computing frameworks, high task launch overheads, lack
+of scalable file systems, schedulers prevent users from running short
+tasks. While, recent improvements have addressed some of these bottlenecks,
+there are numerous challenges in converting \emph{all} jobs into tiny tasks. We
+discuss the design goals for task execution that can support tiny tasks and
+present a preliminary architecture to realize this goal.
+\end{abstract}
+
+\eat{Thus, tiny tasks
+allow for increased utilization without sacrificing responsiveness or fairness.}
+
+\eat{
+\begin{abstract}
 In current data-parallel
 computing frameworks, engineering limitations such as scalability of the
 name node and scheduler prevent users from running short tasks. However,
 recent improvements in distributed file systems and scheduling have eliminated
 these scaling bottlenecks. This paper argues for a move to \emph{tiny tasks}
-that complete in hundreds of milliseconds. Tiny tasks avoid the need for
+that complete in hundreds of milliseconds. 
+Tiny tasks avoid the need for
 complex skew mitigation techniques: by breaking a large job into millions
 of tiny-tasks, work will automatically be evenly spread over available
 resources by the scheduler. Furthermore, tiny tasks alleviate the long wait
@@ -14,6 +34,8 @@ utilization without sacrificing responsiveness or fairness. We demonstrate
 that smaller tasks can improve response times by a factor of \fixme{5},
 and discuss challenges of building a system that supports tiny tasks.
 \end{abstract}
+}
+
 \eat{
 
 \begin{abstract}
