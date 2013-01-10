@@ -1,7 +1,7 @@
 \section{Alternate Designs and Related Work}
 \label{sec:alternate}
 
-Tiny tasks solve two major problems in data centers: outliers, and sharing
+Tiny tasks solve two major problems: outliers, and sharing
 a cluster between batch and interactive or user-facing jobs. A variety of
 approaches solve one of the two problems in isolation; e.g., skew handling
 techniques mitigate outliers, and process migration allows improved
@@ -45,30 +45,30 @@ deterministic unit of work, tasks can be executed in parallel during recovery.
 In contrast, using preemption one would need to maintain redundant checkpoints
 and fault recovery cannot be executed in parallel.
 
-In spite of these challenges, recent work proposed Amoeba, a system that
-uses preemption
-in the context of MapReduce-like cluster computing frameworks~\cite{ananthanarayanan2012true}. Amoeba
-identifies safe-points where a task can be paused and restarted elsewhere
-without wasted work. The main drawback of Amoeba is that it does not provide a mechanism for determining
-such safe-points, which is difficult for general tasks (even tasks that
-use the MapReduce programming model).
-The Amoeba authors choose preemptability rather than small tasks for two
-reasons. First, they cite high task launch overheads in systems like
-Hadoop; as described in~\S\ref{sec:prog}, these overheads are not fundamental and
-can be solved with improved engineering. Second, they note that creating
+Datacenter schedulers like Quincy~\cite{isard2009quincy} kill tasks on
+preemption and trade-off between responsiveness and wasting the work of tasks
+that are preempted.  Recent work proposed Amoeba~\cite{ananthanarayanan2012true},
+a system that uses preemption in the context of MapReduce-like
+cluster computing frameworks. Amoeba identifies safe-points where a task can be
+paused and restarted elsewhere without wasted work. The main drawback of Amoeba
+is that it does not provide a mechanism for determining such safe-points, which
+is difficult for general tasks (even tasks that use the MapReduce programming
+model).  The Amoeba authors choose preemptability rather than small tasks for
+two reasons. First, they cite high task launch overheads in systems like
+Hadoop; as described in~\S\ref{sec:prog}, these overheads are not fundamental
+and can be solved with improved engineering. Second, they note that creating
 \emph{uniformly} sized small tasks is difficult. Tasks need not be uniformly
-sized for the benefits of tiny tasks to hold; rather, tasks must be
-orders of magnitude smaller than today's tasks.
+sized for the benefits of tiny tasks to hold; rather, tasks must be orders of
+magnitude smaller than today's tasks.
 
-\subsection{Static Partitioning}
+\subsection{Coarse-grained Partitioning}
 Omega, Google's newest cluster scheduler~\cite{melnik2010dremel},
 was designed to share cluster
 resources between batch and interactive workloads. However, Omega achieves
-this by
-statically partitioning cluster resources.
+this by coarse-grained partitioning of cluster resources.
 Interactive services like Dremel~\cite{melnik2010dremel} spin up long-running
 agents that serve incoming queries, rather than scheduling new resources for
-each request.  Static partitioning limits utilization because each service
+each request.  Such coarse-grained partitioning limits utilization because each service
 must be provisioned to handle peak load, and one service's extra capacity
 cannot easily be reallocated to another service.
 
@@ -94,3 +94,21 @@ gain more predictable task runtimes. This limits the applicability of these
 techniques under situations of high load, where such guarantees might be most
 important.
 
+\subsection{Fine-grained Sharing}
+The idea of using smaller units of work to improve load balancing is well
+studied.  In multi-threaded applications, work-stealing~\cite{blumofe1994scheduling}
+based schedulers divide work at very fine granularities to provide better load
+balancing.  Smaller units of work have also been used in many other contexts
+including operating systems~\cite{sherman1972trace}, storage systems~\cite{ghemawat2003google,
+chang2008bigtable} and distributed hash tables~\cite{stoica2001chord}. We apply this
+principle to the granularity of tasks scheduled in large-scale clusters.  The
+idea of sharing cluster resources at task-level granularity has been used in
+existing cluster schedulers~\cite{hindman2011mesos, zaharia2010delay} and prior
+proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop} to
+address some of the problems.  Using tiny tasks makes sharing cluster resources
+more effective and enables better responsiveness and fairness for users.
+
+%  Fair sharing 
+% of cluster resources across multiple users has bee proposed in 
+
+% Mesos~\cite{hindman2010mesos}
