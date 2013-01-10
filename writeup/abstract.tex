@@ -1,6 +1,34 @@
 \begin{abstract}
-Operating systems and network designs have shown that small units of work
-improve utilization and responsiveness. This paper argues for a similar model to
+% Colin's shot:
+% Breaking large units of work into smaller tasks is a well-known technique in operating systems and networking for improving responsiveness and utilization.
+Operating systems and network designs break large units of work into
+smaller tasks in order to improve responsiveness and utilization.
+%Operating systems and network designs use small units of work
+%to improve utilization and responsiveness.
+We argue for bringing this model to the datacenter by breaking jobs
+into \textit{tiny tasks} that each complete in hundreds of milliseconds.
+Tiny tasks avoid the need for complex skew mitigation techniques: by
+breaking a large job into millions of tiny tasks, work will automatically
+be spread evenly over available resources by the scheduler.
+Furthermore, tiny tasks alleviate the long wait times seen in today's
+clusters for interactive jobs, since even tasks for batch jobs
+complete quickly.
+% Maybe remove this sentence?
+% Thus, tiny tasks allow for increased utilization without sacrificing
+% responsiveness or fairness.
+We demonstrate that small tasks can improve response times by a factor of
+\fixme{5}.
+
+In current data-parallel computing frameworks, high task launch
+overheads and scalability limitations prevent users from running short tasks.
+While recent research has addressed some of these bottlenecks, converting
+\emph{all} jobs into tiny tasks requires addressing numerous other challenges.
+We discuss the design goals for a task execution framework that can support
+tiny tasks, and present a preliminary architecture to realize this goal.
+
+\eat{
+
+This paper argues for a similar model to
 be used in datacenters by using \textit{tiny tasks} that complete in hundreds of
 milliseconds.  Tiny tasks alleviate the long wait times for interactive,
 user-facing jobs seen in today's clusters and avoid the need for complex skew
@@ -11,53 +39,6 @@ tasks. While, recent improvements have addressed some of these bottlenecks,
 there are numerous challenges in converting \emph{all} jobs into tiny tasks. We
 discuss the design goals for task execution that can support tiny tasks and
 present a preliminary architecture to realize this goal.
-\end{abstract}
-
-\eat{Thus, tiny tasks
-allow for increased utilization without sacrificing responsiveness or fairness.}
-
-\eat{
-\begin{abstract}
-In current data-parallel
-computing frameworks, engineering limitations such as scalability of the
-name node and scheduler prevent users from running short tasks. However,
-recent improvements in distributed file systems and scheduling have eliminated
-these scaling bottlenecks. This paper argues for a move to \emph{tiny tasks}
-that complete in hundreds of milliseconds. 
-Tiny tasks avoid the need for
-complex skew mitigation techniques: by breaking a large job into millions
-of tiny-tasks, work will automatically be evenly spread over available
-resources by the scheduler. Furthermore, tiny tasks alleviate the long wait
-times for interactive, user-facing jobs seen in today's clusters, since even
-tasks for batch jobs complete quickly. Thus, tiny tasks allow for increased
-utilization without sacrificing responsiveness or fairness. We demonstrate
-that smaller tasks can improve response times by a factor of \fixme{5},
-and discuss challenges of building a system that supports tiny tasks.
-\end{abstract}
 }
-
-\eat{
-
-\begin{abstract}
-In data-parallel computing frameworks, engineering limitations (e.g., scalability
-of the name node and scheduler) dictate that users should use tasks with long
-task runtimes.
-However, long tasks result in
-long wait-times for interactive, user-facing jobs in mixed use clusters.
-Furthermore, despite the use of elaborate skew mitigation
-techniques, system designers continue to struggle with evenly distributing
-the work required for a job across tasks.
-Recent improvements in distributed file systems and scheduling have eliminated
-many of the reasons why long task runtimes have been historically preferred.
-In this paper we argue for a move to \emph{tiny tasks},
-tasks with runtimes of a few $100$ milliseconds.
-Tiny tasks enable dynamic repartitioning of work in a job, and thus minimizing
-the necessity for pre-partitioning work across tasks.
-Furthermore, for mixed workloads, the use of tiny tasks limits the time an
-interactive job must wait before its tasks are run, allowing for  increased
-cluster utilization, and improving responsiveness, and job fairness.
-We quantify these simulations, and show that smaller tasks can improve
-response time by a factor of \fixme{5}. We also discuss some challenges
-faced in building a system using tiny tasks.
 \end{abstract}
-}
+
