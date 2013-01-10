@@ -53,7 +53,7 @@
 	<array>
 		<dict>
 			<key>Bounds</key>
-			<string>{{186.62442717117304, 271.87248971939084}, {119.45724487304688, 28.56000000000002}}</string>
+			<string>{{186.62442717117304, 275.4799497413635}, {119.45724487304688, 28.56000000000002}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
@@ -683,7 +683,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-01-10 16:23:56 +0000</string>
+	<string>2013-01-10 16:34:38 +0000</string>
 	<key>Modifier</key>
 	<string>Aurojit Panda</string>
 	<key>NotesVisible</key>

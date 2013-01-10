@@ -53,7 +53,7 @@
 	<array>
 		<dict>
 			<key>Bounds</key>
-			<string>{{178.36830076736419, 270.07999765396113}, {119.45724487304688, 28.56000000000002}}</string>
+			<string>{{178.02827391189544, 276.07006990432734}, {119.45724487304688, 28.56000000000002}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
@@ -1063,7 +1063,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-01-10 16:23:29 +0000</string>
+	<string>2013-01-10 16:34:16 +0000</string>
 	<key>Modifier</key>
 	<string>Aurojit Panda</string>
 	<key>NotesVisible</key>
@@ -1144,7 +1144,7 @@
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{732, 152}, {698, 872}}</string>
+		<string>{{975, -34}, {698, 872}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
