@@ -79,7 +79,7 @@ In the short term, we expect the time needed to read input data to be the
 limiting factor in driving down task durations.
 Previous work has shown that 8MB random disk reads achieve approximately 88\%
 of the bandwidth of sequential reads, and that smaller
-random reads cause significant performance degradation due to disk seeks~\ref{nightingale202flat}. Thus, as long as input data is stored on disk, we
+random reads cause significant performance degradation due to disk seeks~\cite{nightingale2012flat}. Thus, as long as input data is stored on disk, we
 expect tasks to read at least 8MB of input data. Data-parallel
 workloads are commonly I/O bound, so we expect task runtime to be of the
 same order of magnitude as the amount of time to read input data; thus,
@@ -91,7 +91,7 @@ HDFS, where scalability limitations prevent the use of small blocks.
 While HDFS does allow reading only part of a block, having multiple tiny tasks
 that operate on the same file block limits parallelism.
 Recent work on distributed filesystems, e.g., Flat Data Center
-Storage (FDS)~\cite{nightingale2012flat}, address HDFS scalability concerns by
+Storage (FDS)~\cite{nightingale2012flat}, addresses HDFS scalability concerns by
 distributing metadata across multiple servers. While FDS addresses the scalability
 concerns, effective use of tiny tasks requires close coordination between the file
 system, the scheduler, and the caching layer.
@@ -153,8 +153,8 @@ easily allow a RPC to complete within $1$ms. In fact, recent work showed that
 $10\mu$s RPCs are possible in the short term~\cite{low-latency}; thus,
 with careful engineering, we believe task launch overheads of $50\mu$s are
 attainable. $50\mu$s task launch overheads would enable even smaller tasks
-that could read data from in-memory or from flash storage to complete
-in under $10$ms.
+that could read data from in-memory or from flash storage in order to complete
+in milliseconds.
 \eat{
 so that launch overhead constitutes
 less than 1\% of task runtime.
