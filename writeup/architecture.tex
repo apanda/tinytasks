@@ -48,6 +48,9 @@ Recently proposed distributed scheduling techniques including batch
 sampling~\cite{ousterhoutbatch} have shown that distributed schedulers
 can scale well beyond millions of decisions per second at near-optimality.
 Our proposed system relies on the use of such distributed schedulers.
+Since a job completes only when all of its tasks complete, we also plan to 
+explore techniques like gang scheduling~\cite{feitelson1992gang} to minimize
+overall job completion time.
 
 In addition to providing high throughput scheduling decisions, a framework for
 tiny tasks must also reduce the latency for launching individual tasks,
