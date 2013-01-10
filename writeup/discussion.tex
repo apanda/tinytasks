@@ -44,10 +44,11 @@ data can be several gigabytes, incurring very high overheads.
 %apps. Cite some VM papers here… 
 
 \vspace{4pt}\noindent\textbf{Fault tolerance:}
-In a data center setting, tiny tasks are better suited for
-fault tolerance when compared to task preemption. Since tiny tasks
+Tiny tasks are better suited for
+fault tolerance than task preemption. Since tiny tasks
 are deterministic, each task is unit of work that can be executed in parallel
- during recovery~\cite{zaharia2012discretized}. In contrast, while using 
+ during recovery~\cite{zaharia2012discretized}.
+In contrast, while using 
 preemption with larger tasks, the system will need to perform expensive
 operations like logging task execution events to replay~\cite{dunlap2002revirt}
 and fault recovery cannot be executed in parallel.

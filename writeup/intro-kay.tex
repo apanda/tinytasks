@@ -17,7 +17,7 @@ granularity of tasks.
 %of the
 %aforementioned challenges: the granularity of tasks.
 Historically, task launch overheads have prevented users from running
-short tasks; however, recent improvements im distributed file systems and
+short tasks; however, recent improvements in distributed file systems and
 scheduling have eliminated these scaling bottlenecks.
 %prohibited the use of sub-second
 %tasks; however, recent advances in scheduler and
@@ -54,7 +54,7 @@ set of machines for high priority jobs, which provides responsiveness at
 the expense of utilization.
 %a high priority job in a highly utilized cluster might
 %need to wait for long-running tasks to complete before being run.
-However, tiny tasks allow a cluster to be \emph{both} responsive and highly utilized, since small tasks ensure frequent opportunities for new,
+Tiny tasks allow a cluster to be \emph{both} responsive and highly utilized, since small tasks ensure frequent opportunities for new,
 higher priority jobs to be launched.
 \eat{
 Long task runtimes make it challenging to run both batch and interactive
@@ -105,15 +105,16 @@ that can make frequent scheduling decisions. Second,
 task launch overheads must be small enough so as not to counteract the
 benefits from using small tasks.
 Third, tiny tasks must operate on correspondingly tiny amounts
-of data, which requires a file system that can handle a large number of tiny
-file blocks. Finally, tiny tasks require modifications to current programming
+of data, which requires a file system that can handle a large number of 
+small file blocks. Finally, tiny tasks require modifications to current programming
 models to allow \emph{all} jobs to be split into tiny tasks. We propose a system
 that addresses these challenges using a distributed scheduler, a distributed
-file system, and a pipelined execution model. Our proposed system supports
+file system, and an execution model that gives the execution framework control
+over I/O. Our proposed system supports
 100 microsecond task launches, and allows most applications to be
 expressed in terms of a set of tiny tasks.
 
-This paper begins by quantifying the benefits of tiny tasks in~\S\ref{sec:benefits}.
+We begin by quantifying the benefits of tiny tasks in~\S\ref{sec:benefits}.
 We present a preliminary system design that addresses the challenges of
 supporting tiny tasks in~\S\ref{sec:architecture},
 and explore design alternatives and related work in~\S\ref{sec:alternate}.

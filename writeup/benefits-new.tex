@@ -1,25 +1,46 @@
 \section{Benefits of Tiny Tasks}
 \label{sec:benefits}
 
-\eat{Tiny tasks benefit data center workloads by providing inherent elasticity:
-fine-grained units of work can be dynamically allocated to machines as
-resources become available, eliminating stragglers and issues of data skew,
-and allowing jobs to use available resources without sacrificing fairness
-when new jobs are submitted.}
-
 Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
 available to the scheduler: tiny tasks occupy resources for a very small
-duration, so resources can be allocated at a very fine granularity. This
-allows resources to be dynamically reallocated between jobs, allowing greater
-cluster utilization without sacrificing request latency, and to be dynamically
+duration, so resources can be allocated at a very fine time-granularity. This
+allows resources to be dynamically reallocated between jobs, enabling greater
+cluster utilization without sacrificing request latency, and allows
+resources to be dynamically
 reallocated between tasks within a job, eliminating problems caused
 by straggling tasks and data skew.
 
 \subsection{Handling of skew and stragglers}
-Prior studies~\cite{ananthanarayanan2010reining,zaharia2008improving} have noted that
-task lengths in data parallel workloads are highly variable and that outlier
-tasks negatively impact job completion time.
-Outliers occur for one of two reasons.
+
+\begin{figure}[t]
+\centering
+\subfigure[Today's tasks] {
+    \includegraphics[width=0.2\textwidth]{figures/slot_diagram_before}
+    \label{fig:tiny_diagram_original}
+}
+\subfigure[Tiny tasks] {
+    \includegraphics[width=0.2\textwidth]{figures/slot_diagram_after}
+    \label{fig:tiny_diagram_tiny}
+}
+\vspace{-0.1in}
+\caption{Tasks for a single job in a 4-slot cluster.
+With tiny tasks, work is allocated to machines at fine
+time-granularity, mitigating the effect of stragglers and allowing
+the job to complete more quickly.
+\fixme{TODO: replace figures}}
+\vspace{-2ex}
+\label{fig:tiny_diagram}
+\end{figure}
+
+
+Prior studies~\cite{ananthanarayanan2010reining,zaharia2008improving} have
+noted that job response times in data parallel workloads tend to be
+dominated by straggler tasks that take much longer than other tasks in the
+job to complete.
+%have noted that
+%task lengths in data parallel workloads are highly variable and that outlier
+%tasks negatively impact job completion time.
+These outliers occur for one of two reasons.
 First, outliers may be caused by poorly performing machines that cause the
 task to take longer than if it had been run on a different machine; e.g.,
 malfunctioning disks, contended CPUs, swapping memory, or congested networks.
@@ -37,7 +58,7 @@ distributed evenly over available resources, without requiring complex skew
 mitigation techniques: if a machine runs a computationally expensive task, it
 will simply be assigned fewer total tasks.  Similarly, slow resources will
 automatically be assigned less of a job's work, without needing to predict which
-resources are slow or which part of the network is congested.
+machines are slow or which part of the network is congested.
 
 \eat{
 Tiny tasks help mitigate the effect of outliers in two ways. First, splitting
@@ -45,28 +66,6 @@ total work across a larger set of tasks more evenly partitions records across ta
 secondly, individual tasks can be moved in response to slow machines, network congestions, or
 other cluster conditions, and run on other, faster machines.
 }
-\begin{figure*}[!ht]
-\centering
-\subfigure[] {
-    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_before}
-    \label{fig:slot_diagram_original}
-}
-\hspace{0.5in}
-\subfigure[] {
-    \includegraphics[width=0.4\textwidth]{figures/slot_diagram_after}
-    \label{fig:slot_diagram_tiny}
-}
-
-\caption{Two jobs running in a cluster with four slots. With today's tasks,
-tasks for the grey job need to wait for long-running tasks from the black job to
-complete before they are launched, shown in (a).
-On the other hand, with tiny tasks (shown in (b)), resource
-allocation is fine-grained, so resources will quickly be allocated to new
-jobs, allowing the grey job to complete more quickly.}
-\vspace{-2ex}
-\label{fig:slot_diagram}
-\end{figure*}
-
 We use a Facebook trace to quantify how much job response time would
 improve if work were perfectly partitioned across machines.
 % evenly distributing work over available
@@ -74,8 +73,8 @@ improve if work were perfectly partitioned across machines.
 %job response time would improve if work were perfectly partitioned across
 %machines.
 For each job, we divided the total runtime for all tasks in the
-job by the average number of slots used and compare this ``binpacked''
-completion time to the job's original completion time.
+job by the average number of slots used and compare this time to the job's
+original completion time.
 %Our experiment studies the benefits of perfectly balancing
 %work across machines; with tiny tasks, two machines may differ in the amount of
 %time spent processing data for a particular job by as much as one task
@@ -92,8 +91,12 @@ simply because there were not enough tasks to occupy more slots; in this case,
 tiny tasks will further improve performance by increasing parallelism. Second,
 if a task is running on a slow machine, it may take less total time when
 broken into tiny tasks, because some of the tiny tasks will be run on faster
-machines. However, we note that this simulation ignores any overheads associated with 
-tiny tasks and we measure the effects in our next experiment.
+machines.
+While this experiment underestimates the possible improvements from
+evenly balancing work, it also ignores task launch overheads, which
+we address in the next experiment.
+%However, we note that this simulation ignores any overheads associated with 
+%tiny tasks and we measure the effects in our next experiment.
 
 
 \eat{Figure~\ref{fig:sparkskew} demonstrates the improvement offered by tiny tasks on a Spark MapReduce job with data skew and machines that exhibited a random 5x performance variance.
@@ -112,8 +115,33 @@ compared to the other machines. Beyond $2000$ tasks, due to
 task launch overheads, using more tasks increases response time; we discuss
 how to avoid this problem with a new cluster framework in \S\ref{sec:prog}.
 
+%\begin{figure*}[!ht]
+\begin{figure}[t]
+\centering
+\subfigure[Today's tasks] {
+    \includegraphics[width=0.2\textwidth]{figures/slot_diagram_before}
+    \label{fig:slot_diagram_original}
+}
+%\hspace{0.5in}
+\subfigure[Tiny tasks] {
+    \includegraphics[width=0.2\textwidth]{figures/slot_diagram_after}
+    \label{fig:slot_diagram_tiny}
+}
+\vspace{-0.1in}
+\caption{Two jobs running in a cluster with four slots. With today's tasks,
+tasks for the high-priority grey job need to wait for long-running tasks from the black job to
+complete before being launched.
+With tiny tasks, resource
+allocation is fine-grained, so resources will quickly be allocated to
+higher priority grey job.}
+%new
+%jobs, allowing the higiher-priority grey job to complete more quickly.}
+\vspace{-2ex}
+\label{fig:slot_diagram}
+\end{figure}
 
-\subsection{Response Time}
+
+\subsection{Improved Sharing}
 Today, sharing a cluster between interactive and batch jobs involves trading off
 responsiveness and utilization. If a cluster is highly utilized,
 an interactive job may need to wait for long-running batch tasks to
@@ -124,5 +152,5 @@ high utilization, while
 simultaneously guaranteeing that interactive jobs will only need to wait for
 a short time before being serviced. Figure~\ref{fig:slot_diagram} depicts a simple example
 with only two jobs, and demonstrates that with tiny tasks, a newly arriving
-job can quickly gain its fair share of resources, even in the presence
-of large, batch jobs.
+job can quickly obtain resources, even in the presence
+of batch jobs.
