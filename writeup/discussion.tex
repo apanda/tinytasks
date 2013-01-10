@@ -50,10 +50,10 @@ are deterministic, each task is unit of work that can be executed in parallel
  during recovery~\cite{zaharia2012discretized}.
 In contrast, while using 
 preemption with larger tasks, the system will need to perform expensive
-operations like logging task execution events to replay~\cite{dunlap2002revirt}
+operations like checkpointing task execution events~\cite{dunlap2002revirt}
 and fault recovery cannot be executed in parallel.
 
-Datacenter schedulers like Quincy~\cite{isard2009quincy} kill tasks on
+In Datacenters, schedulers like Quincy~\cite{isard2009quincy} kill tasks on
 preemption and trade-off between responsiveness and wasting the work of tasks
 that are preempted.  Recent work proposed Amoeba~\cite{ananthanarayanan2012true},
 a system that uses preemption in the context of MapReduce-like
@@ -70,7 +70,7 @@ sized for the benefits of tiny tasks to hold; rather, tasks must be orders of
 magnitude smaller than today's tasks.
 
 \subsection{Coarse-grained Partitioning}
-Omega, Google's newest cluster scheduler~\cite{melnik2010dremel},
+Omega, Google's cluster scheduler~\cite{melnik2010dremel},
 was designed to share cluster
 resources between batch and interactive workloads. However, Omega achieves
 this by coarse-grained partitioning of cluster resources.
@@ -113,8 +113,8 @@ principle to the granularity of tasks scheduled in large-scale clusters.  The
 idea of sharing cluster resources at task-level granularity has been used in
 existing cluster schedulers~\cite{hindman2011mesos, zaharia2010delay} and prior
 proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop} to
-address some of the problems.  Using tiny tasks makes sharing cluster resources
-more effective and enables better responsiveness and fairness for users.
+address some of the problems. Tiny tasks make sharing of cluster resources
+more effective and enable better responsiveness and fairness for users.
 
 %  Fair sharing 
 % of cluster resources across multiple users has bee proposed in 
