@@ -5,13 +5,14 @@
 While existing frameworks can benefit from the use of smaller tasks (as shown
 in Figure~\ref{fig:sparkskew}), supporting tiny tasks for all jobs in large clusters
 requires addressing numerous challenges.
-Supporting tiny tasks requires a highly scalable scheduler that can
-handle hundreds of thousands of scheduling decisions per second and
-launch tasks with low overhead. Tiny tasks must operate on correspondingly
+Supporting tiny tasks requires low task launch overheads and a highly scalable scheduler that can
+handle hundreds of thousands of scheduling decisions per second.% and
+%launch tasks with low overhead.
+Tiny tasks must operate on correspondingly
 small blocks of data, requiring a scalable file system. To ensure that
 tasks can complete quickly, we propose giving the framework more control
-over I/O so that, for example, a task's data is already in-memory when the
-task is launched.
+over I/O.% so that, for example, a task's data is already in-memory when the
+%task is launched.
 Finally, ensuring
 that all jobs can be broken into tiny tasks requires some improvements
 to the programming model; e.g., support for aggregation trees.
@@ -20,7 +21,7 @@ each of these challenges and the lower bound that each challenge places
 on response time; we aim for tasks that are as small as possible.
 We find that tasks that complete in hundreds of milliseconds
 are practical in the short-term, and that we can drive task launch overhead
-down to 50$\mu$s to further reduce task runtime in the future.
+down to further reduce task runtime in the future.
 
 \subsection{Execution model}
 We propose a task execution model that supports data-parallel computations
@@ -117,7 +118,7 @@ Engineering improvements such as compressing task descriptions,
 avoiding sending the same task description to the same machine multiple
 times, and using more efficient networking have helped some
 centralized schedulers
-handle higher throughput~\cite{zaharia2012meetup}.
+provide higher throughput~\cite{zaharia2012meetup}.
 However, handling large clusters and very
 short tasks may require a decentralized scheduler design.
 Recently proposed distributed scheduling techniques including batch
@@ -179,7 +180,7 @@ in the short term~\cite{low-latency}.
 Using tiny tasks gives the framework more control to optimize I/O.
 %Pipelining is particularly powerful when combined with small tasks.
 With
-today's large tasks, tasks accumulate large amount of output data in memory.
+today's large tasks, tasks accumulate a large amount of output data in memory.
 Often, a task's output data will overflow the available space in memory
 and spill onto a disk, which is a well-known cause of poor MapReduce
 performance~\cite{lipcon2012optimizing}. Tiny tasks fundamentally change the
@@ -207,7 +208,7 @@ reducing the input size; however, some types of tasks cannot easily be
 parallelized. Parallelizing all jobs is the most significant challenge
 in realizing tiny tasks. 
 Consider, for example, reduce tasks in a MapReduce job. In the limit,
-once reduce task can be launched to handle each key. However, if all
+one reduce task can be launched to handle each key. However, if all
 values map to the same key, that key cannot easily be split into many
 tasks.
 %granularity of a reduce task

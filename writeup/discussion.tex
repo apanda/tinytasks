@@ -30,8 +30,8 @@ Work on process
 migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
 machine migration~\cite{clark2005live} has shown mechanisms to transparently
 move tasks across machines. Such methods, however, involve a high overhead, as
-migrating a task involves transferring both task context, a task's intermediate
-data, and its inputs. For data parallel applications, input data, and intermediate
+migrating a task involves transferring task context, a task's intermediate
+data, and its inputs. For data parallel applications, input data and intermediate
 data can be several gigabytes, incurring very high overheads.
 
 %Cooperative multitasking, by contrast, eliminates the need to migrate such data. In
@@ -51,10 +51,10 @@ are deterministic, each task is unit of work that can be executed in parallel
  during recovery~\cite{zaharia2012discretized}.
 In contrast, while using 
 preemption with larger tasks, the system will need to perform expensive
-operations like checkpointing task execution events~\cite{dunlap2002revirt}
+operations like checkpointing task execution events~\cite{dunlap2002revirt},
 and fault recovery cannot be executed in parallel.
 
-In Datacenters, schedulers like Quincy~\cite{isard2009quincy} kill tasks on
+In datacenters, schedulers like Quincy~\cite{isard2009quincy} kill tasks on
 preemption and trade-off between responsiveness and wasting the work of tasks
 that are preempted.  Recent work proposed Amoeba~\cite{ananthanarayanan2012true},
 a system that uses preemption in the context of MapReduce-like
@@ -114,8 +114,10 @@ principle to the granularity of tasks scheduled in large-scale clusters.  The
 idea of sharing cluster resources at task-level granularity has been used in
 existing cluster schedulers~\cite{hindman2011mesos, zaharia2010delay} and prior
 proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop} to
-address some of the problems. Tiny tasks make sharing of cluster resources
-more effective and enable better responsiveness and fairness for users.
+address some of the problems.
+Tiny tasks drive the idea of small tasks to the extreme to enable improved
+sharing of cluster resources
+and better responsiveness.
 
 %  Fair sharing 
 % of cluster resources across multiple users has bee proposed in 
