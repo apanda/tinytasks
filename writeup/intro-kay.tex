@@ -26,7 +26,7 @@ scheduling have eliminated these scaling bottlenecks.
 %tasks; however, recent advances in scheduler and
 We argue for
 breaking all jobs into \emph{tiny tasks}, which alleviates or eliminates
-all of the aforementioned problems:
+all of the following problems:
 %solves many problems in
 %current data-parallel frameworks:
 
@@ -84,7 +84,7 @@ Tiny tasks eliminate the straggler problem because work is allocated to
 machines at fine granularity, so work will automatically be evenly spread
 over available resources, and slower machines will automatically be assigned
 less work. Preliminary simulations and evaluation using Spark demonstrate
-that by eliminating the straggler problem, tiny tasks can improve response
+that by mitigating the straggler problem, tiny tasks can improve response
 times by a factor of 8.
 \eat{
 Prior work has shown that tasks runtimes exhibit a long
@@ -137,6 +137,7 @@ frameworks take on the order of several hundred milliseconds to a second to laun
 many of the gains provided by a system with sub-second task lengths. Similarly, any system
 supporting tiny tasks must provide additional architectural support for more easily dividing tasks.
 }
+
 \begin{figure*}[!ht]
   \centering
   \vspace{-0.2in}

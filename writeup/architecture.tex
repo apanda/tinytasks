@@ -3,7 +3,7 @@
 
 % Argue that we need a new architecture
 While existing frameworks can benefit from the use of smaller tasks (as shown
-in Figure~\ref{??}), supporting sub-second tasks for all jobs in large clusters
+in Figure~\ref{fig:sparkskew}), supporting sub-second tasks for all jobs in large clusters
 requires addressing numerous challenges.
 Supporting tiny tasks requires a highly scalable scheduler that can
 handle hundreds of thousands of scheduling decisions per second and
@@ -21,7 +21,7 @@ on response time. We find that tasks that complete in hundreds of milliseconds
 are practical in the short-term, and that we can drive task launch overhead
 down to 100$\mu$s to further reduce task runtime in the future.
 
-\subsection{Execution Model}
+\subsection{Execution model}
 We propose a tiny task execution model that supports data-parallel computations
 expressed using a variety of popular programming frameworks (e.g.,
 MapReduce~\cite{dean2008mapreduce}, Spark~\cite{zaharia2010spark},
@@ -31,7 +31,7 @@ and idempotent unit of execution. A task consists of a set of named inputs
 and code that operates on these inputs, and runs on a single machine.
 We assume a cooperative scheduling model; i.e., tasks explicitly release
 resources on completion (in contrast to preemptive models, discussed in
-\S\ref{??}).
+\S\ref{sec:preemption}).
 
 %We assume that the framework is used to support data-parallel programs whose input
 %data reside on disk, and the workload is I/O bound.
@@ -72,7 +72,7 @@ resources on completion (in contrast to preemptive models, discussed in
 % pre-fetches inputs before running a task and is responsible for saving
 % outputs to disk or transferring them over the network.  
 
-\subsection{Scalable Storage Systems}
+\subsection{Scalable storage systems}
 
 In the short term, we expect the time needed to read input data to be the
 limiting factor in driving down task durations.
@@ -138,7 +138,7 @@ tiny tasks must also reduce the overhead for launching individual tasks.
 %processes for each task.
 Popular framworks like Hadoop MapReduce have task launch overheads of many
 seconds, due to a variety of factors including the need to launch a new
-JVM for each task; newer frameworks like Spark~\cite{??} reduce
+JVM for each task; newer frameworks like Spark~\cite{zaharia2010spark} reduce
 overhead to $5$ms.
 To support tasks that complete in hundreds of milliseconds, we argue for
 reducing task launch overhead even further to $1$ms so that launch overhead
@@ -166,7 +166,7 @@ required $1$ms, as it has been shown that $5\mu$s-$10\mu$s RPCs are possible
 in the short term~\cite{low-latency}.
 }
 %\subsection{Pipelined Execution}
-\subsection{Framework-Controlled I/O}
+\subsection{Framework-controlled I/O}
 \label{sec:pipeline}
 %To optimize for short tasks, we propose pipelining the phases of task execution.
 %Current task execution involves a task fetching data from the disk, or over the network,
@@ -204,17 +204,19 @@ clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 Most tasks in a data parallel framework can be split into tiny tasks by
 reducing the input size; however, some types of tasks cannot easily be
 parallelized. Parallelizing all jobs is the most significant challenge
-in realizing tiny tasks. For example, in Hadoop MapReduce, the smallest
+in realizing tiny tasks. 
 Consider, for example, reduce tasks in a MapReduce job. In the limit,
 once reduce task can be launched to handle each key. However, if all
-values output from map tasks
-granularity of a reduce task
-is to process a single key.
-When a single key contains a large number of values, the reduce task might
-violate the tiny task constraint.
-In the case where the reduce function is algebraic, our proposed framework should
-apply aggregation trees to progressively combine outputs from multiple tasks and
-thus control each aggregation tasks' length.
+values map to the same key, that key cannot easily be split into many
+tasks.
+%granularity of a reduce task
+%is to process a single key.
+%When a single key contains a large number of values, the reduce task might
+%violate the tiny task constraint.
+Data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation trees to solve
+similar problems by progressively combining inputs from multiple tasks;
+aggregation trees will allow parallelizing tasks where the function
+is commutative and associative.
 
 %While splitting most tasks in a dataparallel framework by reducing input size
 %is straight forward, splitting certain tasks might incur a higher overhead
@@ -228,13 +230,13 @@ thus control each aggregation tasks' length.
 % In this case, aggregation trees provide a mechanism for dividing an individual group
 % across multiple tasks.
 
-Despite the use of aggregation trees, tasks that are not algebraic may remain
+Despite the use of aggregation trees, some tasks may remain
 difficult to divide into tiny tasks. 
 %For example, tasks that are not associative and
 %commutative do not lend themselves to the use of aggregation trees.
-In our example above, a more complicated operation might not lend itself to being
-simplified using an aggregation tree.
-To allow splitting these tasks, we propose providing a framework-maintained
+%In our example above, a more complicated operation might not lend itself to being
+%simplified using an aggregation tree.
+To split these tasks, we propose providing a framework-maintained
 temporary state store that can be used to communicate and share data between a
 job's tiny tasks. Such a store could be used to implement a job that computes
 distinct values in a file, for instance, by storing hashes of all values
