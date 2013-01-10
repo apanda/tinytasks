@@ -51,11 +51,13 @@ Popular frameworks like Hadoop MapReduce
 have task launch overheads of many seconds, largely due to the use of
 heartbeat messages to communicate scheduling decisions and the need to launch new
 processes for each task.
-Newer frameworks like Spark reduce task launch overhead to tens of
-milliseconds using an event-driven architecture and maintaining
-an active thread pool for execution~\cite{shark-tr}.
-With the use of distributed schedulers and more careful engineering,
-it is attainable to reduce the task launch overhead to a level much lower than the
+Newer frameworks like Spark reduce task launch overhead to $5$ms
+by using an event-driven architecture~\cite{shark-tr}.
+A framework for tiny tasks 
+If the framework maintains an active threadpool for task execution on each worker,
+task launching should be essentially a remote procedure call.
+With careful engineering,
+it is attainable to reduce the overhead to a level much lower than the
 required $1$ms, as it has been shown that $5\mu$s-$10\mu$s RPCs are possible
 in the short term~\cite{low-latency}.
 
