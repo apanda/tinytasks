@@ -1,4 +1,33 @@
 \section{Introduction}
+Cluster computing has become widespread, leading to a proliferation of
+research on improving performance.  In order to run data-parallel
+computations more efficiently and more quickly, researchers have attempted
+to tackle a variety of problems that arise in this setting,
+including improving
+fairness~\cite{zaharia2008improving,hindman2011mesos},
+handling preemption~\cite{ananthanarayanan2012true,isard2009quincy},
+mitigating stragglers~\cite{ananthanarayanan2010reining,anathanarayanan2012why},
+and reducing skew~\cite{ananthanarayanan2011scarlett,kwon2012skewtune,gufler2012load}.
+%These efforts have significantly improved performance and efficiency.
+We argue that a single variable affects all of these challenges: the
+granularity of tasks.
+%This paper argues that a single variable affects all of these scheduling
+%challenges
+%Yet, they have surprisingly not explored a single variable that affects all
+%of the
+%aforementioned challenges: the granularity of tasks.
+Historically, task launch overheads have prevented users from running
+short tasks; however, recent improves im distributed file systems and
+scheduling have eliminated these scaling bottlenecks.
+%prohibited the use of sub-second
+%tasks; however, recent advances in scheduler and
+Thus, we argue for
+breaking all jobs into \emph{tiny tasks}, which alleviates or eliminates
+all of the above problems:
+%solves many problems in
+%current data-parallel frameworks:
+
+\eat{
 Computer systems schedule and manage a variety of types of work:
 %Today's systems accept work in discrete units:
 networks process flows of data
@@ -15,7 +44,7 @@ should be broken into tiny units of work that each complete quickly.
 
 Tiny tasks solve two major problems in current data-parallel frameworks:
 %Decreased task runtimes solve two major problems in today's datacenters:
-
+}
 \vspace{4pt}\noindent\textbf{Batch and interactive sharing:}
 Current clusters are forced to tradeoff utilization and responsiveness.
 In a highly utilized cluster, if a high priority job arrives, the job may
