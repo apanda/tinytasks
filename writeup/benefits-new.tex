@@ -36,7 +36,7 @@ as resources become available.  In this manner, work is automatically
 distributed evenly over available resources, without requiring complex skew
 mitigation techniques: if a machine runs a computationally expensive task, it
 will simply be assigned fewer total tasks.  Similarly, slow resources will
-automatically be assigned less work, wihtout needing to predict which
+automatically be assigned less of a job's work, without needing to predict which
 resources are slow or which part of the network is congested.
 
 \eat{
@@ -67,16 +67,24 @@ jobs, allowing the grey job to complete more quickly.}
 \label{fig:slot_diagram}
 \end{figure*}
 
-To quantify these benefits, we used a Facebook trace to determine how much
-job response time would improve if work were perfectly partitioned across
-machines. For each job, we divided the total runtime for all tasks in the
-job by the average number of slots used, and compare this ``binpacked''
+We use a Facebook trace to quantify how much job response time would
+improve if work were perfectly partitioned across machines.
+% evenly distributing work over available
+%resources, we used a Facebook trace to determine how much
+%job response time would improve if work were perfectly partitioned across
+%machines.
+For each job, we divided the total runtime for all tasks in the
+job by the average number of slots used and compare this ``binpacked''
 completion time to the job's original completion time.
+Our experiment studies the benefits of perfectly balancing
+work across machines; with tiny tasks, two machines may differ in the amount of
+time spent processing data for a particular job by as much as one task
+length.
 Figure~\ref{fig:binpacked}
 demonstrates that jobs with 100 or more tasks benefit substantially from
-balancing work more evenly across tasks: at the median, large jobs see
+balancing work more evenly: at the median, large jobs see
 a \fixme{2.1}x reduction in response time from evenly spreading load
-across tasks, and
+across machines, and
 jobs at the 95th percentile see a \fixme{5x} reduction in response time.
 This experiment provides a conservative bound on the speedup for two reasons. First, jobs
 may have been using fewer than their fair share of slots in the original trace,
