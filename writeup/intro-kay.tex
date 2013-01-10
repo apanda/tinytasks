@@ -63,7 +63,7 @@ Long task runtimes make it challenging to run both batch and interactive
 jobs on the same cluster. In particular, task lengths place a lower bound on
 the time before resources allocated to a running task can be recovered. A new
 task therefore must wait for running tasks to finish before it can start running.
-This waiting time is a significant contributor to task latency, and thus adversly
+This waiting time is a significant contributor to task latency, and thus adversely
 affects the request latency for interactive jobs.
 
 One must tradeoff between
@@ -99,7 +99,7 @@ allocated to a job in response to outliers.\\
 }
 
 
-Using smaller task durations offers performance improvements even in
+Using smaller task duration offers performance improvements even in
 today's frameworks.  However, we propose task durations of at most
 hundreds of milliseconds across all jobs, which cannot be fully supported without addressing
 numerous challenges. First, small tasks require a highly scalable scheduler

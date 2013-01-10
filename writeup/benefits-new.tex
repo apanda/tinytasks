@@ -16,7 +16,7 @@ by straggling tasks and data skew.
 \begin{figure}[t]
 \centering
 \subfigure[Today's tasks] {
-    \includegraphics[width=0.24\textwidth]{figures/binpacking-before}
+    \includegraphics[width=0.21\textwidth]{figures/binpacking-before}
     \label{fig:tiny_diagram_original}
 }
 \subfigure[Tiny tasks] {
@@ -79,7 +79,7 @@ machines will perform poorly.
 \eat{
 Tiny tasks help mitigate the effect of outliers in two ways. First, splitting
 total work across a larger set of tasks more evenly partitions records across tasks, reducing data skew;
-secondly, individual tasks can be moved in response to slow machines, network congestions, or
+secondly, individual tasks can be moved in response to slow machines, network congestion, or
 other cluster conditions, and run on other, faster machines.
 }
 We use a Facebook trace~\cite{chen2012interactive} to quantify how much job response time would
