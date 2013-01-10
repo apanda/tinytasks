@@ -1,6 +1,6 @@
 # Note you need gnuplot 4.4 for the pdfcairo terminal.
 
-set terminal pdfcairo dashed font "Gill Sans, 28" linewidth 6 rounded enhanced
+set terminal pdfcairo dashed font "Gill Sans, 28" linewidth 6 rounded enhanced size 7in,3.5in
 
 # Line style for axes
 set style line 80 lt 1 lc rgb "#808080"
@@ -24,8 +24,8 @@ set datafile separator ","
 set output "straggler.pdf"
 set style fill noborder pattern 3
 f(x) = m*x + b
-set xrange [40:10000]
-set yrange [0:140]
+set xrange [40:15000]
+set yrange [0:250]
 set key top right
 set xtics (10,50, 100, 250, 500, 1000, 2500, 5000, 10000)
 #fit f(x) "sorted-log" using 5:6 via m, b
@@ -35,6 +35,6 @@ set xtics (10,50, 100, 250, 500, 1000, 2500, 5000, 10000)
 # processed_stragglers.csv
 set log x
 #plot "procstragglers" using 1:2 w linespoints pt 1 lc -1 lt 1 lw 2 title "Time per Task"
-plot "procstragglers" using 1:2:3 w yerrorbars lc -1 lt -1 lw 1 title "",\
-  "procstragglers" using 1:2 w linespoints pt 12 lc -1 lt 0 lw 2 title "Job Completion Time"
+plot "procstragglers-20" using 1:2:3 w yerrorbars lc -1 lt -1 lw 1 title "",\
+  "procstragglers-20" using 1:2 w linespoints pt 12 lc -1 lt 0 lw 2 title "Job Completion Time"
 #plot "procstragglers" using 1:3:2 w yerrorbars lc -1

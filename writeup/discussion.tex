@@ -11,16 +11,15 @@ provides a simple design paradigm that solves both problems.
 \subsection{Preemption and Process Migration}
 %\subsection{Alternate Design Schemes}
 
-Our choice of a cooperative multi-tasking scheme is in contrast to
-preemption based schemes commonly used in operating systems. 
-The benefits of
-preemption are well studied in operating
+Our choice of a cooperative multi-tasking scheme with tiny tasks 
+is in contrast to preemption based schemes with long running tasks commonly used 
+in operating systems. The benefits of process preemption are well studied in operating
 systems literature; for instance~\cite{sherman1972trace} shows the benefits
 of short scheduling quanta. Work in distributed
 operating systems~\cite{douglis1991transparent,milojivcic2000process,rozier1991overview} and virtual machines~\cite{tanenbaum1990experiences}
 has applied preemption in a distributed context by exploring migrating
 processes between machines.
-Compared to tiny tasks, one advance of preemption is that scheduling quanta
+Compared to tiny tasks, one advantage of preemption is that scheduling quanta
 can be tightly controlled, since the framework (or operating system) controls
 when the task is preempted. However, preemption has other disadvantages:
 
@@ -38,11 +37,20 @@ data can be several gigabytes, incurring very high overheads.
 %addition, we envision moving shared state into a framework-maintained scratch space.
 %By explicitly differentiating such state, we envision that it can be more easily migrated.
 
+%tiny tasks represents the unit of recovery as they implement deterministic
+%operations (need to say this explicitly). In a preemptive model we need the
+%system to checkpoint and log execution in order to be able to transparently
+%recover. This has a high overhead, in particular, in the case of intensive data
+%apps. Cite some VM papers here… 
+
 \vspace{4pt}\noindent\textbf{Fault tolerance:}
-In a data center setting, tiny tasks are better suited for
-fault tolerance when compared to task preemption. Since each tiny task is a
-deterministic unit of work, tasks can be executed in parallel during recovery.
-In contrast, using preemption one would need to maintain redundant checkpoints
+Tiny tasks are better suited for
+fault tolerance than task preemption. Since tiny tasks
+are deterministic, each task is unit of work that can be executed in parallel
+ during recovery~\cite{zaharia2012discretized}.
+In contrast, while using 
+preemption with larger tasks, the system will need to perform expensive
+operations like logging task execution events to replay~\cite{dunlap2002revirt}
 and fault recovery cannot be executed in parallel.
 
 Datacenter schedulers like Quincy~\cite{isard2009quincy} kill tasks on
