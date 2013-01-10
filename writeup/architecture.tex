@@ -117,19 +117,20 @@ parallelized.
 %While splitting most tasks in a dataparallel framework by reducing input size
 %is straight forward, splitting certain tasks might incur a higher overhead
 %than the corresponding improvements.
-For instance, consider an all-to-all shuffle, which involves
-communication across $O(N^2)$ pairs of senders and receivers.
-Using 100x more senders and receivers will increase communication by $10^4$;
-the cost of increased communication may not be offset by benefits from
-using tiny tasks.
+
 Data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation
 trees to solve similar problems by progressively combining outputs from
 multiple tasks. Leveraging aggregation trees will allow a tiny tasks framework
-to reduce task lengths for a wider variety of tasks.
+to reduce task lengths for a wider variety of tasks. For instance, consider a
+job that groups values by some criterion, and calculates the mean for each group.
+In this case, aggregation trees provide a mechanism for dividing an individual group
+across multiple tasks.
 
 Despite the use of aggregation trees, some tasks may remain difficult to
 divide into tiny tasks. For example, tasks that are not associative and
-commutative do not lend themselves to the use of aggregation trees.
+commutative do not lend themselves to the use of aggregation trees. In our
+example above, a more complicated operation might not lend itself to being
+simplified using an aggregation tree.
 To allow splitting these tasks, we propose providing a framework-maintained
 temporary state store that can be used to communicate and share data between a
 job's tiny tasks. Such a store could be used to implement a job that computes
