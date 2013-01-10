@@ -14,10 +14,11 @@ over I/O so that, for example, a task's data is already in-memory when the
 task is launched.
 Finally, ensuring
 that all jobs can be broken into tiny tasks requires some improvements
-to the programming model; e.g, support for aggregation trees.
+to the programming model; e.g., support for aggregation trees.
 In this section, we discuss a preliminary architecture to address
-each of these challenges, and the lower bound that each challenge places
-on response time. We find that tasks that complete in hundreds of milliseconds
+each of these challenges and the lower bound that each challenge places
+on response time; we aim for tasks that are as small as possible.
+We find that tasks that complete in hundreds of milliseconds
 are practical in the short-term, and that we can drive task launch overhead
 down to 100$\mu$s to further reduce task runtime in the future.
 

@@ -2,8 +2,7 @@
 Cluster computing has become widespread, leading to a proliferation of
 research on improving performance for data-parallel computations. 
 Researchers have attempted
-to tackle a variety of problems that arise in this setting,
-including improving
+to tackle a variety of problems that arise in this setting by improving
 fairness~\cite{zaharia2008improving,hindman2011mesos},
 handling preemption~\cite{ananthanarayanan2012true,isard2009quincy},
 mitigating stragglers~\cite{ananthanarayanan2010reining,ananthanarayanan2012why},
@@ -83,9 +82,9 @@ redundant tasks when a task appears to be running on a slow machine.
 Tiny tasks eliminate the straggler problem because work is allocated to
 machines at fine granularity, so work will automatically be evenly spread
 over available resources, and slower machines will automatically be assigned
-less work. Preliminary simulations and evaluation using Spark demonstrate
-that by mitigating the straggler problem, tiny tasks can improve response
-times by a factor of 8.
+less work. Preliminary simulations based on a Facebook workload
+demonstrate that by mitigating the straggler problem, tiny tasks
+can improve response times by as much as a factor of 5.2.
 \eat{
 Prior work has shown that tasks runtimes exhibit a long
 tailed distribution, and are highly variable. This variance can be caused by
@@ -138,22 +137,3 @@ many of the gains provided by a system with sub-second task lengths. Similarly, 
 supporting tiny tasks must provide additional architectural support for more easily dividing tasks.
 }
 
-\begin{figure*}[!ht]
-  \centering
-  \vspace{-0.2in}
-  \begin{minipage}[t]{0.45\textwidth}
-    \includegraphics[width=\textwidth]{figures/binpacked1-sep}
-    \vspace{-4ex}
-    \caption{ Improvement from perfectly balancing the total machine time for the job across tasks. }
-    \label{fig:binpacked}
-  \end{minipage}
-  \hspace{1.2em}
-  \begin{minipage}[t]{0.45\textwidth}
-    \includegraphics[width=\textwidth]{figures/spark-skew-results}
-    \vspace{-4ex}
-    \caption{Improvement from using tiny tasks in a cluster where 20\% of machines
-take 21x longer to run each task. Error bars depict standard deviation.}
-    \label{fig:sparkskew}
-  \end{minipage}
-  \hspace{.5em}
-\end{figure*}

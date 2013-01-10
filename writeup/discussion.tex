@@ -2,11 +2,11 @@
 \label{sec:alternate}
 
 Tiny tasks solve two major problems: outliers, and sharing
-a cluster between batch and interactive or user-facing jobs. A variety of
+a cluster between batch and interactive jobs. A variety of
 approaches solve one of the two problems in isolation; e.g., skew handling
 techniques mitigate outliers, and process migration allows improved
 sharing between long and short jobs.  Unlike these approaches, tiny tasks
-provides a simple design paradigm that solves both problems.
+provides a simple technique to solve both problems.
 
 \subsection{Preemption and Process Migration}
 \label{sec:preemption}
@@ -21,7 +21,7 @@ operating systems~\cite{douglis1991transparent,milojivcic2000process,rozier1991o
 has applied preemption in a distributed context by exploring migrating
 processes between machines.
 Compared to tiny tasks, one advantage of preemption is that scheduling quanta
-can be tightly controlled, since the framework (or operating system) controls
+can be tightly controlled, since the system controls
 when the task is preempted. However, preemption has other disadvantages:
 
 %However achieveing low overhead task-switching is more expensive in the distributed setting.

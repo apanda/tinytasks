@@ -1,4 +1,5 @@
 \section{Benefits of Tiny Tasks}
+
 \label{sec:benefits}
 
 Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
@@ -13,7 +14,6 @@ by straggling tasks and data skew.
 \subsection{Handling of skew and stragglers}
 
 \begin{figure}[t]
-\vspace{-0.2in}
 \centering
 \subfigure[Today's tasks] {
     \includegraphics[width=0.24\textwidth]{figures/binpacking-before}
@@ -33,6 +33,22 @@ the job to complete more quickly.}
 \end{figure}
 
 
+\begin{figure}[t]
+  \centering
+    \includegraphics[width=0.4\textwidth]{figures/binpacked1-sep}
+    \vspace{-3ex}
+    \caption{ Improvement from perfectly balancing the total machine time for
+    each job across its tasks. }
+    \label{fig:binpacked}
+\end{figure}
+
+\begin{figure}[t]
+    \includegraphics[width=0.4\textwidth]{figures/spark-skew-results}
+    \vspace{-3ex}
+    \caption{Improvement from using tiny tasks in a cluster where 20\% of machines
+take 21x longer to run each task. Error bars depict standard deviation.}
+    \label{fig:sparkskew}
+\end{figure}
 Prior studies~\cite{ananthanarayanan2010reining,zaharia2008improving} have
 noted that job response times in data parallel workloads tend to be
 dominated by straggler tasks that take much longer than other tasks in the
@@ -43,7 +59,7 @@ job to complete.
 These outliers occur for one of two reasons.
 First, outliers may be caused by poorly performing machines that cause tasks scheduled
 on them to take longer; e.g.,
-malfunctioning disks, contended CPUs, swapping memory, or congested networks.
+malfunctioning disks, contended CPUs, or congested networks.
 Second, work may have been unevenly
 divided across tasks, either due to
 partitioning skew, where data was unevenly allocated to tasks, or due to
@@ -53,7 +69,7 @@ Tiny tasks transform both the slow resources and the data skew problem
 into a scheduling problem.  Rather than needing to predict which resources
 are slow or statically partition data across tasks, a job is divided into
 thosuands or millions of sub-second tiny tasks, and each task is scheduled
-as resources become available.  In this manner, work is automatically
+as resources become available (shown in Figure~\ref{fig:tiny_diagram}).  In this manner, work is automatically
 distributed evenly over available resources, without requiring complex skew
 mitigation techniques: if a machine runs a computationally expensive task, it
 will simply be assigned fewer total tasks.  Similarly, slow resources will
@@ -72,7 +88,7 @@ improve if work were perfectly partitioned across machines.
 %resources, we used a Facebook trace to determine how much
 %job response time would improve if work were perfectly partitioned across
 %machines.
-For each job, as depicted in Figure~\ref{fig:tiny_diagram}, we divided the total runtime for all tasks in the
+For each job, we divided the total runtime for all tasks in the
 job by the average number of slots used and compare this time to the job's
 original completion time.
 %Our experiment studies the benefits of perfectly balancing
@@ -102,18 +118,19 @@ we address in the next experiment.
 \eat{Figure~\ref{fig:sparkskew} demonstrates the improvement offered by tiny tasks on a Spark MapReduce job with data skew and machines that exhibited a random 5x performance variance.
 With tiny tasks, Spark is able to mitigate both skew and stragglers without explicit knowledge of machines' speeds or records' processing costs.}
 
-To demonstrate that using tiny tasks automatically avoids slow machines,
+%Next, we use Spark~\cite{zaharia2010spark} to demonstrate that tiny tasks
+%improve performance in the presence
+To demonstrate that using tiny tasks improve performance in
+the presence of slow machines,
 we modified some machines in a cluster to run more slowly, and then
 ran a Spark~\cite{zaharia2010spark} job using different numbers of tasks. 
 We used $50$ m1.medium EC2
-instances, 10 of which were modified to take 21x longer to run each task.
+instances, 10 of which were modified to take 20x longer to run each task.
 Figure~\ref{fig:sparkskew} demonstrates that using a larger number of tasks
 improves response time by 8x compared to using the same number
 of tasks as machines in the cluster, because the slow machines are
-\eat{assigned approximately $\frac{1}{21}$ as many tasks}assigned fewer tasks
-compared to the other machines. Beyond $2000$ tasks, due to
-task launch overheads, using more tasks increases response time; we discuss
-how to avoid this problem with a new cluster framework in \S\ref{sec:prog}.
+\eat{assigned approximately $\frac{1}{20}$ as many tasks}assigned fewer tasks. Beyond $2000$ tasks, task launch overheads cause response time; we discuss
+how to decrease overheads in \S\ref{sec:prog}.
 
 %\begin{figure*}[!ht]
 \begin{figure}[t]
