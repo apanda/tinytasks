@@ -1,32 +1,55 @@
 \section{Architecting for Tiny Tasks}
 \label{sec:architecture}
 % Argue that we need a new architecture
-While existing frameworks like Spark benefit from the use of smaller tasks, Figure~\ref{fig:sparkskew}
-shows the need for a new task execution framework to truly support tiny tasks across a wide
-variety of jobs.
-Supporting tiny tasks requires a highly scalable scheduler that can handle hundreds 
-of thousands of scheduling decisions per seconds. We also argue that efficiently using
-tiny tasks requires task launch overheads be reduced by two orders of magnitude to around $100\mu$s.
-Efficiently utilizing CPU and I/O resources with low task runtimes, requires
-a pipelined task execution model where the execution framework manages I/O
-requests for input, output and intermediate data. In this section
-we discuss these components and other changes required to allow all jobs to use
-tiny tasks, and discuss challenges associated with converting certain jobs.
 
-\subsection{Architecture Overview}
-We propose a tiny task execution model that supports computations expressed using 
-a variety of popular programming frameworks (e.g., MapReduce~\cite{dean2008mapreduce},
-Spark~\cite{zaharia2010spark}, DryadLINQ~\cite{yu2008dryadlinq}). 
+In this section, we discuss the optimal choice of task length and its implications
+on system architecture.
+
+We propose a tiny task execution model that supports data-parallel computations
+expressed using a variety of popular programming frameworks (e.g.,
+MapReduce~\cite{dean2008mapreduce}, Spark~\cite{zaharia2010spark},
+DryadLINQ~\cite{yu2008dryadlinq}).
 A job is composed of a number of tasks, each representing an atomic
 and idempotent unit of execution. A task consists of a set of named inputs
-and code that operates on these inputs, and runs on a single machine.
-A tasks inputs are restricted to around 8MB. The task execution framework
-pre-fetches inputs before running a task and is responsible for saving
-outputs to disk or transferring them over the network.  We use a cooperative 
+and code that operates on these inputs, and runs in a single thread.
+We assume that the framework is used to support data-parallel programs whose input
+data reside on disk, and the workload is I/O bound.
+
+To allow tasks to complete quickly, we propose operating on data blocks of
+at most $8$MB.
+Previous work has shown that $8$MB random disk reads achieve
+approximately $88$\% of the bandwidth of sequential reads, and smaller reads would
+cause significant performance degradation due to disk seeks~\cite{nightingale2012flat}. 
+Assuming $100$MB/s disk throughput in a fully pipelined execution framework, each task
+can execute up roughly $100$ms to process the $8$MB input.
+
+Although frameworks such as Spark are significantly better
+than traditional frameworks such as Hadoop in handling smaller tasks,
+Figure~\ref{fig:sparkskew} shows the need for a new execution framework
+to truly support tiny tasks at $100$ms range.
+
+% While newer data-parallel frameworks like Spark can support tasks of finer-granularity,
+% Figure~\ref{fig:sparkskew} shows that even in newer frameworks like Spark, 
+% benefit from the use of
+% smaller tasks, Figure~\ref{fig:sparkskew}
+% shows the need for a new task execution framework to truly support tiny tasks across a wide
+% variety of jobs.
+
+Supporting tiny tasks requires a highly scalable scheduler that can handle hundreds 
+of thousands of scheduling decisions per seconds. We also argue that efficiently using
+tiny tasks requires task launch overheads be reduced to $1$ms or less.
+Efficiently utilizing CPU and I/O resources with low task runtimes requires
+a pipelined task execution model where the execution framework manages I/O
+requests for input, output and intermediate data. We use a cooperative 
 scheduling model, i.e., resources are reassigned after tasks explicitly release 
 them on finishing. Task runtimes are limited by limiting input size and
 appropriate modifications to programming frameworks. Section~\ref{sec:alternate} 
 compares our design to other alternatives.
+
+
+% The task execution framework
+% pre-fetches inputs before running a task and is responsible for saving
+% outputs to disk or transferring them over the network.  
 
 \subsection{Low-latency scheduling}
 Supporting tiny tasks requires a low-latency, high throughput cluster scheduler.
@@ -106,11 +129,6 @@ to greatly improve network utilization and performance in
 clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 
 \subsection{Scalable Storage Systems}
-To allow tasks to complete quickly, we propose operating on data blocks of
-at most $8$MB. Previous work has shown that $8$MB random disk reads achieve
-approximately $88$\% of the bandwidth of sequential reads, and that smaller random
-reads cause significant performance degradation due to disk
-seeks~\cite{nightingale2012flat}. 
 
 Using small data blocks requires a move away from traditional file systems like
 HDFS, where scalability limitations prevent the use of small blocks.
