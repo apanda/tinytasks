@@ -17,11 +17,15 @@ Tiny tasks solve two major problems in current data-parallel frameworks:
 %Decreased task runtimes solve two major problems in today's datacenters:
 
 \vspace{4pt}\noindent\textbf{Batch and interactive sharing:}
-Current clusters are forced to tradeoff utilization and responsiveness:
-a high priority job in a highly utilized cluster might
-need to wait for long-running tasks to complete before being run.
-Tiny tasks allow a cluster to be \emph{both} highly utilized and highly
-responsive, since small tasks ensure frequent opportunities for new,
+Current clusters are forced to tradeoff utilization and responsiveness.
+In a highly utilized cluster, if a high priority job arrives, the job may
+need to wait for long-running tasks to complete before being launched.
+On the other end of the spectrum, a cluster can maintain a reserved
+set of machines for high priority jobs, which provides responsiveness at
+the expense of utilization.
+%a high priority job in a highly utilized cluster might
+%need to wait for long-running tasks to complete before being run.
+However, tiny tasks allow a cluster to be \emph{both} responsive and highly utilized, since small tasks ensure frequent opportunities for new,
 higher priority jobs to be launched.
 \eat{
 Long task runtimes make it challenging to run both batch and interactive
