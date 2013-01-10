@@ -37,9 +37,16 @@ decisions per second.
 Today's centralized schedulers have well-known scalability
 limits~\cite{wilkesberkeley} that
 hinder their ability to support tiny tasks in a large cluster.
+Engineering improvements such as compressing task descriptions,
+avoiding sending the same task description to the same machine multiple
+times, and using more efficient networking have helped some
+centralized schedulers
+handle higher throughput~\cite{zaharia2012meetup}.
+However, handling large clusters and very
+short tasks may require a decentralized scheduler design.
 Recently proposed distributed scheduling techniques including batch
 sampling~\cite{ousterhoutbatch} have shown that distributed schedulers
-can scale well and beyond millions decisions per second at near-optimality.
+can scale well beyond millions of decisions per second at near-optimality.
 Our proposed system relies on the use of such distributed schedulers.
 
 In addition to providing high throughput scheduling decisions, a framework for
@@ -61,16 +68,19 @@ it is attainable to reduce the overhead to a level much lower than the
 required $1$ms, as it has been shown that $5\mu$s-$10\mu$s RPCs are possible
 in the short term~\cite{low-latency}.
 
-\subsection{Pipelined Execution}
+%\subsection{Pipelined Execution}
+\subsection{Framework-Controlled I/O}
 \label{sec:pipeline}
-To optimize for short tasks, we propose pipelining the phases of task execution.
-Current task execution involves a task fetching data from the disk, or over the network,
-processing this data, and storing the output either on memory or on disk. We observe
-that these three steps are independent phases. We propose pipelining these phases such that one task's
-input is fetched while another task is running, thus more fully utilizing both
-the CPU and the I/O bus.
+%To optimize for short tasks, we propose pipelining the phases of task execution.
+%Current task execution involves a task fetching data from the disk, or over the network,
+%processing this data, and storing the output either on memory or on disk. We observe
+%that these three steps are independent phases. We propose pipelining these phases such that one task's
+%input is fetched while another task is running, thus more fully utilizing both
+%the CPU and the I/O bus.
 
-Pipelining is particularly powerful when combined with small tasks. With
+Using tiny tasks gives the framework more control to optimize I/O.
+%Pipelining is particularly powerful when combined with small tasks.
+With
 today's large tasks, tasks accumulate large amount of output data in memory.
 Often, a task's output data will overflow the available space in memory
 and spill onto a disk, which is a well-known cause of poor MapReduce
