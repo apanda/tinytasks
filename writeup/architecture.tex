@@ -79,7 +79,7 @@ In the short term, we expect the time needed to read input data to be the
 limiting factor in driving down task durations.
 Previous work has shown that 8MB random disk reads achieve approximately 88\%
 of the bandwidth of sequential reads, and that smaller
-random reads cause significant performance degredation due to disk seeks~\ref{nightingale202flat}. Thus, as long as input data is stored on disk, we
+random reads cause significant performance degradation due to disk seeks~\ref{nightingale202flat}. Thus, as long as input data is stored on disk, we
 expect tasks to read at least 8MB of input data. Data-parallel
 workloads are commonly I/O bound, so we expect task runtime to be of the
 same order of magnitude as the amount of time to read input data; thus,
@@ -137,7 +137,7 @@ tiny tasks must also reduce the overhead for launching individual tasks.
 %have task launch overheads of many seconds, largely due to the use of
 %heartbeat messages to communicate scheduling decisions and the need to launch new
 %processes for each task.
-Popular framworks like Hadoop MapReduce have task launch overheads of many
+Popular frameworks like Hadoop MapReduce have task launch overheads of many
 seconds, due to a variety of factors including the need to launch a new
 JVM for each task; newer frameworks like Spark~\cite{zaharia2010spark} reduce
 overhead to $5$ms.

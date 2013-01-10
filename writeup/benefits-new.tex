@@ -68,7 +68,7 @@ computational skew, where some data is more expensive to process.
 Tiny tasks transform both the slow resources and the data skew problem
 into a scheduling problem.  Rather than needing to predict which resources
 are slow or statically partition data across tasks, a job is divided into
-thosuands or millions of sub-second tiny tasks, and each task is scheduled
+thousands or millions of sub-second tiny tasks, and each task is scheduled
 as resources become available (shown in Figure~\ref{fig:tiny_diagram}).  In this manner, work is automatically
 distributed evenly over available resources, without requiring complex skew
 mitigation techniques: if a machine runs a computationally expensive task, it
