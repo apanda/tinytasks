@@ -40,8 +40,8 @@ job to complete.
 %task lengths in data parallel workloads are highly variable and that outlier
 %tasks negatively impact job completion time.
 These outliers occur for one of two reasons.
-First, outliers may be caused by poorly performing machines that cause the
-task to take longer than if it had been run on a different machine; e.g.,
+First, outliers may be caused by poorly performing machines that cause tasks scheduled
+on them to take longer; e.g.,
 malfunctioning disks, contended CPUs, swapping memory, or congested networks.
 Second, work may have been unevenly
 divided across tasks, either due to
@@ -57,7 +57,7 @@ distributed evenly over available resources, without requiring complex skew
 mitigation techniques: if a machine runs a computationally expensive task, it
 will simply be assigned fewer total tasks.  Similarly, slow resources will
 automatically be assigned less of a job's work, without needing to predict which
-machines are slow or which part of the network is congested.
+machines will perform poorly.
 
 \eat{
 Tiny tasks help mitigate the effect of outliers in two ways. First, splitting
@@ -71,7 +71,7 @@ improve if work were perfectly partitioned across machines.
 %resources, we used a Facebook trace to determine how much
 %job response time would improve if work were perfectly partitioned across
 %machines.
-For each job, we divided the total runtime for all tasks in the
+For each job, as depicted in Figure~\ref{fig:tiny_diagram}, we divided the total runtime for all tasks in the
 job by the average number of slots used and compare this time to the job's
 original completion time.
 %Our experiment studies the benefits of perfectly balancing
@@ -91,8 +91,8 @@ tiny tasks will further improve performance by increasing parallelism. Second,
 if a task is running on a slow machine, it may take less total time when
 broken into tiny tasks, because some of the tiny tasks will be run on faster
 machines.
-While this experiment underestimates the possible improvements from
-evenly balancing work, it also ignores task launch overheads, which
+This experiment underestimates the possible improvements from
+evenly balancing work, and also ignores task launch overheads, which
 we address in the next experiment.
 %However, we note that this simulation ignores any overheads associated with 
 %tiny tasks and we measure the effects in our next experiment.
