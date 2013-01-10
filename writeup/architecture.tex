@@ -17,7 +17,7 @@ tiny tasks, and discuss challenges associated with converting certain jobs.
 We propose a tiny task execution model that supports computations expressed using 
 a variety of popular programming frameworks (e.g., MapReduce~\cite{dean2008mapreduce},
 Spark~\cite{zaharia2010spark}, DryadLINQ~\cite{yu2008dryadlinq}). 
-A job is composed of a number of tasks, each representing an indivisible
+A job is composed of a number of tasks, each representing an atomic
 and idempotent unit of execution. A task consists of a set of named inputs
 and code that operates on these inputs, and runs on a single machine.
 A tasks inputs are restricted to around 8MB. The task execution framework
@@ -117,22 +117,32 @@ both the scheduler, and the filesystem.
 Most tasks in a data parallel framework can be split into tiny tasks by
 reducing the input size; however, some types of tasks cannot easily be
 parallelized.
+
+For example, in Hadoop MapReduce, the smallest granularity of a reduce task
+is to process a single key.
+When a single key contains a large number of values, the reduce task might
+violate the tiny task constraint.
+In the case where the reduce function is algebraic, our proposed framework should
+apply aggregation trees to progressively combine outputs from multiple tasks and
+thus control each aggregation tasks' length.
+
 %While splitting most tasks in a dataparallel framework by reducing input size
 %is straight forward, splitting certain tasks might incur a higher overhead
 %than the corresponding improvements.
 
-Data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation
-trees to solve similar problems by progressively combining outputs from
-multiple tasks. Leveraging aggregation trees will allow a tiny tasks framework
-to reduce task lengths for a wider variety of tasks. For instance, consider a
-job that groups values by some criterion, and calculates the mean for each group.
-In this case, aggregation trees provide a mechanism for dividing an individual group
-across multiple tasks.
+% Some data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation
+% trees to solve similar problems by progressively combining outputs from
+% multiple tasks. Leveraging aggregation trees will allow a tiny tasks framework
+% to reduce task lengths for a wider variety of tasks. For instance, consider a
+% job that groups values by some criterion, and calculates the mean for each group.
+% In this case, aggregation trees provide a mechanism for dividing an individual group
+% across multiple tasks.
 
-Despite the use of aggregation trees, some tasks may remain difficult to
-divide into tiny tasks. For example, tasks that are not associative and
-commutative do not lend themselves to the use of aggregation trees. In our
-example above, a more complicated operation might not lend itself to being
+Despite the use of aggregation trees, tasks that are not algebraic may remain
+difficult to divide into tiny tasks. 
+%For example, tasks that are not associative and
+%commutative do not lend themselves to the use of aggregation trees.
+In our example above, a more complicated operation might not lend itself to being
 simplified using an aggregation tree.
 To allow splitting these tasks, we propose providing a framework-maintained
 temporary state store that can be used to communicate and share data between a
