@@ -30,33 +30,34 @@ compares our design to other alternatives.
 
 \subsection{Low-latency scheduling}
 Supporting tiny tasks requires a low-latency, high throughput cluster scheduler.
-For instance, supporting $100$ms tasks in a cluster with $10,000$ cores
-(e.g., 1250 8-core machines),
-requires a scheduler that can, on average, make $10^5$ scheduling
+For instance, supporting $100$ms tasks in a cluster with $160,000$ cores
+(e.g., 10,000 16-core machines),
+requires a scheduler that can, on average, make $1.6$ million scheduling
 decisions per second.
 Today's centralized schedulers have well-known scalability
 limits~\cite{wilkesberkeley} that
-hinder their ability to support tiny tasks in a large cluster/
+hinder their ability to support tiny tasks in a large cluster.
 Recently proposed distributed scheduling techniques including batch
-sampling~\cite{ousterhoutbatch} provide a scalable alternative, and provide
-near-optimal scheduling.
+sampling~\cite{ousterhoutbatch} have shown that distributed schedulers
+can scale well and beyond millions decisions per second at near-optimality.
 Our proposed system relies on the use of such distributed schedulers.
 
 In addition to providing high throughput scheduling decisions, a framework for
-tiny tasks must also reduce the overhead
-for launching individual tasks. Popular frameworks like Hadoop MapReduce
-have task launch overheads of many seconds, while newer frameworks like Spark,
-reduce task launch overhead to tens of milliseconds. The time required to 
-ship binaries across the network is the dominant cause of this overhead.
-In order to support sub-second tasks while also ensuring that
-task launch overhead is not a significant fraction of task runtime, we propose a system
-that caches binaries, and provides task launch overheads of $100 \mu$s. While significantly
-lower than current overheads, we believe that this low
-overhead is attainable in a well-engineered system:
-studies of network round
-trip times in datacenters have demonstrated that round trip times of 10$\mu$s
-are attainable today, and launching a task in Java by simply
-reusing a running thread requires less than $1\mu$s
+tiny tasks must also reduce the latency for launching individual tasks,
+especially in the case of cooperative scheduling.
+Consider for an average task length of $100$ms, in order to achieve 99\% utilization,
+task launch overhead should be less than $1$ms.
+Popular frameworks like Hadoop MapReduce
+have task launch overheads of many seconds, largely due to the use of
+heartbeat messages to communicate scheduling decisions and the need to launch new
+processes for each task.
+Newer frameworks like Spark reduce task launch overhead to tens of
+milliseconds using an event-driven architecture and maintaining
+an active thread pool for execution~\cite{shark-tr}.
+With the use of distributed schedulers and more careful engineering,
+it is attainable to reduce the task launch overhead to a level much lower than the
+required $1$ms, as it has been shown that $5\mu$s-$10\mu$s RPCs are possible
+in the short term~\cite{low-latency}.
 
 \subsection{Pipelined Execution}
 \label{sec:pipeline}
