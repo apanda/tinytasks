@@ -3,7 +3,7 @@
 
 % Argue that we need a new architecture
 While existing frameworks can benefit from the use of smaller tasks (as shown
-in Figure~\ref{fig:sparkskew}), supporting sub-second tasks for all jobs in large clusters
+in Figure~\ref{fig:sparkskew}), supporting tiny tasks for all jobs in large clusters
 requires addressing numerous challenges.
 Supporting tiny tasks requires a highly scalable scheduler that can
 handle hundreds of thousands of scheduling decisions per second and
@@ -20,16 +20,16 @@ each of these challenges and the lower bound that each challenge places
 on response time; we aim for tasks that are as small as possible.
 We find that tasks that complete in hundreds of milliseconds
 are practical in the short-term, and that we can drive task launch overhead
-down to 100$\mu$s to further reduce task runtime in the future.
+down to 50$\mu$s to further reduce task runtime in the future.
 
 \subsection{Execution model}
-We propose a tiny task execution model that supports data-parallel computations
+We propose a task execution model that supports data-parallel computations
 expressed using a variety of popular programming frameworks (e.g.,
 MapReduce~\cite{dean2008mapreduce}, Spark~\cite{zaharia2010spark},
 DryadLINQ~\cite{yu2008dryadlinq}).
 A job is composed of a number of tasks, each representing an atomic
 and idempotent unit of execution. A task consists of a set of named inputs
-and code that operates on these inputs, and runs on a single machine.
+and code that operates on these inputs, and each task runs on a single machine.
 We assume a cooperative scheduling model; i.e., tasks explicitly release
 resources on completion (in contrast to preemptive models, discussed in
 \S\ref{sec:preemption}).
