@@ -59,7 +59,7 @@ job to complete.
 These outliers occur for one of two reasons.
 First, outliers may be caused by poorly performing machines that cause tasks scheduled
 on them to take longer; e.g.,
-malfunctioning disks, contended CPUs, or congested networks.
+due to malfunctioning disks, contended CPUs, or congested networks.
 Second, work may have been unevenly
 divided across tasks, either due to
 partitioning skew, where data was unevenly allocated to tasks, or due to
@@ -79,7 +79,7 @@ machines will perform poorly.
 \eat{
 Tiny tasks help mitigate the effect of outliers in two ways. First, splitting
 total work across a larger set of tasks more evenly partitions records across tasks, reducing data skew;
-secondly, individual tasks can be moved in response to slow machines, network congestions, or
+secondly, individual tasks can be moved in response to slow machines, network congestion, or
 other cluster conditions, and run on other, faster machines.
 }
 We use a Facebook trace~\cite{chen2012interactive} to quantify how much job response time would
@@ -109,7 +109,7 @@ if a task is running on a slow machine, it may take less total time when
 broken into tiny tasks, because some of the tiny tasks will be run on faster
 machines.
 This experiment underestimates the possible improvements from
-evenly balancing work, and also ignores task launch overheads, which
+evenly balancing work but ignores task launch overheads, which
 we address in the next experiment.
 %However, we note that this simulation ignores any overheads associated with 
 %tiny tasks and we measure the effects in our next experiment.
@@ -120,7 +120,7 @@ With tiny tasks, Spark is able to mitigate both skew and stragglers without expl
 
 %Next, we use Spark~\cite{zaharia2010spark} to demonstrate that tiny tasks
 %improve performance in the presence
-To demonstrate that using tiny tasks improve performance in
+To demonstrate that using tiny tasks improves performance in
 the presence of slow machines,
 we modified some machines in a cluster to run more slowly, and then
 ran a Spark~\cite{zaharia2010spark} job using different numbers of tasks. 

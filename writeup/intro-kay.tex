@@ -49,8 +49,9 @@ Tiny tasks solve two major problems in current data-parallel frameworks:
 }
 \vspace{4pt}\noindent\textbf{Batch and interactive sharing:}
 Current clusters are forced to tradeoff utilization and responsiveness.
-In a highly utilized cluster, if a high priority job arrives, the job may
-need to wait for long-running tasks to complete before being launched, sacrificing responsiveness.
+In a highly utilized cluster, if a high priority interactive job arrives,
+the job may
+need to wait for long-running, batch tasks to complete before being launched, sacrificing responsiveness.
 On the other end of the spectrum, a cluster can maintain a reserved
 set of machines for high priority jobs, which provides responsiveness at
 the expense of utilization.
@@ -58,20 +59,6 @@ the expense of utilization.
 %need to wait for long-running tasks to complete before being run.
 Tiny tasks allow a cluster to be \emph{both} responsive and highly utilized, since small tasks ensure frequent opportunities for new,
 higher priority jobs to be launched.
-\eat{
-Long task runtimes make it challenging to run both batch and interactive
-jobs on the same cluster. In particular, task lengths place a lower bound on
-the time before resources allocated to a running task can be recovered. A new
-task therefore must wait for running tasks to finish before it can start running.
-This waiting time is a significant contributor to task latency, and thus adversly
-affects the request latency for interactive jobs.
-
-One must tradeoff between
-cluster utilization and responsiveness, limiting the benefits of sharing
-a cluster. By reducing task runtimes to an acceptably small value, tiny
-tasks allow batch and interactive jobs share the same resources, without
-trading off request latency.
-}
 
 \vspace{4pt}\noindent\textbf{Straggler mitigation:}
 Prior work has shown that job runtimes are largely determined by
@@ -81,7 +68,7 @@ work is evenly balanced across tasks, and to speculatively launch
 redundant tasks when a task appears to be running on a slow machine.
 Tiny tasks alleviate the straggler problem because work is allocated to
 machines at fine granularity, so work will automatically be evenly spread
-over available resources, and slower machines will automatically be assigned
+over available resources, and slower machines will be assigned
 less work. Preliminary simulations based on a Facebook workload
 demonstrate that by mitigating the straggler problem, tiny tasks
 can improve response times by as much as a factor of 5.2.
@@ -112,7 +99,7 @@ small file blocks. Finally, tiny tasks require modifications to current programm
 models to allow \emph{all} jobs to be split into tiny tasks. We propose a system
 that addresses these challenges using a distributed scheduler, and an execution model that gives the execution framework control
 over I/O. Our proposed system supports
-100 microsecond task launches, and allows most applications to be
+50 microsecond task launches, and allows most applications to be
 expressed in terms of a set of tiny tasks.
 
 We begin by quantifying the benefits of tiny tasks in~\S\ref{sec:benefits}.
