@@ -6,12 +6,12 @@ While existing frameworks can benefit from the use of smaller tasks (as shown
 in Figure~\ref{fig:sparkskew}), supporting tiny tasks for all jobs in large clusters
 requires addressing numerous challenges.
 Supporting tiny tasks requires low task launch overheads and a highly scalable scheduler that can
-handle hundreds of thousands of scheduling decisions per second.% and
+handle hundreds of thousands of scheduling decisions per second. % and
 %launch tasks with low overhead.
 Tiny tasks must operate on correspondingly
 small blocks of data, requiring a scalable file system. To ensure that
 tasks can complete quickly, we propose giving the framework more control
-over I/O.% so that, for example, a task's data is already in-memory when the
+over I/O. % so that, for example, a task's data is already in-memory when the
 %task is launched.
 Finally, ensuring
 that all jobs can be broken into tiny tasks requires some improvements
