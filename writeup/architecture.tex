@@ -177,7 +177,7 @@ in the short term~\cite{low-latency}.
 %input is fetched while another task is running, thus more fully utilizing both
 %the CPU and the I/O bus.
 
-Using tiny tasks gives the framework more control to optimize I/O.
+Using tiny tasks requires giving the framework more control to optimize I/O.
 %Pipelining is particularly powerful when combined with small tasks.
 With
 today's large tasks, tasks accumulate a large amount of output data in memory.
@@ -209,7 +209,7 @@ parallelized. Parallelizing all jobs is the most significant challenge
 in realizing tiny tasks. 
 Consider, for example, reduce tasks in a MapReduce job. In the limit,
 one reduce task can be launched to handle each key. However, if all
-values map to the same key, that key cannot easily be split into many
+values map to the same key, that key cannot easily be split into multiple
 tasks.
 %granularity of a reduce task
 %is to process a single key.
