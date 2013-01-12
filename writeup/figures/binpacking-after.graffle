@@ -386,11 +386,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -411,11 +411,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -436,11 +436,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -461,11 +461,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -486,11 +486,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -511,11 +511,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -536,11 +536,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -561,11 +561,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -586,11 +586,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -611,11 +611,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -636,11 +636,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -661,11 +661,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.6</string>
+						<string>0.00784314</string>
 						<key>g</key>
-						<string>0.6</string>
+						<string>0.372549</string>
 						<key>r</key>
-						<string>0.6</string>
+						<string>0.85098</string>
 					</dict>
 				</dict>
 			</dict>
@@ -718,7 +718,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-01-10 23:32:04 +0000</string>
+	<string>2013-01-12 18:54:36 +0000</string>
 	<key>Modifier</key>
 	<string>Aurojit Panda</string>
 	<key>NotesVisible</key>
