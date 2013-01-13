@@ -387,11 +387,11 @@
 					<key>Color</key>
 					<dict>
 						<key>b</key>
-						<string>0.498039</string>
+						<string>0.0213648</string>
 						<key>g</key>
-						<string>0.498039</string>
+						<string>0.0213648</string>
 						<key>r</key>
-						<string>0.498039</string>
+						<string>0.0213648</string>
 					</dict>
 					<key>HeadArrow</key>
 					<string>0</string>
@@ -1063,7 +1063,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-01-12 18:56:20 +0000</string>
+	<string>2013-01-13 01:22:40 +0000</string>
 	<key>Modifier</key>
 	<string>Aurojit Panda</string>
 	<key>NotesVisible</key>
@@ -1100,6 +1100,16 @@
 		<array>
 			<string>int</string>
 			<string>0</string>
+		</array>
+		<key>NSPrinter</key>
+		<array>
+			<string>coded</string>
+			<string>BAtzdHJlYW10eXBlZIHoA4QBQISEhAlOU1ByaW50ZXIAhIQITlNPYmplY3QAhZKEhIQITlNTdHJpbmcBlIQBKxZSQURMYWIgS2l0Y2hlbiBQcmludGVyhoY=</string>
+		</array>
+		<key>NSPrinterName</key>
+		<array>
+			<string>string</string>
+			<string>RADLab Kitchen Printer</string>
 		</array>
 		<key>NSRightMargin</key>
 		<array>
