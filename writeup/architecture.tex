@@ -79,23 +79,24 @@ resources on completion (in contrast to preemptive models, discussed in
 
 In the short term, we expect the time needed to read input data to be the
 limiting factor in driving down task durations.
-Previous work has shown that 8MB random disk reads achieve approximately 88\%
-of the bandwidth of sequential reads, and that smaller
+Previous work has shown that 8MB random disk reads can achieve approximately 88\%
+of the throughput of sequential reads, and that smaller
 random reads cause significant performance degradation due to disk seeks~\cite{nightingale2012flat}. Thus, as long as input data is stored on disk, we
-expect tasks to read at least 8MB of input data. Data-parallel
-workloads are commonly I/O bound, so we expect task runtime to be of the
-same order of magnitude as the amount of time to read input data; thus,
-assuming 100MB/s disk throughput, 8MB input data sizes imply task durations
+require that tasks read at least 8MB of input data. Data-parallel
+workloads are commonly I/O bound, so we expect task runtime to be dominated
+by time taken to read input data; thus,
+assuming 100MB/s disk throughput, 8MB input data sizes should result in task durations
 of hundreds of milliseconds.
 
-Using small data blocks requires a move away from traditional file systems like
+Using small data blocks requires a move away from traditional distributed file systems like
 HDFS, where scalability limitations prevent the use of small blocks.
 While HDFS does allow reading only part of a block, having multiple tiny tasks
 that operate on the same file block limits parallelism.
 Recent work on distributed filesystems, e.g., Flat Data Center
-Storage (FDS)~\cite{nightingale2012flat}, addresses HDFS scalability concerns by
-distributing metadata across multiple servers. While FDS addresses the scalability
-concerns, effective use of tiny tasks requires close coordination between the file
+Storage (FDS)~\cite{nightingale2012flat}, addresses these scalability concerns by
+distributing metadata across multiple servers. 
+
+The effective use of tiny tasks also requires close coordination between the file
 system, the scheduler, and the caching layer.
 In particular, locality based scheduling, pipelined data access, caching blocks in 
 memory, and effective coordination of network traffic are closely linked, and 

@@ -44,3 +44,9 @@ backup
 
 # Vim crud
 .*.s[a-w][a-z]
+
+#aspell
+.aspell*
+
+# OS X
+.DS_Store
