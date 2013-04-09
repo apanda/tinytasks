@@ -48,7 +48,7 @@ the job to complete more quickly.}
 \end{figure}
 
 \begin{figure}[t]
-    \includegraphics[width=0.4\textwidth]{figures/spark-skew-results}
+    \includegraphics[width=0.4\textwidth]{figures/spark_experiment/straggler}
     \vspace{-3ex}
     \caption{Improvement from using tiny tasks in a cluster where 20\% of machines
 take 20x longer to run each task. Error bars depict standard deviation.}
@@ -98,7 +98,7 @@ total time for all tasks in the job were perfectly divided over the slots
 used by the job.
 Figure~\ref{fig:binpacked} compares this binpacked completion time to the
 job's original completion time. Evenly balancing work improves performance by
-$2.2$x and $5.1$x at the median and 95th percentile, respectively, for
+$2.2$x and $5.2$x at the median and 95th percentile, respectively, for
 jobs that originally had 100 or more tasks.
 %Jobs that originally had
 %100 or more tasks benefit substantially from balancing work more evenly:

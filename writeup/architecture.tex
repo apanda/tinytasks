@@ -24,7 +24,7 @@ We find that tasks that complete in hundreds of milliseconds
 are practical in the short-term, and that we can drive task launch overhead
 down to further reduce task runtime in the future.
 
-\subsection{Execution model}
+\subsection{Execution Model}
 We propose a task execution model that supports data-parallel computations
 expressed using a variety of popular programming frameworks (e.g.,
 MapReduce~\cite{dean2004mapreduce}, Spark~\cite{zaharia2010spark},
@@ -75,7 +75,7 @@ resources on completion (in contrast to preemptive models, discussed in
 % pre-fetches inputs before running a task and is responsible for saving
 % outputs to disk or transferring them over the network.  
 
-\subsection{Scalable storage systems}
+\subsection{Scalable Storage Systems}
 
 In the short term, we expect the time needed to read input data to be the
 limiting factor in driving down task durations.
@@ -90,7 +90,7 @@ of hundreds of milliseconds.
 
 Using small data blocks requires a move away from traditional distributed file systems like
 HDFS, where scalability limitations prevent the use of small blocks.
-While HDFS does allow reading only part of a block, having multiple tiny tasks
+While HDFS does allow tasks to read only part of a block, having multiple tiny tasks
 that operate on the same file block limits parallelism.
 Recent work on distributed filesystems, e.g., Flat Data Center
 Storage (FDS)~\cite{nightingale2012flat}, addresses these scalability concerns by
@@ -107,7 +107,7 @@ component that accounts for these factors.
 
 
 
-\subsection{Low-latency scheduling}
+\subsection{Low-Latency Scheduling}
 Supporting tiny tasks requires a low-latency, high throughput cluster scheduler.
 Handling $100$ms tasks in a cluster with $160,000$ cores
 (e.g., 10,000 16-core machines),
@@ -123,9 +123,9 @@ centralized schedulers
 provide higher throughput~\cite{zaharia2012meetup}.
 However, handling large clusters and very
 short tasks may require a decentralized scheduler design.
-Recently proposed distributed scheduling techniques including batch
-sampling~\cite{ousterhoutbatch} have shown that distributed schedulers
-can scale well beyond millions of decisions per second at near-optimality.
+Recently proposed distributed schedulers (e.g., Sparrow~\cite{ousterhout2013sparrow})
+can scale well beyond millions of decisions per second while providing near-optimal
+response times.
 Our proposed system relies on the use of such distributed schedulers.
 %Since a job completes only when all of its tasks complete, we also plan to 
 %explore techniques like gang scheduling~\cite{feitelson1992gang} to minimize

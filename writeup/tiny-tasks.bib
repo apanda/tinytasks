@@ -1,3 +1,10 @@
+@inproceedings{thusoo2010data,
+ author = {Thusoo, Ashish and Shao, Zheng and Anthony, Suresh and Borthakur, Dhruba and Jain, Namit and Sen Sarma, Joydeep and Murthy, Raghotham and Liu, Hao},
+ title = {{Data Warehousing and Analytics Infrastructure at Facebook}},
+ booktitle = {Proc. SIGMOD},
+ year = {2010},
+} 
+
 @inproceedings{dc-teenage-decade,
   title = "Warehouse-Scale Computing: Entering the Teenage Decade",
   author = "Luiz Andre Barroso",
@@ -14,7 +21,7 @@
 @inproceedings{diskirrelevant,
   author="{G. Ananthanarayanan, A. Ghodsi, S. Shenker, I. Stoica}",
   title="{Disk-Locality in Datacenter Computing Considered Irrelevant}",
-  booktitle={{USENIX HotOS}},
+  booktitle={Proc. HotOS},
   year = 2011
 }
 @article{sherman1972trace,
@@ -28,11 +35,14 @@
   publisher={ACM}
 }
 @article{douglis1991transparent,
-  title={Transparent process migration: Design alternatives and the Sprite implementation},
+  title={{Transparent Process Migration: Design Alternatives and the Sprite Implementation}},
   author={Douglis, F. and Ousterhout, J.},
   journal={Software: Practice and Experience},
   year={1991},
-  publisher={Wiley Online Library}
+  publisher={Wiley Online Library},
+  volume = {21},
+  number = {8},
+  pages = {757--785}
 }
 @article{milojivcic2000process,
   title={Process migration},
@@ -42,11 +52,10 @@
   publisher={ACM}
 }
 @inproceedings{ananthanarayanan2012true,
-  title={True elasticity in multi-tenant data-intensive compute clusters},
+  title={{True Elasticity in Multi-Tenant Data-Intensive Compute Clusters}},
   author={Ananthanarayanan, G. and Douglas, C. and Ramakrishnan, R. and Rao, S. and Stoica, I.},
-  booktitle={Proceedings of the Third ACM Symposium on Cloud Computing},
+  booktitle={Proc. SOCC},
   year={2012},
-  organization={ACM}
 }
 @inproceedings{kwon2012skewtune,
   title={SkewTune: Mitigating skew in MapReduce applications},
@@ -58,16 +67,14 @@
 @inproceedings{ananthanarayanan2010reining,
   title={{Reining in the Outliers in Map-Reduce Clusters using Mantri}},
   author={Ananthanarayanan, G. and Kandula, S. and Greenberg, A. and Stoica, I. and Lu, Y. and Saha, B. and Harris, E.},
-  booktitle={Proceedings of the 9th USENIX conference on Operating systems design and implementation},
+  booktitle={Proc. OSDI},
   year={2010},
-  organization={USENIX Association}
 }
 @inproceedings{ananthanarayanan2011scarlett,
-  title={Scarlett: coping with skewed content popularity in mapreduce clusters},
+  title={{Scarlett: Coping with Skewed Content Popularity in MapReduce Clusters}},
   author={Ananthanarayanan, G. and Agarwal, S. and Kandula, S. and Greenberg, A. and Stoica, I. and Harlan, D. and Harris, E.},
-  booktitle={Proceedings of the Sixth European Conference on Computer systems},
+  booktitle={Proc. EuroSys},
   year={2011},
-  organization={ACM}
 }
 @inproceedings{zaharia2008improving,
   title={{Improving MapReduce Performance in Heterogeneous Environments}},
@@ -107,27 +114,23 @@
 author = {John Wilkes},
 title = {{Omega: Flexible, Scalable Schedulers for Large Compute Clusters}},
 year = {2013},
-journal = {Proc. EuroSys},
-note = {To appear}
+booktitle = {Proc. EuroSys},
 }
 
-@article{chowdhury2011managing,
-  title={Managing data transfers in computer clusters with orchestra},
+@inproceedings{chowdhury2011managing,
+  title={{Managing Data Transfers in Computer Clusters with Orchestra}},
   author={Chowdhury, M. and Zaharia, M. and Ma, J. and Jordan, M.I. and Stoica, I.},
-  journal={SIGCOMM-Computer Communication Review},
-  volume={41},
-  number={4},
-  pages={98},
+  booktitle={Proc. SIGCOMM},
+  pages={98--109},
   year={2011}
 }
 
 @inproceedings{chowdhury2012coflow,
-  title={Coflow: a networking abstraction for cluster applications},
+  title={{Coflow: A Networking Abstraction for Cluster Applications}},
   author={Chowdhury, M. and Stoica, I.},
-  booktitle={Proceedings of the 11th ACM Workshop on Hot Topics in Networks},
+  booktitle={Proc. HotNets},
   pages={31--36},
   year={2012},
-  organization={ACM}
 }
 
 @inproceedings{yu2008dryadlinq,
@@ -139,12 +142,12 @@ note = {To appear}
 }
 
 @inproceedings{clark2005live,
-  title={Live migration of virtual machines},
+  title={{Live Migration of Virtual Machines}},
   author={Clark, C. and Fraser, K. and Hand, S. and Hansen, J.G. and Jul, E. and Limpach, C. and Pratt, I. and Warfield, A.},
-  booktitle={Proceedings of the 2nd conference on Symposium on Networked Systems Design \& Implementation-Volume 2},
+  booktitle={Proc. NSDI},
   pages={273--286},
   year={2005},
-  organization={USENIX Association}
+  volume = {2},
 }
 
 @article{tanenbaum1990experiences,
@@ -177,10 +180,27 @@ note = {To appear}
     Number = {UCB/EECS-2012-214},
 }
 
+@article{dean2013the,
+  title={{The Tail at Scale}},
+  author={Dean, Jeffrey and Barroso, Luiz Andr\'{e}},
+  journal = {CACM},
+  year = {2013},
+  volume = {56},
+  number = {2},
+  pages = {74--80}
+}
+
+@inproceedings{ananthanarayanan2013effective,
+  title = {{Effective Straggler Mitigation: Attack of the Clones}},
+  author = {Ananthanarayanan, Ganesh and Ghodsi, Ali and Shenker, Scott and Stoica, Ion},
+  booktitle = {Proc. NSDI},
+  year = {2013},
+}
+
 @article{dean2004mapreduce,
   title={{MapReduce: Simplified Data Processing on Large Clusters}},
   author={Dean, Jeffrey and Ghemawat, Sanjay},
-  journal = {Proceedings of the 6th conference on Symposium on Operating Systems Design and Implementation},
+  journal = {Proc. OSDI},
   year={2004},
 }
 
@@ -218,52 +238,33 @@ note = {To appear}
 } 
 
 @inproceedings{hindman2011mesos,
-  title={Mesos: A platform for fine-grained resource sharing in the data center},
+  title={{Mesos: A Platform for Fine-Grained Resource Sharing in the Data Center}},
   author={Hindman, B. and Konwinski, A. and Zaharia, M. and Ghodsi, A. and Joseph, A.D. and Katz, R. and Shenker, S. and Stoica, I.},
-  booktitle={Proceedings of the 8th USENIX conference on Networked systems design and implementation},
-  pages={22--22},
+  booktitle={Proc. NSDI},
   year={2011},
-  organization={USENIX Association}
-}
-
-@inproceedings{ananthanarayanan2012why,
- author = {Ananthanarayanan, Ganesh and Ghodsi, Ali and Shenker, Scott and Stoica, Ion},
- title = {Why let resources idle? aggressive cloning of jobs with dolly},
- booktitle = {Proceedings of the 4th USENIX conference on Hot Topics in Cloud Ccomputing},
- series = {HotCloud'12},
- year = {2012},
- address = {Boston, MA},
 }
 
 @inproceedings{ghemawat2003google,
-  title={The Google file system},
+  title={{The Google File System}},
   author={Ghemawat, S. and Gobioff, H. and Leung, S.T.},
-  booktitle={ACM SIGOPS Operating Systems Review},
-  volume={37},
-  number={5},
+  booktitle={Proc. SOSP},
   pages={29--43},
   year={2003},
-  organization={ACM}
 }
 
-@article{chang2008bigtable,
-  title={Bigtable: A distributed storage system for structured data},
+@inproceedings{chang2008bigtable,
+  title={{Bigtable: A Distributed Storage System for Structured Data}},
   author={Chang, F. and Dean, J. and Ghemawat, S. and Hsieh, W.C. and Wallach, D.A. and Burrows, M. and Chandra, T. and Fikes, A. and Gruber, R.E.},
-  journal={ACM Transactions on Computer Systems (TOCS)},
-  volume={26},
-  number={2},
-  pages={4},
-  year={2008},
-  publisher={ACM}
+  booktitle = {Proc. OSDI},
+  year={2006},
 }
 
 @inproceedings{gufler2012load,
-  title={Load balancing in mapreduce based on scalable cardinality estimates},
+  title={{Load Balancing in MapReduce Based on Scalable Cardinality Estimates}},
   author={Gufler, B. and Augsten, N. and Reiser, A. and Kemper, A.},
-  booktitle={Data Engineering (ICDE), 2012 IEEE 28th International Conference on},
+  booktitle={Proc. ICDE},
   pages={522--533},
-  year={2012},
-  organization={IEEE}
+  year={2012}
 }
 
 @article{stoica2001chord,
@@ -278,12 +279,10 @@ note = {To appear}
 }
 
 @inproceedings{bhatotia2011incoop,
-  title={Incoop: MapReduce for incremental computations},
+  title={{Incoop: MapReduce for Incremental Computations}},
   author={Bhatotia, P. and Wieder, A. and Rodrigues, R. and Acar, U.A. and Pasquin, R.},
-  booktitle={Proceedings of the 2nd ACM Symposium on Cloud Computing},
-  pages={7},
+  booktitle={Proc. SOCC},
   year={2011},
-  organization={ACM}
 }
 
 @inproceedings{zaharia2010delay,
@@ -296,12 +295,11 @@ note = {To appear}
 }
 
 @inproceedings{blumofe1994scheduling,
-  title={Scheduling multithreaded computations by work stealing},
+  title={{Scheduling Multithreaded Computations by Work Stealing}},
   author={Blumofe, R.D. and Leiserson, C.E.},
-  booktitle={Foundations of Computer Science, 1994 Proceedings., 35th Annual Symposium on},
+  booktitle={Proc. FOCS},
   pages={356--368},
   year={1994},
-  organization={IEEE}
 }
 
 @misc{zaharia2012meetup,
@@ -328,24 +326,20 @@ note = {To appear}
   organization={USENIX Association}
 }
 
-@article{dunlap2002revirt,
-  title={ReVirt: Enabling intrusion analysis through virtual-machine logging and replay},
+@inproceedings{dunlap2002revirt,
+  title={{ReVirt: Enabling Intrusion Analysis through Virtual-Machine Logging and Replay}},
   author={Dunlap, G.W. and King, S.T. and Cinar, S. and Basrai, M.A. and Chen, P.M.},
-  journal={ACM SIGOPS Operating Systems Review},
-  volume={36},
-  number={SI},
-  pages={211--224},
+  booktitle={Proc. OSDI},
   year={2002},
-  publisher={ACM}
+  pages={211--224}
 }
 
 @article{chen2012interactive,
-  title={Interactive analytical processing in big data systems: a cross-industry study of MapReduce workloads},
+  title={{Interactive Analytical Processing in Big Data Systems: A Cross-Industry Study of MapReduce Workloads}},
   author={Chen, Y. and Alspaugh, S. and Katz, R.},
-  journal={Proceedings of the VLDB Endowment},
+  journal={Proc. of the VLDB Endow.},
   volume={5},
   number={12},
   pages={1802--1813},
   year={2012},
-  publisher={VLDB Endowment}
 }
