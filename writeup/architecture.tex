@@ -95,7 +95,13 @@ that operate on the same file block limits parallelism.
 Recent work on distributed filesystems, e.g., Flat Data Center
 Storage (FDS)~\cite{nightingale2012flat}, addresses these scalability concerns by
 distributing metadata across multiple servers. 
-
+%While FDS adequately addresses scalability concerns, but a framework built for
+%tiny tasks can improve performance by using a closely integrating the file
+%system and the scheduler, as discussed in \S\ref{sec:pipeline}.
+As discussed in \S\ref{sec:pipeline}, a framework built for tiny tasks can
+improve on FDS performance by more closely integrating the file system and
+the task scheduler.
+\eat{
 The effective use of tiny tasks also requires close coordination between the file
 system, the scheduler, and the caching layer.
 In particular, locality based scheduling, pipelined data access, caching blocks in 
@@ -104,11 +110,11 @@ must be considered holistically. We propose building a globally aware, distribut
 component that accounts for these factors.
 %, and provides additional information to
 %both the scheduler, and the filesystem.
-
+}
 
 
 \subsection{Low-Latency Scheduling}
-Supporting tiny tasks requires a low-latency, high throughput cluster scheduler.
+Supporting tiny tasks requires a low-latency, high throughput task scheduler.
 Handling $100$ms tasks in a cluster with $160,000$ cores
 (e.g., 10,000 16-core machines),
 requires a scheduler that can, on average, make $1.6$ million scheduling
@@ -170,14 +176,123 @@ required $1$ms, as it has been shown that $5\mu$s-$10\mu$s RPCs are possible
 in the short term~\cite{low-latency}.
 }
 %\subsection{Pipelined Execution}
-\subsection{Framework-controlled I/O}
+\subsection{Framework-Controlled I/O}
 \label{sec:pipeline}
+Using tiny tasks fundamentally changes the resource footprint of tasks,
+giving the framework more control to optimize I/O.
+Today's large tasks accumulate a large amount of output data in memory.
+Often this output data will exceed available memory and spill onto disk,
+leading to poor MapReduce performance~\cite{lipcon2012optimizing}.
+Tiny tasks fundamentally change the task resource footprint: since tasks
+run for a shorter period of time, they generate less output data and thus use
+less memory. The framework can explicitly control the remaining memory, caching
+the most important data and storing remaining data on disk or on a different
+machine.
+%For example, output data can be written to disk in the background, while
+%more tasks are executing, alleviating performance problems caused by spilling
+%data to disk during task execution. 
+For MapReduce-style jobs, the framework could store the map
+outputs that will be used for the first set of reduce tasks in memory, and store
+remaining outputs on disk. While the first set of tiny reduce tasks are running,
+the framework can pipeline reading data for the next set of tasks.
+This approach considers file system scheduling, network scheduling, task scheduling,
+and caching holistically. The benefits of a more holistic approach to
+scheduling have been illustrated in more restricted settings (e.g., in the
+context of network scheduling~\cite{chowdhury2012coflow,chowdhury2011managing}),
+but validating our broader approach remains for future work.
+\eat{
+We propose further optimizing I/O by breaking each task into three phases, and
+scheduling each phase separately. Current task exeuction involves fetching data
+(typically from disk), processing this data, and storing the output (sometimes
+by sending the output over the network). By breaking apart these phases and scheduling each separately,
+the framework can optimize resource usage: the framework need not guess when
+a task will need to use the disk, for example, and can opportunistically
+read input data for future datas from disk or over the network when resources are
+idle. This approach assumes that considering file system scheduling, data
+caching, network
+scheduling, and task scheduling holistically will improve performance.
+The benefits of a more holistic approach to scheduling have been illustrated in
+restricted
+settings (e.g., in the context of network scheduling~\cite{chowdhury2012coflow,chowdhury2011managing}), but validating our more radical approach is the subject of ongoing work.
+    }
+ \eat{     
+The framework can store the most frequently used output data in memory, and flush
+remaining data to disk.
+
 %To optimize for short tasks, we propose pipelining the phases of task execution.
 %Current task execution involves a task fetching data from the disk, or over the network,
 %processing this data, and storing the output either on memory or on disk. We observe
 %that these three steps are independent phases. We propose pipelining these phases such that one task's
 %input is fetched while another task is running, thus more fully utilizing both
 %the CPU and the I/O bus.
+To optimize for tiny tasks, we propose giving the framework more control over I/O.
+Current task execution involves a task fetching data (typically from disk), processing
+this data, and storing the output either on memory or on disk.
+
+decouple stages of a task
+over taks life time, using many types of resources. instead of traditional thing,
+assign each independently, leads to pipelining
+doing this reduces the efficiency loss from having so many small tasks
+
+by tightly integrating the task scheduler and the file system.
+
+To improve the efficiency and response time of small tasks, we propose giving
+the framework more control over I/O by tightly integrating the scheduler
+and the file system. Traditionally, task execution involves fetching data (often
+from disk), processing this data, and outputting the data (by storing data in
+memory or on disk, or by sending the data over the network). We propose scheduling
+each of these three phases independently. This approach allows the scheduler to
+keep disks, CPU, and network resources all highly utilized, without needing to guess
+when a task will need to use each resource.
+
+A scheduler for tiny tasks can improve efficiency and utilization by tightly
+controlling I/O.
+% More control over I/O
+Tiny tasks funamentally change the resource footprint of tasks, giving the framework
+more control over I/O. We propose leveraging this additional control by tightly
+integrating the task scheduler and the distributed file system.
+Today's large tasks accumulate a large amount of output data in memory.
+Often this output data will exceed available memory, 
+and will spill onto a disk, leading to poor MapReduce
+performance~\cite{lipcon2012optimizing}. Tiny tasks fundamentally change the
+resource footprint of tasks: since tasks run for a shorter period of time,
+they generate less output data and thus use less memory. When a tiny task completes,
+it explicitly gives control of its output data to the framework.  
+The framework can choose to cache the most important and most frequently-accessed
+output data, and store the remaining data on disk or move it to a different machine.
+
+% Why this control is useful
+
+% Efficiency improvement0
+% Memory foot print different --> framework can decide what to do with data (and
+% no problems with data spilling to disk)
+% further benefits. We propose further optimizing by pipelining, considering these
+% things holsitically, understanding benefit is subject of future work.
+Data written to disk can be written in the background, while more tasks for the
+job are run, alleviating the performance problems caused by spilling data to disk
+during task execution.
+
+
+The framework can
+explicitly control the remaining memory, choosing to cache the most important
+and most frequently-accessed output data, and store the remaining data on disk
+or on a different machine. Data written to disk can be written in the
+background, while more tasks for the job are run, alleviating the performance
+problems caused by spilling data to disk during task execution.
+Shifting control of I/O entirely to the framework also allows for
+powerful optimizations.  For a MapReduce-style job, for instance, the
+framework could store the map outputs that will be used for the first set of
+tiny reduce tasks in memory, and store the remaining outputs on disk. While
+the first set of tiny reduce tasks are running, the framework can pipeline
+reading data for the next set of tasks.  Giving frameworks better control over
+I/O has been shown
+to greatly improve network utilization and performance in
+clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
+
+
+Using tiny tasks enables the framework to improve efficiency and utilization
+by optimizing I/O. Tiny tasks fundamentally change the resource footprint of
+tasks, and give the framework more choice in when to transfer data 
 
 Using tiny tasks requires providing the framework with additional control to optimize I/O.
 %Pipelining is particularly powerful when combined with small tasks.
@@ -201,7 +316,7 @@ reading data for the next set of tasks.  Giving frameworks better control over
 I/O has been shown
 to greatly improve network utilization and performance in
 clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
-
+}
 \subsection{Programming model}
 \label{sec:prog}
 Most tasks in a data parallel framework can be split into tiny tasks by

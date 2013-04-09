@@ -1,10 +1,10 @@
 \section{Alternate Designs and Related Work}
 \label{sec:alternate}
 
-Tiny tasks solve two major problems: outliers, and sharing
+Tiny tasks solve two major problems: stragglers, and sharing
 a cluster between batch and interactive jobs. A variety of
 approaches solve one of the two problems in isolation; e.g., skew handling
-techniques mitigate outliers, and process migration allows improved
+techniques mitigate stragglers, and process migration allows improved
 sharing between long and short jobs.
 %Unlike these approaches, tiny tasks
 %provides a simple technique to solve both problems.
@@ -26,7 +26,8 @@ in operating systems.
 %has applied preemption in a distributed context.
 % by migrating
 %processes between machines.
-Compared to tiny tasks, one advantage of preemption is that the system
+Compared to tiny tasks, one advantage of using preemption to guarantee sharing
+properties is that the system
 can tightly control scheduling quanta~\cite{sherman1972trace,tanenbaum1990experiences};
 however, preemption has other disadvantages:
 
@@ -97,19 +98,26 @@ and can be solved with improved engineering. Second, they note that creating
 sized for the benefits of tiny tasks to hold; rather, tasks must be orders of
 magnitude smaller than today's tasks.
 
-\subsection{Static Partitioning}
+\subsection{Coarse-Graned Partitioning}
 Many clusters use static partitioning to ensure that long-running jobs do not
 cause head of line blocking for newly arriving, high priority
 jobs~\cite{thusoo2010data}. Static partitioning limits utiliation because each
 partition must be provisioned to handle peak load, and extra capacity cannot
 easily be reallocated.
 
+
+Omega~\cite{wilkes2013omega}, Google's cluster scheduler, uses more flexible coarse
+grained partitioning. Omega shares a cluster across many frameworks that
+each perform their own task-level scheduling. Tiny tasks can improve performance
+for a single framework in this context, but performing task-level scheduling
+separately for each framework limits cluster utilization.
+Tiny tasks reap the greatest efficiency benefits when used to share resources
+between multiple users and frameworks.
+%such systems limit utilization by
+%performing task-level scheduling separately for each framework. Tiny tasks reap
+%the greatest benefit when used to share resources between different frameworks at
+%task-level granularity.
 \eat{
-Omega, Google's cluster scheduler, uses more flexible coarse grained partitioning.
-Services like Dremel~\cite{melnik2010dremel} spin up long-running agents to serve
-incoming queries, rather than scheduling new resources for each request.
-Omega closely monitors resource usage on each 
-Many clusters use static partitioning 
 Omega, Google's cluster scheduler~\cite{wilkes2013omega},
 shares cluster resources between batch and interactive workloads using
 coarse-grained partitioning of cluster resources.
@@ -120,6 +128,20 @@ Such coarse-grained partitioning limits utilization because each service
 must be provisioned to handle peak load, and one service's extra capacity
 cannot easily be reallocated to another service.
 }
+\subsection{Fine-grained Sharing}
+The idea of using smaller units of work to improve load balancing is well
+studied.  In multi-threaded applications, work-stealing
+based schedulers~\cite{blumofe1994scheduling} divide work at very fine granularities to provide better load
+balancing.  Smaller units of work have also been used in
+operating systems~\cite{sherman1972trace}, storage systems~\cite{chang2008bigtable,ghemawat2003google} and distributed hash tables~\cite{stoica2001chord}. We apply this
+principle to tasks scheduled in large-scale clusters.  The
+idea of sharing cluster resources at task-level granularity has been used in
+existing cluster schedulers~\cite{hindman2011mesos, zaharia2010delay} and prior
+proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop} to
+address some of the problems.
+Tiny tasks drive the idea of small tasks to the extreme to enable improved
+sharing of cluster resources
+and better responsiveness.
 
 \subsection{Skew-Handling}
 A separate line of research has focused on skew-mitigation to
@@ -146,22 +168,4 @@ most important.
 %re such guarantees might be most
 %important.
 
-\subsection{Fine-grained Sharing}
-The idea of using smaller units of work to improve load balancing is well
-studied.  In multi-threaded applications, work-stealing
-based schedulers~\cite{blumofe1994scheduling} divide work at very fine granularities to provide better load
-balancing.  Smaller units of work have also been used in
-operating systems~\cite{sherman1972trace}, storage systems~\cite{chang2008bigtable,ghemawat2003google} and distributed hash tables~\cite{stoica2001chord}. We apply this
-principle to tasks scheduled in large-scale clusters.  The
-idea of sharing cluster resources at task-level granularity has been used in
-existing cluster schedulers~\cite{hindman2011mesos, zaharia2010delay} and prior
-proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop} to
-address some of the problems.
-Tiny tasks drive the idea of small tasks to the extreme to enable improved
-sharing of cluster resources
-and better responsiveness.
 
-%  Fair sharing 
-% of cluster resources across multiple users has bee proposed in 
-
-% Mesos~\cite{hindman2010mesos}
