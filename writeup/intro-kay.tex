@@ -2,30 +2,46 @@
 Cluster computing has become widespread, leading to a proliferation of
 research on improving performance for data-parallel computations. 
 Researchers have attempted
-to tackle a variety of problems that arise in this setting by improving
-fairness~\cite{zaharia2008improving,hindman2011mesos},
-handling preemption~\cite{ananthanarayanan2012true,isard2009quincy},
-mitigating stragglers~\cite{ananthanarayanan2010reining,ananthanarayanan2012why},
-and reducing skew~\cite{ananthanarayanan2011scarlett,kwon2012skewtune,gufler2012load}.
+to tackle numerous problems that arise in this setting 
+including unfairness~\cite{ananthanarayanan2012true,hindman2011mesos,isard2009quincy,zaharia2008improving}, stragglers~\cite{ananthanarayanan2012why,ananthanarayanan2010reining}, and skew~\cite{ananthanarayanan2011scarlett,gufler2012load,kwon2012skewtune}.
+Reducing task granularity alleviates all of these problems, yet surprisingly has
+not been explored.
+%Prior efforts use a variety of techniques but surprisingly overlook a single
+%variable: task granularity.
+%While these efforts use a variety of techniques, we argue that a single aspect
+% asset approach technique aspect variable facet
+%can address all of these challenges
+%by improving
+%fairness~\cite{zaharia2008improving,hindman2011mesos},
+%supporting preemption~\cite{ananthanarayanan2012true,isard2009quincy},
+%mitigating stragglers~\cite{ananthanarayanan2010reining,ananthanarayanan2012why},
+%and reducing skew~\cite{ananthanarayanan2011scarlett,kwon2012skewtune,gufler2012load}.
 %These efforts have significantly improved performance and efficiency.
 %We argue that a single variable affects all of these challenges: the
 %granularity of tasks.
-We argue that task granularity affects all of these challenges. Surprisingly,
-to the best of our knowledge, no one has explored the effects of lowering
-task granularity on these problems.
+%We argue that a single variable underlies all of these 
+%We argue that a single variable affects all of these challenges: the granularity
+%of tasks.
+%We argue that task granularity affects all of these challenges.
+%Surprisingly,
+%to the best of our knowledge, no one has explored the effect of lowering
+%task granularity on data-parallel computations.
+% on these problems.
 %This paper argues that a single variable affects all of these scheduling
 %challenges
 %Yet, they have surprisingly not explored a single variable that affects all
 %of the
 %aforementioned challenges: the granularity of tasks.
-Historically, task launch overheads have prevented users from running
-short tasks; however, recent improvements in distributed file systems and
-scheduling have eliminated these scaling bottlenecks.
+%Reducing task granularity addresses all of these problems.
+Historically, task launch overheads have prevented using smaller tasks,
+but recent improvements in distributed file systems and
+scheduling have eliminated scaling bottlenecks.
 %prohibited the use of sub-second
 %tasks; however, recent advances in scheduler and
-We argue for
-breaking all jobs into \emph{tiny tasks}, which alleviates or eliminates
-all of the following problems:
+Thus, we argue for
+breaking all jobs into \emph{tiny tasks}, which offers the following benefits:
+%alleviates or eliminates
+%the following problems:
 %solves many problems in
 %current data-parallel frameworks:
 
@@ -47,29 +63,37 @@ should be broken into tiny units of work that each complete quickly.
 Tiny tasks solve two major problems in current data-parallel frameworks:
 %Decreased task runtimes solve two major problems in today's datacenters:
 }
-\vspace{4pt}\noindent\textbf{Batch and interactive sharing:}
+%\vspace{4pt}
+\noindent\textbf{Batch and interactive sharing:}
 Current clusters are forced to tradeoff utilization and responsiveness.
-In a highly utilized cluster, if a high priority interactive job arrives,
-the job may
-need to wait for long-running, batch tasks to complete before being launched, sacrificing responsiveness.
-On the other end of the spectrum, a cluster can maintain a reserved
-set of machines for high priority jobs, which provides responsiveness at
-the expense of utilization.
+If a cluster is highly utilized, an interactive job may need to wait for long-running
+batch tasks to complete before it can be serviced; reserving slots for
+interactive jobs avoids this problem but results in lower
+utilization.
+%In a highly utilized cluster, if a high priority interactive job arrives,
+%the job may
+%need to wait for long-running, batch tasks to complete before being launched, sacrificing responsiveness.
+%On the other end of the spectrum, a cluster can maintain a reserved
+%set of machines for high priority jobs, which provides responsiveness at
+%the expense of utilization.
 %a high priority job in a highly utilized cluster might
 %need to wait for long-running tasks to complete before being run.
 Tiny tasks allow a cluster to be \emph{both} responsive and highly utilized, since small tasks ensure frequent opportunities for new,
-higher priority jobs to be launched.
+interactive jobs to be launched.
 
-\vspace{4pt}\noindent\textbf{Straggler mitigation:}
+%\vspace{4pt}
+\noindent\textbf{Straggler mitigation:}
 Prior work has shown that job runtimes are largely determined by
 stragglers: tasks that take much longer to complete than other tasks in the
-job. This problem has led to a wide variety of techniques to ensure that
-work is evenly balanced across tasks, and to speculatively launch
-redundant tasks when a task appears to be running on a slow machine.
+job.
+%This problem has led to a wide variety of techniques to ensure that
+%work is evenly balanced across tasks~\cite{gufler2012load,kwon12skewtune}, and to
+%speculatively launch
+%redundant tasks when a task appears to be running on a slow machine~\cite{dean2004mapreduce,zaharia2008improving,ananthanarayanan2010reining}.
 Tiny tasks alleviate the straggler problem because work is allocated to
 machines at fine granularity, so work will automatically be evenly spread
 over available resources, and slower machines will be assigned
-less work. Preliminary simulations based on a Facebook workload
+less work. Simulations based on a Facebook workload
 demonstrate that by mitigating the straggler problem, tiny tasks
 can improve response times by as much as a factor of 5.2.
 \eat{

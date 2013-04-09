@@ -2,14 +2,19 @@
 
 \label{sec:benefits}
 
-Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
-available to the scheduler: tiny tasks occupy resources for a very small
-duration, so resources can be allocated at a very fine time-granularity. This
-allows resources to be dynamically reallocated between jobs, enabling greater
-cluster utilization without sacrificing request latency, and allows
-resources to be dynamically
-reallocated between tasks within a job, eliminating problems caused
-by straggling tasks and data skew.
+Tiny tasks benefit datacenter workloads by reducing scheduling quanta. Using
+a trace-based simulation and experiments with Spark~\cite{zaharia2010spark},
+we demonstrate that tiny tasks can improve job response times by 
+as much as a factor of 5.2.
+
+%Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
+%available to the scheduler: tiny tasks occupy resources for a very small
+%duration, so resources can be allocated at a very fine time-granularity. This
+%allows resources to be dynamically reallocated between jobs, enabling greater
+%cluster utilization without sacrificing request latency, and allows
+%resources to be dynamically
+%reallocated between tasks within a job, eliminating problems caused
+%by straggling tasks and data skew.
 
 \subsection{Handling of skew and stragglers}
 
@@ -88,19 +93,30 @@ improve if work were perfectly partitioned across machines.
 %resources, we used a Facebook trace to determine how much
 %job response time would improve if work were perfectly partitioned across
 %machines.
-For each job, we divided the total runtime for all tasks in the
-job by the average number of slots used and compare this time to the job's
-original completion time.
+For each job in the trace, we ask how long the job would have taken if the
+total time for all tasks in the job were perfectly divided over the slots
+used by the job.
+Figure~\ref{fig:binpacked} compares this ``binpacked'' completion time to the
+job's original completion time. Evenly balancing work improves performance by
+$2.2$x and $5.1$x at the median and 95th percentile, respectively, for
+jobs that originally had 100 or more tasks.
+%Jobs that originally had
+%100 or more tasks benefit substantially from balancing work more evenly:
+%the median and 95th percentile reduction in completion time is $2.2$s and
+%at the median, large jobs see 
+%For each job, we divided the total runtime for all tasks in the
+%job by the average number of slots used and compare this time to the job's
+%original completion time.
 %Our experiment studies the benefits of perfectly balancing
 %work across machines; with tiny tasks, two machines may differ in the amount of
 %time spent processing data for a particular job by as much as one task
 %length.
-Figure~\ref{fig:binpacked}
-demonstrates that jobs with 100 or more tasks benefit substantially from
-balancing work more evenly: at the median, large jobs see
-a $2.2$x reduction in response time from evenly spreading load
-across machines, and
-jobs at the 95th percentile see a $5.2$x reduction in response time.
+%Figure~\ref{fig:binpacked}
+%demonstrates that jobs with 100 or more tasks benefit substantially from
+%balancing work more evenly: at the median, large jobs see
+%a $2.2$x reduction in response time from evenly spreading load
+%across machines, and
+%jobs at the 95th percentile see a $5.2$x reduction in response time.
 This experiment provides a conservative bound on the speedup for two reasons. First, jobs
 may have been using fewer than their fair share of slots in the original trace,
 simply because there were not enough tasks to occupy more slots; in this case,
