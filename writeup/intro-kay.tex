@@ -65,7 +65,7 @@ Tiny tasks solve two major problems in current data-parallel frameworks:
 }
 %\vspace{4pt}
 \noindent\textbf{Batch and interactive sharing:}
-Current clusters are forced to tradeoff utilization and responsiveness.
+Current clusters are required to tradeoff utilization and responsiveness.
 If a cluster is highly utilized, an interactive job may need to wait for long-running
 batch tasks to complete before it can be serviced; reserving slots for
 interactive jobs avoids this problem but results in lower
@@ -91,8 +91,8 @@ job.
 %speculatively launch
 %redundant tasks when a task appears to be running on a slow machine~\cite{dean2004mapreduce,zaharia2008improving,ananthanarayanan2010reining}.
 Tiny tasks alleviate the straggler problem because work is allocated to
-machines at fine granularity, so work will automatically be evenly spread
-over available resources, and slower machines will be assigned
+machines at a fine granularity, so work can be evenly spread
+over available resources, and slower machines are assigned
 less work. Simulations based on a Facebook workload
 demonstrate that by mitigating the straggler problem, tiny tasks
 can improve response times by as much as a factor of 5.2.

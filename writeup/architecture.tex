@@ -3,13 +3,14 @@
 
 % Argue that we need a new architecture
 While existing frameworks can benefit from the use of smaller tasks (as shown
-in Figure~\ref{fig:sparkskew}), supporting tiny tasks for all jobs in large clusters
+in Figure~\ref{fig:sparkskew}), supporting tiny tasks for all jobs in a large cluster
 requires addressing numerous challenges.
-Supporting tiny tasks requires low task launch overheads and a highly scalable scheduler that can
+A cluster supporting tiny tasks must provide low task launch overheads and use
+a highly scalable scheduler that can
 handle hundreds of thousands of scheduling decisions per second. % and
 %launch tasks with low overhead.
-Tiny tasks must operate on correspondingly
-small blocks of data, requiring a scalable file system. To ensure that
+Tiny tasks operate on
+small blocks of data, and hence require a scalable file system. To ensure that
 tasks can complete quickly, we propose giving the framework more control
 over I/O. % so that, for example, a task's data is already in-memory when the
 %task is launched.
@@ -26,7 +27,7 @@ down to further reduce task runtime in the future.
 \subsection{Execution model}
 We propose a task execution model that supports data-parallel computations
 expressed using a variety of popular programming frameworks (e.g.,
-MapReduce~\cite{dean2008mapreduce}, Spark~\cite{zaharia2010spark},
+MapReduce~\cite{dean2004mapreduce}, Spark~\cite{zaharia2010spark},
 DryadLINQ~\cite{yu2008dryadlinq}).
 A job is composed of a number of tasks, each representing an atomic
 and idempotent unit of execution. A task consists of a set of named inputs
@@ -177,12 +178,11 @@ in the short term~\cite{low-latency}.
 %input is fetched while another task is running, thus more fully utilizing both
 %the CPU and the I/O bus.
 
-Using tiny tasks requires giving the framework more control to optimize I/O.
+Using tiny tasks requires providing the framework with additional control to optimize I/O.
 %Pipelining is particularly powerful when combined with small tasks.
-With
-today's large tasks, tasks accumulate a large amount of output data in memory.
-Often, a task's output data will overflow the available space in memory
-and spill onto a disk, which is a well-known cause of poor MapReduce
+Today's large tasks accumulate a large amount of output data in memory.
+Often this output data will exceed available memory, 
+and will spill onto a disk, leading to poor MapReduce
 performance~\cite{lipcon2012optimizing}. Tiny tasks fundamentally change the
 resource footprint of tasks: since tasks run for a shorter period of time,
 they generate less output data and thus use less memory. The framework can
