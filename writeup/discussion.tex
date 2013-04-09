@@ -5,34 +5,43 @@ Tiny tasks solve two major problems: outliers, and sharing
 a cluster between batch and interactive jobs. A variety of
 approaches solve one of the two problems in isolation; e.g., skew handling
 techniques mitigate outliers, and process migration allows improved
-sharing between long and short jobs.  Unlike these approaches, tiny tasks
-provides a simple technique to solve both problems.
+sharing between long and short jobs.
+%Unlike these approaches, tiny tasks
+%provides a simple technique to solve both problems.
 
 \subsection{Preemption and Process Migration}
 \label{sec:preemption}
 %\subsection{Alternate Design Schemes}
 
 Our choice of a cooperative multi-tasking scheme with tiny tasks 
-is in contrast to preemption based schemes with long running tasks commonly used 
-in operating systems. The benefits of process preemption are well studied in operating
-systems literature; for instance~\cite{sherman1972trace} shows the benefits
-of short scheduling quanta. Work in distributed
-operating systems~\cite{douglis1991transparent,milojivcic2000process,rozier1991overview} and virtual machines~\cite{tanenbaum1990experiences}
-has applied preemption in a distributed context by exploring migrating
-processes between machines.
-Compared to tiny tasks, one advantage of preemption is that scheduling quanta
-can be tightly controlled, since the system controls
-when the task is preempted. However, preemption has other disadvantages:
+contrasts preemption based schemes commonly used 
+in operating systems.
+%The benefits of using process preemption to enforce
+%short scheduling quanta are well studied in operating
+%systems literature (e.g., ~\cite{sherman1972trace}).
+%demonstrates the benefits of
+%using preemption to enforce short scheduling quanta.
+%Work in distributed
+%operating systems~\cite{douglis1991transparent,milojivcic2000process,rozier1991overview} and virtual machines~\cite{tanenbaum1990experiences}
+%has applied preemption in a distributed context.
+% by migrating
+%processes between machines.
+Compared to tiny tasks, one advantage of preemption is that the system
+can tightly control scheduling quanta~\cite{sherman1972trace,tanenbaum1990experiences};
+however, preemption has other disadvantages:
 
 %However achieveing low overhead task-switching is more expensive in the distributed setting.
 \vspace{4pt}\noindent\textbf{Cost of task-switching:}
-Work on process
-migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
-machine migration~\cite{clark2005live} has shown mechanisms to transparently
-move tasks across machines. Such methods, however, involve a high overhead, as
-migrating a task involves transferring task context, a task's intermediate
-data, and its inputs. For data parallel applications, input data and intermediate
-data can be several gigabytes, incurring very high overheads.
+Prior work has proposed mechanisms to migrate processes
+~\cite{douglis1991transparent,milojivcic2000process}, virtual machines~\cite{clark2005live}, and services~\cite{rozier1991overview} across machines.
+%Work on process
+%migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
+%machine migration~\cite{clark2005live} proposes mechanisms to transparently
+%move tasks across machines.
+%Such methods involve a high overhead, as
+Migrating tasks involves transferring inputs, context, and intermediate
+data; for data parallel applications, input data and intermediate
+data can be several gigabytes, incurring high migration overhead.
 
 %Cooperative multitasking, by contrast, eliminates the need to migrate such data. In
 %addition, we envision moving shared state into a framework-maintained scratch space.
@@ -45,22 +54,40 @@ data can be several gigabytes, incurring very high overheads.
 %apps. Cite some VM papers here… 
 
 \vspace{4pt}\noindent\textbf{Fault tolerance:}
-Tiny tasks are better suited for
-fault tolerance than task preemption. Since tiny tasks
-are deterministic, each task is unit of work that can be executed in parallel
- during recovery~\cite{zaharia2012discretized}.
-In contrast, while using 
-preemption with larger tasks, the system will need to perform expensive
-operations like checkpointing task execution events~\cite{dunlap2002revirt},
-and fault recovery cannot be executed in parallel.
+If a long task fails, it must be re-executed from the beginning. Periodic task
+checkpointing
+can speed recovery, but at great expense~\cite{dunlap2002revirt}.
+On the other hand, the short duration of
+tiny tasks limits the amount of lost work after a failure, and tiny
+tasks can be executed in parallel to speed recovery.
+%tiny tasks
+%represent small units of work that can be executed in parallel during recovery.
+%each task is a unit of work that can be executed in parallel during recovery.
+%Furthermore, unlike with tiny tasks,
+%fault recovery cannot be parallelized.
+%Tiny tasks are better suited for
+%fault tolerance than task preemption. Since tiny tasks
+%are deterministic, each task is unit of work that can be executed in parallel
+% during recovery~\cite{zaharia2012discretized}.
+%In contrast, while using 
+%preemption with larger tasks, the system will need to perform expensive
+%operations like checkpointing task execution events~\cite{dunlap2002revirt},
+%and fault recovery cannot be executed in parallel.
 
-In datacenters, schedulers like Quincy~\cite{isard2009quincy} kill tasks on
-preemption and trade-off between responsiveness and wasting the work of tasks
-that are preempted.  Recent work proposed Amoeba~\cite{ananthanarayanan2012true},
-a system that uses preemption in the context of MapReduce-like
-cluster computing frameworks. Amoeba identifies safe-points where a task can be
+In spite of these drawbacks, some schedulers for data parallel application
+use preemption.
+Quincy~\cite{isard2009quincy} kills tasks on
+preemption, trading wasted work for responsiveness.
+%ting the work of tasks
+%that are preempted.
+Amoeba~\cite{ananthanarayanan2012true} uses preemption to provide improved elasticity in the context of 
+MapReduce-like cluster computing frameworks. 
+%Recent work proposed Amoeba~\cite{ananthanarayanan2012true},
+%a system that uses preemption in the context of MapReduce-like
+%cluster computing frameworks.
+Amoeba identifies safe-points when a task can be
 paused and restarted elsewhere without wasted work. The main drawback of Amoeba
-is that it does not provide a mechanism for determining such safe-points, which
+is that it does not provide a mechanism for determining safe-points, which
 is difficult for general tasks (even tasks that use the MapReduce programming
 model).  The Amoeba authors choose preemptability rather than small tasks for
 two reasons. First, they cite high task launch overheads in systems like
@@ -71,13 +98,13 @@ sized for the benefits of tiny tasks to hold; rather, tasks must be orders of
 magnitude smaller than today's tasks.
 
 \subsection{Coarse-grained Partitioning}
-Omega, Google's cluster scheduler~\cite{melnik2010dremel},
-was designed to share cluster
-resources between batch and interactive workloads. However, Omega achieves
-this by coarse-grained partitioning of cluster resources.
+Omega, Google's cluster scheduler~\cite{wilkes2013omega},
+shares cluster resources between batch and interactive workloads using
+coarse-grained partitioning of cluster resources.
 Interactive services like Dremel~\cite{melnik2010dremel} spin up long-running
 agents that serve incoming queries, rather than scheduling new resources for
-each request.  Such coarse-grained partitioning limits utilization because each service
+each request.  
+Such coarse-grained partitioning limits utilization because each service
 must be provisioned to handle peak load, and one service's extra capacity
 cannot easily be reallocated to another service.
 
@@ -90,27 +117,28 @@ speculation~\cite{zaharia2008improving}. Mantri and Scarlett attempt to
 mitigate task runtime skew by modeling the causes for skew and accounting for
 these causes when scheduling tasks. In particular, Mantri performs resource aware scheduling to decrease the
 probability of observing task skews, while Scarlett replicates storage blocks
-based on their probability to decrease the wait time for a popular block. While
-both of these systems moderately reduce task skew, they rely on a fragile set of
-signals, and do not work in all cases.
+based on their probability to decrease the wait time for a popular block. Both of these systems moderately reduce task skew, but they rely on a fragile set of
+signals and do not work in all cases.
 %Using tiny tasks naturally overcomes data
 %skew among reduce tasks as fine-grained hash partitioning ensures that the data is
 %more evenly spread across tasks. As shown in
 %Section~\ref{sec:benefits}, using tiny tasks also allows work to be balanced across
 %different machines thereby overcoming skew due to slow machines.
-Furthermore, existing skew mitigation techniques trade-off cluster resources to
+Furthermore, existing skew mitigation techniques use additional cluster resources to
 gain more predictable task runtimes. This limits the applicability of these
-techniques under situations of high load, where such guarantees might be most
-important.
+techniques under situations of high load, when achieving predictability may be
+most important.
+%re such guarantees might be most
+%important.
 
 \subsection{Fine-grained Sharing}
 The idea of using smaller units of work to improve load balancing is well
-studied.  In multi-threaded applications, work-stealing~\cite{blumofe1994scheduling}
-based schedulers divide work at very fine granularities to provide better load
-balancing.  Smaller units of work have also been used in many other contexts
-including operating systems~\cite{sherman1972trace}, storage systems~\cite{ghemawat2003google,
+studied.  In multi-threaded applications, work-stealing
+based schedulers~\cite{blumofe1994scheduling} divide work at very fine granularities to provide better load
+balancing.  Smaller units of work have also been used in
+operating systems~\cite{sherman1972trace}, storage systems~\cite{ghemawat2003google,
 chang2008bigtable} and distributed hash tables~\cite{stoica2001chord}. We apply this
-principle to the granularity of tasks scheduled in large-scale clusters.  The
+principle to tasks scheduled in large-scale clusters.  The
 idea of sharing cluster resources at task-level granularity has been used in
 existing cluster schedulers~\cite{hindman2011mesos, zaharia2010delay} and prior
 proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop} to

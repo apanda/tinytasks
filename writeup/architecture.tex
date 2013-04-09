@@ -246,10 +246,14 @@ seen so far. We envision that this store would provide a key-value interface,
 and would provide strong consistency guarantees.
 
 Inevitably, some tasks will be impractical to split, despite these tools.
-To accommodate these
-tasks, we plan on allowing some large tasks to run on the cluster. These tasks
-may need to run on a small part of the cluster reserved for large tasks.
-Alternately, we expect that if a small percentage of tasks remain large, they
-can be run on the same infrastructure as tiny tasks without impacting the
-performance of remaining tasks. Exploring the effects of such sharing is
-the subject of ongoing research.
+To accommodate such
+tasks, we plan on allowing some large tasks to run on the cluster. We expect
+that if a small percentage of tasks remain large, they can be run on the same 
+infrastructure as tiny tasks without impacting the performance of remaining tasks.
+Exploring the impact of such sharing is the subject of ongoing research.
+%These tasks
+%may need to run on a small part of the cluster reserved for large tasks.
+%Alternately, we expect that if a small percentage of tasks remain large, they
+%can be run on the same infrastructure as tiny tasks without impacting the
+%performance of remaining tasks. Exploring the effects of such sharing is
+%the subject of ongoing research.

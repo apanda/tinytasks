@@ -21,11 +21,11 @@ set ylabel "Cumulative Fraction" offset 2
 set xlabel "Improvement in Job Completion Time" offset 0,1
 set bars small
 set datafile separator ","
-set output "binpacked1-sep-avg.pdf"
+set output "binpacked1-sep.pdf"
 set style fill noborder pattern 3
 f(x) = m*x + b
 set xrange [1:10]
-set key bottom right
+set key bottom right title "Original Job Size"
 #fit f(x) "sorted-log" using 5:6 via m, b
 #plot "sorted-log" using 5:6 w points lc -1 lt 1 pt 8  title "Time vs Loss", \
 #     f(x) w lines lc 9 lt 1 title "Fit line"

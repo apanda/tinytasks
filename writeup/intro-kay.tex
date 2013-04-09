@@ -5,7 +5,7 @@ Researchers have attempted
 to tackle numerous problems that arise in this setting 
 including unfairness~\cite{ananthanarayanan2012true,hindman2011mesos,isard2009quincy,zaharia2008improving}, stragglers~\cite{ananthanarayanan2012why,ananthanarayanan2010reining}, and skew~\cite{ananthanarayanan2011scarlett,gufler2012load,kwon2012skewtune}.
 Reducing task granularity alleviates all of these problems, yet surprisingly has
-not been explored.
+not been explored in this context.
 %Prior efforts use a variety of techniques but surprisingly overlook a single
 %variable: task granularity.
 %While these efforts use a variety of techniques, we argue that a single aspect
@@ -35,7 +35,7 @@ not been explored.
 %Reducing task granularity addresses all of these problems.
 Historically, task launch overheads have prevented using smaller tasks,
 but recent improvements in distributed file systems and
-scheduling have eliminated scaling bottlenecks.
+scheduling eliminate scaling bottlenecks.
 %prohibited the use of sub-second
 %tasks; however, recent advances in scheduler and
 Thus, we argue for

@@ -43,7 +43,7 @@ the job to complete more quickly.}
     \includegraphics[width=0.4\textwidth]{figures/binpacked1-sep}
     \vspace{-3ex}
     \caption{ Improvement from perfectly balancing the total machine time for
-    each job across its tasks. }
+    each job across its slots. }
     \label{fig:binpacked}
 \end{figure}
 
@@ -96,7 +96,7 @@ improve if work were perfectly partitioned across machines.
 For each job in the trace, we ask how long the job would have taken if the
 total time for all tasks in the job were perfectly divided over the slots
 used by the job.
-Figure~\ref{fig:binpacked} compares this ``binpacked'' completion time to the
+Figure~\ref{fig:binpacked} compares this binpacked completion time to the
 job's original completion time. Evenly balancing work improves performance by
 $2.2$x and $5.1$x at the median and 95th percentile, respectively, for
 jobs that originally had 100 or more tasks.
@@ -162,11 +162,11 @@ how to decrease overheads in \S\ref{sec:prog}.
 }
 \vspace{-0.1in}
 \caption{Two jobs running in a cluster with four slots. With today's tasks,
-tasks for the high-priority grey job need to wait for long-running tasks from the black job to
+tasks for the high-priority dark job need to wait for long-running tasks from the light job to
 complete before being launched.
 With tiny tasks, resource
 allocation is fine-grained, so resources will quickly be allocated to
-higher priority grey job.}
+higher priority dark job.}
 %new
 %jobs, allowing the higiher-priority grey job to complete more quickly.}
 \vspace{-2ex}
