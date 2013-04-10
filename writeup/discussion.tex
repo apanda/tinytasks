@@ -33,8 +33,10 @@ however, preemption has other disadvantages:
 
 %However achieveing low overhead task-switching is more expensive in the distributed setting.
 \vspace{4pt}\noindent\textbf{Cost of task-switching:}
-Prior work has proposed mechanisms to migrate processes
-~\cite{douglis1991transparent,milojivcic2000process}, virtual machines~\cite{clark2005live}, and services~\cite{rozier1991overview} across machines.
+Prior work has proposed mechanisms to migrate
+processes~\cite{douglis1991transparent,milojivcic2000process}, virtual
+machines~\cite{clark2005live}, and services~\cite{rozier1991overview} across
+machines.
 %Work on process
 %migration~\cite{douglis1991transparent,milojivcic2000process} and virtual
 %machine migration~\cite{clark2005live} proposes mechanisms to transparently
@@ -101,7 +103,7 @@ magnitude smaller than today's tasks.
 \subsection{Coarse-Graned Partitioning}
 Many clusters use static partitioning to ensure that long-running jobs do not
 cause head of line blocking for newly arriving, high priority
-jobs~\cite{thusoo2010data}. Static partitioning limits utiliation because each
+jobs~\cite{thusoo2010data}. Static partitioning limits utilization because each
 partition must be provisioned to handle peak load, and extra capacity cannot
 easily be reallocated.
 

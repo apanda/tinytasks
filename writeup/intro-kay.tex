@@ -3,7 +3,9 @@ Cluster computing has become widespread, leading to a proliferation of
 research on improving performance for data-parallel computations. 
 Researchers have attempted
 to tackle numerous problems that arise in this setting 
-including unfairness~\cite{ananthanarayanan2013effective,hindman2011mesos,isard2009quincy,zaharia2008improving}, stragglers~\cite{ananthanarayanan2013,ananthanarayanan2010reining}, and skew~\cite{ananthanarayanan2011scarlett,gufler2012load,kwon2012skewtune}.
+including
+unfairness~\cite{ananthanarayanan2013effective,hindman2011mesos,isard2009quincy,zaharia2008improving},
+stragglers~\cite{ananthanarayanan2013effective,ananthanarayanan2010reining}, and skew~\cite{ananthanarayanan2011scarlett,gufler2012load,kwon2012skewtune}.
 Reducing task granularity alleviates all of these problems, yet surprisingly has
 not been explored in this context.
 %Prior efforts use a variety of techniques but surprisingly overlook a single
@@ -94,7 +96,7 @@ Tiny tasks alleviate the straggler problem because work is allocated to
 machines at a fine granularity, so work can be evenly spread
 over available resources, and slower machines are assigned
 less work. Simulations based on a Facebook workload
-demonstrate that by mitigating the straggler problem, tiny tasks
+demonstrate that by mitigating stragglers, tiny tasks
 can improve response times by as much as a factor of 5.2.
 \eat{
 Prior work has shown that tasks runtimes exhibit a long
@@ -120,8 +122,8 @@ benefits from using small tasks.
 Third, tiny tasks must operate on correspondingly tiny amounts
 of data, which requires a file system that can handle a large number of 
 small file blocks. Finally, tiny tasks require modifications to current programming
-models to allow \emph{all} jobs to be split into tiny tasks. We propose a system
-that addresses these challenges using a distributed scheduler, and an execution model that gives the execution framework control
+models to allow \emph{all} jobs to be split into tiny tasks. We propose an
+architecture that addresses these challenges using a distributed scheduler, and an execution model that gives the execution framework control
 over I/O. Our proposed system supports
 50 microsecond task launches, and allows most applications to be
 expressed in terms of a set of tiny tasks.

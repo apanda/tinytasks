@@ -114,6 +114,7 @@ component that accounts for these factors.
 
 
 \subsection{Low-Latency Scheduling}
+\label{sec:sched}
 Supporting tiny tasks requires a low-latency, high throughput task scheduler.
 Handling $100$ms tasks in a cluster with $160,000$ cores
 (e.g., 10,000 16-core machines),
@@ -149,7 +150,7 @@ tiny tasks must also reduce the overhead for launching individual tasks.
 Popular frameworks like Hadoop MapReduce have task launch overheads of many
 seconds, due to a variety of factors including the need to launch a new
 JVM for each task; newer frameworks like Spark~\cite{zaharia2010spark} reduce
-overhead to $5$ms.
+the overhead to $5$ms.
 To support tasks that complete in hundreds of milliseconds, we argue for
 reducing task launch overhead even further to $1$ms so that launch overhead
 constitutes at most 1\% of task runtime.
