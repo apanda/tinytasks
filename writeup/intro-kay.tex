@@ -1,8 +1,8 @@
 \section{Introduction}
 Cluster computing has become widespread, leading to a proliferation of
-research on improving performance for data-parallel computations. 
+research on improving performance for data-parallel computations.
 Researchers have attempted
-to tackle numerous problems that arise in this setting 
+to tackle numerous problems that arise in this setting
 including
 unfairness~\cite{ananthanarayanan2013effective,hindman2011mesos,isard2009quincy,zaharia2008improving},
 stragglers~\cite{ananthanarayanan2013effective,ananthanarayanan2010reining}, and skew~\cite{ananthanarayanan2011scarlett,gufler2012load,kwon2012skewtune}.
@@ -21,7 +21,7 @@ not been explored in this context.
 %These efforts have significantly improved performance and efficiency.
 %We argue that a single variable affects all of these challenges: the
 %granularity of tasks.
-%We argue that a single variable underlies all of these 
+%We argue that a single variable underlies all of these
 %We argue that a single variable affects all of these challenges: the granularity
 %of tasks.
 %We argue that task granularity affects all of these challenges.
@@ -35,7 +35,7 @@ not been explored in this context.
 %of the
 %aforementioned challenges: the granularity of tasks.
 %Reducing task granularity addresses all of these problems.
-Historically, task launch overheads have prevented using smaller tasks,
+Historically, task launch overheads have prevented the use of smaller tasks,
 but recent improvements in distributed file systems and
 scheduling eliminate scaling bottlenecks.
 %prohibited the use of sub-second
@@ -112,7 +112,7 @@ allocated to a job in response to outliers.\\
 }
 
 
-Using smaller task duration offers performance improvements even in
+Using smaller tasks offers performance improvements even in
 today's frameworks.  However, we propose task durations of at most
 hundreds of milliseconds across all jobs, which cannot be fully supported without addressing
 numerous challenges. First, small tasks require a highly scalable scheduler
@@ -120,11 +120,11 @@ that can make frequent scheduling decisions. Second,
 task launch overheads must be small enough so as not to counteract the
 benefits from using small tasks.
 Third, tiny tasks must operate on correspondingly tiny amounts
-of data, which requires a file system that can handle a large number of 
+of data, which requires a file system that can handle a large number of
 small file blocks. Finally, tiny tasks require modifications to current programming
 models to allow \emph{all} jobs to be split into tiny tasks. We propose an
 architecture that addresses these challenges using a distributed scheduler, and an execution model that gives the execution framework control
-over I/O. Our proposed system supports
+over I/O. Our proposed design supports
 50 microsecond task launches, and allows most applications to be
 expressed in terms of a set of tiny tasks.
 

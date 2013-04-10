@@ -13,8 +13,8 @@ sharing between long and short jobs.
 \label{sec:preemption}
 %\subsection{Alternate Design Schemes}
 
-Our choice of a cooperative multi-tasking scheme with tiny tasks 
-contrasts preemption based schemes commonly used 
+Our choice of a cooperative multi-tasking scheme with tiny tasks
+contrasts preemption based schemes commonly used
 in operating systems.
 %The benefits of using process preemption to enforce
 %short scheduling quanta are well studied in operating
@@ -54,7 +54,7 @@ data can be several gigabytes, incurring high migration overhead.
 %operations (need to say this explicitly). In a preemptive model we need the
 %system to checkpoint and log execution in order to be able to transparently
 %recover. This has a high overhead, in particular, in the case of intensive data
-%apps. Cite some VM papers here… 
+%apps. Cite some VM papers here…
 
 \vspace{4pt}\noindent\textbf{Fault tolerance:}
 If a long task fails, it must be re-executed from the beginning. Periodic task
@@ -72,19 +72,19 @@ tasks can be executed in parallel to speed recovery.
 %fault tolerance than task preemption. Since tiny tasks
 %are deterministic, each task is unit of work that can be executed in parallel
 % during recovery~\cite{zaharia2012discretized}.
-%In contrast, while using 
+%In contrast, while using
 %preemption with larger tasks, the system will need to perform expensive
 %operations like checkpointing task execution events~\cite{dunlap2002revirt},
 %and fault recovery cannot be executed in parallel.
 
-In spite of these drawbacks, some schedulers for data parallel application
+In spite of these drawbacks, some schedulers for data parallel applications
 use preemption.
 Quincy~\cite{isard2009quincy} kills tasks on
 preemption, trading wasted work for responsiveness.
 %ting the work of tasks
 %that are preempted.
-Amoeba~\cite{ananthanarayanan2012true} uses preemption to provide improved elasticity in the context of 
-MapReduce-like cluster computing frameworks. 
+Amoeba~\cite{ananthanarayanan2012true} uses preemption to provide improved elasticity in the context of
+MapReduce-like cluster computing frameworks.
 %Recent work proposed Amoeba~\cite{ananthanarayanan2012true},
 %a system that uses preemption in the context of MapReduce-like
 %cluster computing frameworks.
@@ -100,7 +100,7 @@ and can be solved with improved engineering. Second, they note that creating
 sized for the benefits of tiny tasks to hold; rather, tasks must be orders of
 magnitude smaller than today's tasks.
 
-\subsection{Coarse-Graned Partitioning}
+\subsection{Coarse-Grained Partitioning}
 Many clusters use static partitioning to ensure that long-running jobs do not
 cause head of line blocking for newly arriving, high priority
 jobs~\cite{thusoo2010data}. Static partitioning limits utilization because each
@@ -125,7 +125,7 @@ shares cluster resources between batch and interactive workloads using
 coarse-grained partitioning of cluster resources.
 Interactive services like Dremel~\cite{melnik2010dremel} spin up long-running
 agents that serve incoming queries, rather than scheduling new resources for
-each request.  
+each request.
 Such coarse-grained partitioning limits utilization because each service
 must be provisioned to handle peak load, and one service's extra capacity
 cannot easily be reallocated to another service.
@@ -139,15 +139,15 @@ operating systems~\cite{sherman1972trace}, storage systems~\cite{chang2008bigtab
 principle to tasks scheduled in large-scale clusters.  The
 idea of sharing cluster resources at task-level granularity has been used in
 existing cluster schedulers~\cite{hindman2011mesos, zaharia2010delay} and prior
-proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop} to
-address some of the problems.
+proposals have also looked at splitting MapReduce tasks~\cite{bhatotia2011incoop}.
+%address some of the problems.
 Tiny tasks drive the idea of small tasks to the extreme to enable improved
 sharing of cluster resources
 and better responsiveness.
 
 \subsection{Skew-Handling}
-A separate line of research has focused on skew-mitigation to
-mitigate the effect of stragglers.
+A separate line of research has focused on skew and straggler mitigation.
+%mitigate the effect of stragglers.
 %improve job performance in data centers.
 Examples of such work include
 Mantri~\cite{ananthanarayanan2010reining}, SkewTune~\cite{kwon2012skewtune},
@@ -163,10 +163,11 @@ signals and do not work in all cases.
 %more evenly spread across tasks. As shown in
 %Section~\ref{sec:benefits}, using tiny tasks also allows work to be balanced across
 %different machines thereby overcoming skew due to slow machines.
-Furthermore, existing skew mitigation techniques use additional cluster resources to
+Furthermore, existing straggler mitigation techniques use additional cluster resources to
 gain more predictable task runtimes. This limits the applicability of these
 techniques under situations of high load, when achieving predictability may be
 most important.
+SkewTune reactively mitigates data skew by splitting large tasks at runtime, while tiny tasks preemptively avoid data skew.
 %re such guarantees might be most
 %important.
 

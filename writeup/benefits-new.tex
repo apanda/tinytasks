@@ -4,7 +4,7 @@
 
 Tiny tasks benefit datacenter workloads by reducing scheduling quanta. Using
 a trace-based simulation and experiments with Spark~\cite{zaharia2010spark},
-we demonstrate that tiny tasks can improve job response times by 
+we demonstrate that tiny tasks can improve job response times by
 as much as a factor of 5.2.
 
 %Tiny tasks benefit datacenter workloads by increasing the amount of elasticity
@@ -103,7 +103,7 @@ jobs that originally had 100 or more tasks.
 %Jobs that originally had
 %100 or more tasks benefit substantially from balancing work more evenly:
 %the median and 95th percentile reduction in completion time is $2.2$s and
-%at the median, large jobs see 
+%at the median, large jobs see
 %For each job, we divided the total runtime for all tasks in the
 %job by the average number of slots used and compare this time to the job's
 %original completion time.
@@ -127,7 +127,7 @@ machines.
 This experiment underestimates the possible improvements from
 evenly balancing work but ignores task launch overheads, which
 we address in the next experiment.
-%However, we note that this simulation ignores any overheads associated with 
+%However, we note that this simulation ignores any overheads associated with
 %tiny tasks and we measure the effects in our next experiment.
 
 
@@ -139,7 +139,7 @@ With tiny tasks, Spark is able to mitigate both skew and stragglers without expl
 To demonstrate that using tiny tasks improves performance in
 the presence of slow machines,
 we modified some machines in a cluster to run more slowly, and then
-ran a Spark~\cite{zaharia2010spark} job using different numbers of tasks. 
+ran a Spark~\cite{zaharia2010spark} job using different numbers of tasks.
 We used $50$ m1.medium EC2
 instances, 10 of which were modified to take 20x longer to run each task.
 Figure~\ref{fig:sparkskew} demonstrates that using a larger number of tasks
@@ -179,7 +179,7 @@ Today, sharing a cluster between interactive and batch jobs involves trading off
 responsiveness and utilization. If a cluster is highly utilized,
 an interactive job may need to wait for long-running batch tasks to
 complete before it can be serviced; reserving slots for
-interactive slots avoids this problem but results in lower utilization.
+interactive jobs avoids this problem but results in lower utilization.
 Using tiny tasks for all jobs avoids this tradeoff: the cluster can run at
 high utilization, while
 simultaneously guaranteeing that interactive jobs will only need to wait for

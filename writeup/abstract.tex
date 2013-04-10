@@ -8,11 +8,14 @@
 We argue for breaking data-parallel jobs
 in compute clusters into \textit{tiny tasks} that each complete in hundreds of milliseconds.
 Tiny tasks avoid the need for complex skew mitigation techniques: by
-breaking a large job into millions of tiny tasks, work will 
+breaking a large job into millions of tiny tasks, work will
 be evenly spread over available resources by the scheduler.
+%Furthermore, tiny tasks alleviate long wait times seen in today's
+%clusters for interactive jobs, since even tasks for batch jobs
+%complete quickly.
 Furthermore, tiny tasks alleviate long wait times seen in today's
-clusters for interactive jobs, since even tasks for batch jobs
-complete quickly.
+clusters for interactive jobs: even large batch jobs can be split into small
+tasks that each complete quickly.
 % Maybe remove this sentence?
 % Thus, tiny tasks allow for increased utilization without sacrificing
 % responsiveness or fairness.
@@ -34,7 +37,7 @@ This paper argues for a similar model to
 be used in datacenters by using \textit{tiny tasks} that complete in hundreds of
 milliseconds.  Tiny tasks alleviate the long wait times for interactive,
 user-facing jobs seen in today's clusters and avoid the need for complex skew
-mitigation techniques by evenly spreading work across available resources. 
+mitigation techniques by evenly spreading work across available resources.
 In current data-parallel computing frameworks, high task launch overheads, lack
 of scalable file systems, schedulers prevent users from running short
 tasks. While, recent improvements have addressed some of these bottlenecks,

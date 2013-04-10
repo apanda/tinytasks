@@ -16,7 +16,7 @@ over I/O. % so that, for example, a task's data is already in-memory when the
 %task is launched.
 Finally, ensuring
 that all jobs can be broken into tiny tasks requires some improvements
-to the programming model; e.g., support for aggregation trees.
+to the programming model; e.g., support for framework-managed temporary storage.
 In this section, we discuss a preliminary architecture to address
 each of these challenges and the lower bound that each challenge places
 on response time; we aim for tasks that are as small as possible.
@@ -43,7 +43,7 @@ resources on completion (in contrast to preemptive models, discussed in
 %at most $8$MB.
 %Previous work has shown that $8$MB random disk reads achieve
 %approximately $88$\% of the bandwidth of sequential reads, and smaller reads would
-%cause significant performance degradation due to disk seeks~\cite{nightingale2012flat}. 
+%cause significant performance degradation due to disk seeks~\cite{nightingale2012flat}.
 %Assuming $100$MB/s disk throughput in a fully pipelined execution framework, each task
 %can execute up roughly $100$ms to process the $8$MB input.
 
@@ -53,27 +53,27 @@ resources on completion (in contrast to preemptive models, discussed in
 %to truly support tiny tasks at $100$ms range.
 
 % While newer data-parallel frameworks like Spark can support tasks of finer-granularity,
-% Figure~\ref{fig:sparkskew} shows that even in newer frameworks like Spark, 
+% Figure~\ref{fig:sparkskew} shows that even in newer frameworks like Spark,
 % benefit from the use of
 % smaller tasks, Figure~\ref{fig:sparkskew}
 % shows the need for a new task execution framework to truly support tiny tasks across a wide
 % variety of jobs.
 
-%Supporting tiny tasks requires a highly scalable scheduler that can handle hundreds 
+%Supporting tiny tasks requires a highly scalable scheduler that can handle hundreds
 %of thousands of scheduling decisions per second. We also argue that efficiently using
 %tiny tasks requires task launch overheads be reduced to $1$ms or less.
 %Efficiently utilizing CPU and I/O resources with low task runtimes requires
 %a pipelined task execution model where the execution framework manages I/O
-%requests for input, output and intermediate data. We use a cooperative 
-%scheduling model, i.e., resources are reassigned after tasks explicitly release 
+%requests for input, output and intermediate data. We use a cooperative
+%scheduling model, i.e., resources are reassigned after tasks explicitly release
 %them on finishing. Task runtimes are limited by limiting input size and
-%appropriate modifications to programming frameworks. Section~\ref{sec:alternate} 
+%appropriate modifications to programming frameworks. Section~\ref{sec:alternate}
 %compares our design to other alternatives.
 
 
 % The task execution framework
 % pre-fetches inputs before running a task and is responsible for saving
-% outputs to disk or transferring them over the network.  
+% outputs to disk or transferring them over the network.
 
 \subsection{Scalable Storage Systems}
 
@@ -94,7 +94,7 @@ While HDFS does allow tasks to read only part of a block, having multiple tiny t
 that operate on the same file block limits parallelism.
 Recent work on distributed filesystems, e.g., Flat Data Center
 Storage (FDS)~\cite{nightingale2012flat}, addresses these scalability concerns by
-distributing metadata across multiple servers. 
+distributing metadata across multiple servers.
 %While FDS adequately addresses scalability concerns, but a framework built for
 %tiny tasks can improve performance by using a closely integrating the file
 %system and the scheduler, as discussed in \S\ref{sec:pipeline}.
@@ -104,8 +104,8 @@ the task scheduler.
 \eat{
 The effective use of tiny tasks also requires close coordination between the file
 system, the scheduler, and the caching layer.
-In particular, locality based scheduling, pipelined data access, caching blocks in 
-memory, and effective coordination of network traffic are closely linked, and 
+In particular, locality based scheduling, pipelined data access, caching blocks in
+memory, and effective coordination of network traffic are closely linked, and
 must be considered holistically. We propose building a globally aware, distributed
 component that accounts for these factors.
 %, and provides additional information to
@@ -134,7 +134,7 @@ Recently proposed distributed schedulers (e.g., Sparrow~\cite{ousterhout2013spar
 can scale well beyond millions of decisions per second while providing near-optimal
 response times.
 Our proposed system relies on the use of such distributed schedulers.
-%Since a job completes only when all of its tasks complete, we also plan to 
+%Since a job completes only when all of its tasks complete, we also plan to
 %explore techniques like gang scheduling~\cite{feitelson1992gang} to minimize
 %overall job completion time.
 
@@ -168,7 +168,7 @@ in milliseconds.
 \eat{
 so that launch overhead constitutes
 less than 1\% of task runtime.
-A framework for tiny tasks 
+A framework for tiny tasks
 If the framework maintains an active threadpool for task execution on each worker,
 task launching should be essentially a remote procedure call.
 With careful engineering,
@@ -191,7 +191,7 @@ the most important data and storing remaining data on disk or on a different
 machine.
 %For example, output data can be written to disk in the background, while
 %more tasks are executing, alleviating performance problems caused by spilling
-%data to disk during task execution. 
+%data to disk during task execution.
 For MapReduce-style jobs, the framework could store the map
 outputs that will be used for the first set of reduce tasks in memory, and store
 remaining outputs on disk. While the first set of tiny reduce tasks are running,
@@ -216,7 +216,7 @@ The benefits of a more holistic approach to scheduling have been illustrated in
 restricted
 settings (e.g., in the context of network scheduling~\cite{chowdhury2012coflow,chowdhury2011managing}), but validating our more radical approach is the subject of ongoing work.
     }
- \eat{     
+ \eat{
 The framework can store the most frequently used output data in memory, and flush
 remaining data to disk.
 
@@ -253,12 +253,12 @@ Tiny tasks funamentally change the resource footprint of tasks, giving the frame
 more control over I/O. We propose leveraging this additional control by tightly
 integrating the task scheduler and the distributed file system.
 Today's large tasks accumulate a large amount of output data in memory.
-Often this output data will exceed available memory, 
+Often this output data will exceed available memory,
 and will spill onto a disk, leading to poor MapReduce
 performance~\cite{lipcon2012optimizing}. Tiny tasks fundamentally change the
 resource footprint of tasks: since tasks run for a shorter period of time,
 they generate less output data and thus use less memory. When a tiny task completes,
-it explicitly gives control of its output data to the framework.  
+it explicitly gives control of its output data to the framework.
 The framework can choose to cache the most important and most frequently-accessed
 output data, and store the remaining data on disk or move it to a different machine.
 
@@ -293,12 +293,12 @@ clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 
 Using tiny tasks enables the framework to improve efficiency and utilization
 by optimizing I/O. Tiny tasks fundamentally change the resource footprint of
-tasks, and give the framework more choice in when to transfer data 
+tasks, and give the framework more choice in when to transfer data
 
 Using tiny tasks requires providing the framework with additional control to optimize I/O.
 %Pipelining is particularly powerful when combined with small tasks.
 Today's large tasks accumulate a large amount of output data in memory.
-Often this output data will exceed available memory, 
+Often this output data will exceed available memory,
 and will spill onto a disk, leading to poor MapReduce
 performance~\cite{lipcon2012optimizing}. Tiny tasks fundamentally change the
 resource footprint of tasks: since tasks run for a shorter period of time,
@@ -323,7 +323,7 @@ clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 Most tasks in a data parallel framework can be split into tiny tasks by
 reducing the input size; however, some types of tasks cannot easily be
 parallelized. Parallelizing all jobs is the most significant challenge
-in realizing tiny tasks. 
+in realizing tiny tasks.
 Consider, for example, reduce tasks in a MapReduce job. In the limit,
 one reduce task can be launched to handle each key. However, if all
 values map to the same key, that key cannot easily be split into multiple
@@ -332,10 +332,12 @@ tasks.
 %is to process a single key.
 %When a single key contains a large number of values, the reduce task might
 %violate the tiny task constraint.
-Data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation trees to solve
-similar problems by progressively combining inputs from multiple tasks;
-aggregation trees will allow parallelizing tasks where the function
-is commutative and associative.
+When the reduce function is associative and commutative, such tasks can be parallelized using techniques like map-side combiners or aggregation trees.
+These techniques are already used by existing frameworks \cite{yu2008dryadlinq}, and will allow most jobs to be split into tiny tasks.
+%Data parallel frameworks like Dryad~\cite{yu2008dryadlinq} use aggregation trees to solve
+%similar problems by progressively combining inputs from multiple tasks;
+%aggregation trees will allow parallelizing tasks where the function
+%is commutative and associative.
 
 %While splitting most tasks in a dataparallel framework by reducing input size
 %is straight forward, splitting certain tasks might incur a higher overhead
@@ -350,22 +352,24 @@ is commutative and associative.
 % across multiple tasks.
 
 Despite the use of aggregation trees, some tasks may remain
-difficult to divide into tiny tasks. 
+difficult to divide into tiny tasks.
 %For example, tasks that are not associative and
 %commutative do not lend themselves to the use of aggregation trees.
 %In our example above, a more complicated operation might not lend itself to being
 %simplified using an aggregation tree.
-To split these tasks, we propose providing a framework-maintained
+To split these tasks, we propose providing a framework-managed
 temporary state store that can be used to communicate and share data between a
-job's tiny tasks. Such a store could be used to implement a job that computes
-distinct values in a file, for instance, by storing hashes of all values
-seen so far. We envision that this store would provide a key-value interface,
-and would provide strong consistency guarantees.
+job's tiny tasks.
+For instance, to implement a job that computes distinct values, we could store hashes of all values seen so far in the state store.
+%Such a store could be used to implement a job that computes
+%distinct values in a file, for instance, by storing hashes of all values
+%seen so far.
+We envision that this store would have a key-value interface and provide strong consistency guarantees.
 
 Inevitably, some tasks will be impractical to split, despite these tools.
 To accommodate such
 tasks, we plan on allowing some large tasks to run on the cluster. We expect
-that if a small percentage of tasks remain large, they can be run on the same 
+that if a small percentage of tasks remain large, they can be run on the same
 infrastructure as tiny tasks without impacting the performance of remaining tasks.
 Exploring the impact of such sharing is the subject of ongoing research.
 %These tasks
