@@ -203,12 +203,12 @@ context of network scheduling~\cite{chowdhury2012coflow,chowdhury2011managing}),
 but validating our broader approach remains for future work.
 \eat{
 We propose further optimizing I/O by breaking each task into three phases, and
-scheduling each phase separately. Current task exeuction involves fetching data
+scheduling each phase separately. Current task execution involves fetching data
 (typically from disk), processing this data, and storing the output (sometimes
 by sending the output over the network). By breaking apart these phases and scheduling each separately,
 the framework can optimize resource usage: the framework need not guess when
 a task will need to use the disk, for example, and can opportunistically
-read input data for future datas from disk or over the network when resources are
+read input data for future tasks from disk or over the network when resources are
 idle. This approach assumes that considering file system scheduling, data
 caching, network
 scheduling, and task scheduling holistically will improve performance.
@@ -231,7 +231,7 @@ Current task execution involves a task fetching data (typically from disk), proc
 this data, and storing the output either on memory or on disk.
 
 decouple stages of a task
-over taks life time, using many types of resources. instead of traditional thing,
+over tasks life time, using many types of resources. instead of traditional thing,
 assign each independently, leads to pipelining
 doing this reduces the efficiency loss from having so many small tasks
 
@@ -249,7 +249,7 @@ when a task will need to use each resource.
 A scheduler for tiny tasks can improve efficiency and utilization by tightly
 controlling I/O.
 % More control over I/O
-Tiny tasks funamentally change the resource footprint of tasks, giving the framework
+Tiny tasks fundamentally change the resource footprint of tasks, giving the framework
 more control over I/O. We propose leveraging this additional control by tightly
 integrating the task scheduler and the distributed file system.
 Today's large tasks accumulate a large amount of output data in memory.
