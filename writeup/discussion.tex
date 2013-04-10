@@ -102,8 +102,8 @@ magnitude smaller than today's tasks.
 
 \subsection{Coarse-Grained Partitioning}
 Many clusters use static partitioning to ensure that long-running jobs do not
-cause head of line blocking for newly arriving, high priority
-jobs~\cite{thusoo2010data}. Static partitioning limits utilization because each
+affect high priority jobs due to head of line blocking~\cite{thusoo2010data}.
+Static partitioning limits utilization because each
 partition must be provisioned to handle peak load, and extra capacity cannot
 easily be reallocated.
 
