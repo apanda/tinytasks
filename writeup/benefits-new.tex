@@ -43,14 +43,17 @@ the job to complete more quickly.}
     \includegraphics[width=0.4\textwidth]{figures/binpacked1-sep}
     \vspace{-3ex}
     \caption{ Improvement from perfectly balancing the total machine time for
-    each job across its slots. }
+    each job across its slots. Jobs that originally had more tasks see
+    a more substantial improvement because having a large number of tasks increases the
+    likelihood that the job includes stragglers.}
     \label{fig:binpacked}
 \end{figure}
 
 \begin{figure}[t]
-    \includegraphics[width=0.4\textwidth]{figures/spark_experiment/straggler}
+\centering
+    \includegraphics[width=0.45\textwidth]{figures/spark_experiment/straggler}
     \vspace{-3ex}
-    \caption{Improvement from using tiny tasks in a cluster where 20\% of machines
+    \caption{Completion time for a Spark job that is split into various numbers of tasks. The job is executed in a cluster where 20\% of machines
 take 20x longer to run each task. Error bars depict standard deviation.}
     \label{fig:sparkskew}
 \end{figure}
@@ -93,6 +96,7 @@ improve if work were perfectly partitioned across machines.
 %resources, we used a Facebook trace to determine how much
 %job response time would improve if work were perfectly partitioned across
 %machines.
+The trace contains 54,976 jobs.
 For each job in the trace, we ask how long the job would have taken if the
 total time for all tasks in the job were perfectly divided over the slots
 used by the job.
@@ -161,12 +165,19 @@ how to decrease overheads in \S\ref{sec:sched}.
     \label{fig:slot_diagram_tiny}
 }
 \vspace{-0.1in}
-\caption{Two jobs running in a cluster with four slots. With today's tasks,
-tasks for the high-priority dark job need to wait for long-running tasks from the light job to
+\caption{
+A high priority dark job arrives (at the dashed line) in a cluster where all
+slots are in use by a low priority light job.
+%    The dashed line denotes the arrival of a a high priority (dark) job
+%in a cluster where
+%all 4 slots are in use by a low priority (light) job.
+%Two jobs running in a cluster with four slots.
+With today's tasks,
+tasks for the high-priority job must wait for long-running tasks from the light job to
 complete before being launched.
 With tiny tasks, resource
 allocation is fine-grained, so resources will quickly be allocated to
-higher priority dark job.}
+the higher priority job.}
 %new
 %jobs, allowing the higiher-priority grey job to complete more quickly.}
 \vspace{-2ex}
@@ -180,7 +191,7 @@ responsiveness and utilization. If a cluster is highly utilized,
 an interactive job may need to wait for long-running batch tasks to
 complete before it can be serviced; reserving slots for
 interactive jobs avoids this problem but results in lower utilization.
-Using tiny tasks for all jobs avoids this tradeoff: the cluster can run at
+Using tiny tasks for all jobs avoids this trade off: the cluster can run at
 high utilization, while
 simultaneously guaranteeing that interactive jobs will only need to wait for
 a short time before being serviced. Figure~\ref{fig:slot_diagram} depicts a simple example
