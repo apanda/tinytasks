@@ -93,8 +93,8 @@ job.
 %speculatively launch
 %redundant tasks when a task appears to be running on a slow machine~\cite{dean2004mapreduce,zaharia2008improving,ananthanarayanan2010reining}.
 Tiny tasks alleviate the straggler problem because work is allocated to
-machines at a fine granularity, so work can be evenly spread
-over available resources, and slower machines are assigned
+machines at a fine granularity, so work is evenly spread
+over available resources by the task scheduler, and slower machines are assigned
 less work. Simulations based on a Facebook workload
 demonstrate that by mitigating stragglers, tiny tasks
 can improve response times by as much as a factor of 5.2.

@@ -90,13 +90,13 @@ total work across a larger set of tasks more evenly partitions records across ta
 secondly, individual tasks can be moved in response to slow machines, network congestion, or
 other cluster conditions, and run on other, faster machines.
 }
-We use a Facebook trace~\cite{chen2012interactive} to quantify how much job response time would
+We use a 54,976 job Facebook trace~\cite{chen2012interactive} to quantify how much job response time would
 improve if work were perfectly partitioned across machines.
 % evenly distributing work over available
 %resources, we used a Facebook trace to determine how much
 %job response time would improve if work were perfectly partitioned across
 %machines.
-The trace contains 54,976 jobs.
+%The trace contains 54,976 jobs.
 For each job in the trace, we ask how long the job would have taken if the
 total time for all tasks in the job were perfectly divided over the slots
 used by the job.
@@ -130,7 +130,8 @@ broken into tiny tasks, because some of the tiny tasks will be run on faster
 machines.
 This experiment underestimates the possible improvements from
 evenly balancing work but ignores task launch overheads, which
-we address in the next experiment.
+we address 
+in the next experiment.
 %However, we note that this simulation ignores any overheads associated with
 %tiny tasks and we measure the effects in our next experiment.
 
