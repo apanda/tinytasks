@@ -100,16 +100,16 @@ and can be solved with improved engineering. Second, they note that creating
 sized for the benefits of tiny tasks to hold; rather, tasks must be orders of
 magnitude smaller than today's tasks.
 
-\subsection{Coarse-Grained Partitioning}
-Many clusters use static partitioning to ensure that long-running jobs do not
+\subsection{Coarse-Grained Resource Allocation}
+Many clusters use static resource allocation to ensure that long-running jobs do not
 affect high priority jobs due to head of line blocking~\cite{thusoo2010data}.
 Static partitioning limits utilization because each
 partition must be provisioned to handle peak load, and extra capacity cannot
 easily be reallocated.
 
 
-Omega~\cite{wilkes2013omega}, Google's cluster scheduler, uses more flexible coarse
-grained partitioning. Omega shares a cluster across many frameworks that
+Omega~\cite{wilkes2013omega}, Google's cluster scheduler, uses flexible coarse
+grained resource allocation. Omega shares a cluster across many frameworks that
 each perform their own task-level scheduling. Tiny tasks can improve performance
 for a single framework in this context, but performing task-level scheduling
 separately for each framework limits cluster utilization.
@@ -130,7 +130,7 @@ Such coarse-grained partitioning limits utilization because each service
 must be provisioned to handle peak load, and one service's extra capacity
 cannot easily be reallocated to another service.
 }
-\subsection{Fine-grained Sharing}
+\subsection{Fine-Grained Sharing}
 The idea of using smaller units of work to improve load balancing is well
 studied.  In multi-threaded applications, work-stealing
 based schedulers~\cite{blumofe1994scheduling} divide work at very fine granularities to provide better load

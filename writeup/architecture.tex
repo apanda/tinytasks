@@ -129,7 +129,7 @@ times, and using more efficient networking have helped some
 centralized schedulers
 provide higher throughput~\cite{zaharia2012meetup}.
 However, handling large clusters and very
-short tasks may require a decentralized scheduler design.
+short tasks will require a decentralized scheduler design.
 Recently proposed distributed schedulers (e.g., Sparrow~\cite{ousterhoutbatch})
 can scale well beyond millions of decisions per second while providing near-optimal
 response times.
@@ -318,7 +318,7 @@ I/O has been shown
 to greatly improve network utilization and performance in
 clusters~\cite{chowdhury2011managing, chowdhury2012coflow}.
 }
-\subsection{Programming model}
+\subsection{Programming Model}
 \label{sec:prog}
 Most tasks in a data parallel framework can be split into tiny tasks by
 reducing the input size; however, some types of tasks cannot easily be
