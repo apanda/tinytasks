@@ -66,9 +66,9 @@ def main(argv):
     elif line.find("CPU utilization") != -1:
       items = line.split(" ")
       time = int(items[4])
-      user_cpu_usage.append((time, items[8]))
-      sys_cpu_usage.append((time, items[10]))
-      total_cpu_usage.append((time, items[12][:-1]))
+      user_cpu_usage.append((time, float(items[8])))
+      sys_cpu_usage.append((time, float(items[10])))
+      total_cpu_usage.append((time, float(items[12][:-1])))
     elif line.find("rchar") != -1:
       items = line.split(" ")
       time = int(items[4])
@@ -90,6 +90,7 @@ def main(argv):
   running_tasks_file = open(running_tasks_filename, "w")
   running_tasks = 0
   earliest_time = int(task_events[0][0])
+  latest_time = int(task_events[-1][0])
   for (time, event) in task_events:
     # Plot only the time delta -- makes the graph much easier to read.
     running_tasks_file.write("%s\t%s\n" % (time - earliest_time, running_tasks))
@@ -103,6 +104,18 @@ def main(argv):
   write_output_data(sys_cpu_filename, sys_cpu_usage, earliest_time)
   total_cpu_filename = "%s/total_cpu" % file_prefix
   write_output_data(total_cpu_filename, total_cpu_usage, earliest_time)
+
+  # Print average CPU usage during time when tasks were running. This assumes that
+  # all the measurement intervals were the same.
+  filtered_user_cpu_usage = filter(
+    lambda x: x[0] >= earliest_time and x[0] <= latest_time, user_cpu_usage)
+  print "Average user CPU use:"
+  print sum([pair[1] for pair in filtered_user_cpu_usage]) * 1.0 / len(filtered_user_cpu_usage)
+
+  filtered_total_cpu_usage = filter(
+    lambda x: x[0] >= earliest_time and x[0] <= latest_time, total_cpu_usage)
+  print "Average total CPU use:"
+  print sum([pair[1] for pair in filtered_total_cpu_usage]) * 1.0 / len(filtered_total_cpu_usage)
 
   # Output IO usage data.
   rchar_filename = "%s/rchar" % file_prefix
