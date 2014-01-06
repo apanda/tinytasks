@@ -11,6 +11,22 @@ def write_output_data(filename, data, earliest_time):
     f.write("%s\t%s\n" % (time - earliest_time, x))
   f.close()
 
+def write_running_tasks_plot(file_prefix, y2label, output_filename, running_tasks_plot_file,
+    running_tasks_filename):
+  # Warning: this graph ends up looking like a comb -- since the time in between task launches is
+  # short relative to task runtime.
+  running_tasks_plot_file.write(
+    "# Must be plotted from the parent directory for links to work correctly\n")
+  write_template(running_tasks_plot_file)
+  running_tasks_plot_file.write("set xlabel \"Time (ms)\"\n")
+  running_tasks_plot_file.write("set xrange [0:20000]\n")
+  running_tasks_plot_file.write("set y2tics\n")
+  running_tasks_plot_file.write("set y2label \"%s\"\n" % y2label)
+  running_tasks_plot_file.write("set output \"%s/%s.pdf\"\n\n" % (file_prefix, output_filename))
+  running_tasks_plot_file.write(
+    ("plot \"%s\" using 1:2 w l ls 1 title \"Running tasks\" axes x1y1,\\\n" %
+      running_tasks_filename))
+
 def main(argv):
   file_prefix = argv[0].strip("/")
   print "Parsing logs in directory %s" % file_prefix
@@ -31,6 +47,14 @@ def main(argv):
   wchar = []
   wbytes = []
 
+  # Time, network traffic tuples.
+  trans_bytes = []
+  trans_packets = []
+  recv_bytes = []
+  recv_packets = []
+  
+  BYTES_PER_MB = 1048576
+
   results_file = open("%s/%s.log" % (file_prefix, file_prefix))
   for line in results_file:
     if line.find("Task run") != -1:
@@ -48,7 +72,6 @@ def main(argv):
     elif line.find("rchar") != -1:
       items = line.split(" ")
       time = int(items[4])
-      BYTES_PER_MB = 1048576
       rchar.append((time, float(items[7]) / BYTES_PER_MB))
       rbytes.append((time, float(items[13]) / BYTES_PER_MB))
       wchar.append((time, float(items[10]) / BYTES_PER_MB))
@@ -56,6 +79,10 @@ def main(argv):
     elif line.find("trans rates") != -1:
       items = line.strip("\n").split(" ")
       time = int(items[4])
+      trans_bytes.append((time, float(items[7]) / BYTES_PER_MB))
+      trans_packets.append((time, float(items[9])))
+      recv_bytes.append((time, float(items[13]) / BYTES_PER_MB))
+      recv_packets.append((time, float(items[15])))
 
   # Output file with number of running tasks.
   task_events.sort(key = lambda x: x[0])
@@ -87,20 +114,20 @@ def main(argv):
   wbytes_filename = "%s/wbytes" % file_prefix
   write_output_data(wbytes_filename, wbytes, earliest_time)
 
-  # Warning: this graph ends up looking like a comb -- since the time in between task launches is
-  # short relative to task runtime.
+  # Output network data.
+  trans_bytes_filename = "%s/trans_bytes" % file_prefix
+  write_output_data(trans_bytes_filename, trans_bytes, earliest_time)
+  trans_packets_filename = "%s/trans_packets" % file_prefix
+  write_output_data(trans_packets_filename, trans_packets, earliest_time)
+  recv_bytes_filename = "%s/recv_bytes" % file_prefix
+  write_output_data(recv_bytes_filename, recv_bytes, earliest_time)
+  recv_packets_filename = "%s/recv_packets" % file_prefix
+  write_output_data(recv_packets_filename, recv_packets, earliest_time)
+
+  # Output one file with running tasks, CPU, and IO usage.
   running_tasks_plot_file = open("%s/running_tasks_cpu.gp" % file_prefix, "w")
-  running_tasks_plot_file.write(
-    "# Must be plotted from the parent directory for links to work correctly\n")
-  write_template(running_tasks_plot_file)
-  running_tasks_plot_file.write("set xlabel \"Time (ms)\"\n")
-  running_tasks_plot_file.write("set xrange [0:10000]\n")
-  running_tasks_plot_file.write("set y2tics\n")
-  running_tasks_plot_file.write("set y2label \"MB\"\n")
-  running_tasks_plot_file.write("set output \"%s/running_tasks_cpu.pdf\"\n\n" % file_prefix)
-  running_tasks_plot_file.write(
-    ("plot \"%s\" using 1:2 w l ls 1 title \"Running tasks\" axes x1y1,\\\n" %
-      running_tasks_filename))
+  write_running_tasks_plot(file_prefix, "MB", "running_tasks_cpu", running_tasks_plot_file,
+    running_tasks_filename)
   running_tasks_plot_file.write(
     ("\"%s\" using 1:2 w l ls 2 title \"User CPU\" axes x1y1,\\\n" %
       user_cpu_filename))
@@ -113,11 +140,32 @@ def main(argv):
   running_tasks_plot_file.write(
     "\"%s\" using 1:2 w l ls 5 title \"rchar\" axes x1y2,\\\n" % rchar_filename)
   running_tasks_plot_file.write(
-    "\"%s\" using 1:2 w l ls 6 title \"wchar\" axes x1y2,\\\n" % wchar_filename)
-  running_tasks_plot_file.write(
-    "\"%s\" using 1:2 w l ls 7 title \"rbytes\" axes x1y2,\\\n" % rbytes_filename)
-  running_tasks_plot_file.write(
-    "\"%s\" using 1:2 w l ls 8 title \"wbytes\" axes x1y2\n" % wbytes_filename)
+    "\"%s\" using 1:2 w l ls 6 title \"wchar\" axes x1y2\n" % wchar_filename)
+  # Comment these out 'till I figure out what rbytes/wbytes actually are.
+  #running_tasks_plot_file.write(
+  #  "\"%s\" using 1:2 w l ls 7 title \"rbytes\" axes x1y2,\\\n" % rbytes_filename)
+  #running_tasks_plot_file.write(
+  #  "\"%s\" using 1:2 w l ls 8 title \"wbytes\" axes x1y2\n" % wbytes_filename)
+
+  # Output two network files: one with bytes and another with packets.
+  network_plot_file = open("%s/running_tasks_network_bytes.gp" % file_prefix, "w")
+  write_running_tasks_plot(file_prefix, "MB", "running_tasks_network_bytes",
+    network_plot_file, running_tasks_filename)
+  network_plot_file.write(
+    ("\"%s\" using 1:2 w l ls 2 title \"Transmitted bytes\" axes x1y2,\\\n" %
+      trans_bytes_filename))
+  network_plot_file.write(
+    "\"%s\" using 1:2 w l ls 3 title \"Received bytes\" axes x1y2\n" % recv_bytes_filename)
+
+  network_plot_file = open("%s/running_tasks_network_packets.gp" % file_prefix, "w")
+  write_running_tasks_plot(file_prefix, "packets", "running_tasks_network_packets",
+    network_plot_file, running_tasks_filename)
+  network_plot_file.write(
+    ("\"%s\" using 1:2 w l ls 2 title \"Transmitted packets\" axes x1y2,\\\n" %
+      trans_packets_filename))
+  network_plot_file.write(
+    "\"%s\" using 1:2 w l ls 3 title \"Received packets\" axes x1y2\n" % recv_packets_filename)
+
 
 if __name__ == "__main__":
   main(sys.argv[1:])
