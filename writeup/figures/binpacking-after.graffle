@@ -42,7 +42,7 @@
 	<key>ColumnSpacing</key>
 	<real>36</real>
 	<key>CreationDate</key>
-	<string>2013-01-10 09:01:35 +0000</string>
+	<string>2013-01-10 01:01:35 -0800</string>
 	<key>Creator</key>
 	<string>Aurojit Panda</string>
 	<key>DisplayScale</key>
@@ -53,9 +53,16 @@
 	<array>
 		<dict>
 			<key>Bounds</key>
-			<string>{{206.49819946289062, 198.62000274658203}, {13, 37}}</string>
+			<string>{{206.498, 198.62}, {13, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>138</integer>
 			<key>Shape</key>
@@ -78,9 +85,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{188.49819946289062, 198.62000274658203}, {13, 37}}</string>
+			<string>{{188.498, 198.62}, {13, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>137</integer>
 			<key>Shape</key>
@@ -103,9 +117,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{170.49819946289062, 198.62000274658203}, {13, 37}}</string>
+			<string>{{170.498, 198.62}, {13, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>136</integer>
 			<key>Shape</key>
@@ -128,9 +149,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{152.49819946289062, 198.62000274658203}, {13, 37}}</string>
+			<string>{{152.498, 198.62}, {13, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>135</integer>
 			<key>Shape</key>
@@ -153,9 +181,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{134.49819946289062, 198.62000274658203}, {13, 37}}</string>
+			<string>{{134.498, 198.62}, {13, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>134</integer>
 			<key>Shape</key>
@@ -178,9 +213,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{171.99639892578125, 147.70001220703125}, {49.996408462524414, 37}}</string>
+			<string>{{171.996, 147.7}, {49.9964, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>133</integer>
 			<key>Shape</key>
@@ -203,9 +245,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{195.75660610198975, 100.24000549316406}, {30.493964096103191, 37}}</string>
+			<string>{{195.757, 100.24}, {30.494, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>131</integer>
 			<key>Shape</key>
@@ -228,9 +277,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{155.75660610198975, 100.24000549316406}, {30.493964096103191, 37}}</string>
+			<string>{{155.757, 100.24}, {30.494, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>130</integer>
 			<key>Shape</key>
@@ -254,12 +310,19 @@
 		<dict>
 			<key>Class</key>
 			<string>LineGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>101</integer>
 			<key>Points</key>
 			<array>
-				<string>{116, 249.53999328613281}</string>
-				<string>{361.99999237060547, 250.03998804092407}</string>
+				<string>{116, 249.54}</string>
+				<string>{362, 250.04}</string>
 			</array>
 			<key>Style</key>
 			<dict>
@@ -276,13 +339,13 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{167.58256823098236, 258}, {97.834877014160156, 28.56000000000002}}</string>
+			<string>{{167.583, 258}, {97.8349, 28.56}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
 			<dict>
 				<key>Font</key>
-				<string>GillSans</string>
+				<string>YanoneKaffeesatz-Thin</string>
 				<key>Size</key>
 				<real>44</real>
 			</dict>
@@ -313,10 +376,10 @@
 				<key>Pad</key>
 				<integer>0</integer>
 				<key>Text</key>
-				<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 GillSans;}
+				<string>{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fnil\fcharset0 YanoneKaffeesatz-Thin;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs88 \cf0 Time}</string>
 				<key>VerticalPad</key>
@@ -325,13 +388,13 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{16.78414864351058, 133.68446707567728}, {90.879989624023438, 30.493964096103191}}</string>
+			<string>{{16.7841, 133.684}, {90.88, 30.494}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
 			<dict>
 				<key>Font</key>
-				<string>GillSans</string>
+				<string>YanoneKaffeesatz-Thin</string>
 				<key>Size</key>
 				<real>44</real>
 			</dict>
@@ -364,10 +427,10 @@
 				<key>Pad</key>
 				<integer>0</integer>
 				<key>Text</key>
-				<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 GillSans;}
+				<string>{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fnil\fcharset0 YanoneKaffeesatz-Thin;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs88 \cf0 Slots}</string>
 				<key>VerticalPad</key>
@@ -376,13 +439,13 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{86.733768848058517, 198.71338708963094}, {20.00358963012696, 28.596625727751892}}</string>
+			<string>{{86.7338, 198.713}, {20.0036, 28.5966}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
 			<dict>
 				<key>Font</key>
-				<string>GillSans</string>
+				<string>YanoneKaffeesatz-Thin</string>
 				<key>Size</key>
 				<real>44</real>
 			</dict>
@@ -413,10 +476,10 @@
 				<key>Pad</key>
 				<integer>0</integer>
 				<key>Text</key>
-				<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 GillSans;}
+				<string>{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fnil\fcharset0 YanoneKaffeesatz-Thin;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs88 \cf0 3}</string>
 				<key>VerticalPad</key>
@@ -425,13 +488,13 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{86.733768848058517, 151.10242139371155}, {20.00358963012696, 28.596625727751892}}</string>
+			<string>{{86.7338, 151.102}, {20.0036, 28.5966}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
 			<dict>
 				<key>Font</key>
-				<string>GillSans</string>
+				<string>YanoneKaffeesatz-Thin</string>
 				<key>Size</key>
 				<real>44</real>
 			</dict>
@@ -462,10 +525,10 @@
 				<key>Pad</key>
 				<integer>0</integer>
 				<key>Text</key>
-				<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 GillSans;}
+				<string>{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fnil\fcharset0 YanoneKaffeesatz-Thin;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs88 \cf0 2}</string>
 				<key>VerticalPad</key>
@@ -474,13 +537,13 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{86.733768848058517, 103.49145187820289}, {20.00358963012696, 28.596625727751892}}</string>
+			<string>{{86.7338, 103.491}, {20.0036, 28.5966}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
 			<dict>
 				<key>Font</key>
-				<string>GillSans</string>
+				<string>YanoneKaffeesatz-Thin</string>
 				<key>Size</key>
 				<real>44</real>
 			</dict>
@@ -511,10 +574,10 @@
 				<key>Pad</key>
 				<integer>0</integer>
 				<key>Text</key>
-				<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 GillSans;}
+				<string>{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fnil\fcharset0 YanoneKaffeesatz-Thin;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs88 \cf0 1}</string>
 				<key>VerticalPad</key>
@@ -523,13 +586,13 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{86.733768848058517, 55.530014038085938}, {20.00358963012696, 28.596625727751892}}</string>
+			<string>{{86.7338, 55.53}, {20.0036, 28.5966}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>FontInfo</key>
 			<dict>
 				<key>Font</key>
-				<string>GillSans</string>
+				<string>YanoneKaffeesatz-Thin</string>
 				<key>Size</key>
 				<real>44</real>
 			</dict>
@@ -560,10 +623,10 @@
 				<key>Pad</key>
 				<integer>0</integer>
 				<key>Text</key>
-				<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
-\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 GillSans;}
+				<string>{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fnil\fcharset0 YanoneKaffeesatz-Thin;}
 {\colortbl;\red255\green255\blue255;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs88 \cf0 0}</string>
 				<key>VerticalPad</key>
@@ -572,9 +635,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{116, 198.62000274658203}, {13, 37}}</string>
+			<string>{{116, 198.62}, {13, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>24</integer>
 			<key>Shape</key>
@@ -597,9 +667,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{116, 147.70001220703125}, {49.996408462524414, 37}}</string>
+			<string>{{116, 147.7}, {49.9964, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>17</integer>
 			<key>Shape</key>
@@ -622,9 +699,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{116, 100.24000549316406}, {30.493964096103191, 37}}</string>
+			<string>{{116, 100.24}, {30.494, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>10</integer>
 			<key>Shape</key>
@@ -647,9 +731,16 @@
 		</dict>
 		<dict>
 			<key>Bounds</key>
-			<string>{{116, 52.779998779296875}, {110.25057019809293, 37}}</string>
+			<string>{{116, 52.78}, {110.251, 37}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
+			<key>FontInfo</key>
+			<dict>
+				<key>Font</key>
+				<string>YanoneKaffeesatz-Regular</string>
+				<key>Size</key>
+				<real>44</real>
+			</dict>
 			<key>ID</key>
 			<integer>7</integer>
 			<key>Shape</key>
@@ -718,9 +809,9 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-04-09 01:42:50 +0000</string>
+	<string>2013-05-09 10:22:04 -0700</string>
 	<key>Modifier</key>
-	<string>Aurojit Panda</string>
+	<string>Kay Ousterhout</string>
 	<key>NotesVisible</key>
 	<string>NO</string>
 	<key>Orientation</key>
@@ -736,11 +827,6 @@
 			<string>float</string>
 			<string>41</string>
 		</array>
-		<key>NSHorizonalPagination</key>
-		<array>
-			<string>coded</string>
-			<string>BAtzdHJlYW10eXBlZIHoA4QBQISEhAhOU051bWJlcgCEhAdOU1ZhbHVlAISECE5TT2JqZWN0AIWEASqEhAFxlwCG</string>
-		</array>
 		<key>NSLeftMargin</key>
 		<array>
 			<string>float</string>
@@ -750,11 +836,6 @@
 		<array>
 			<string>size</string>
 			<string>{612, 792}</string>
-		</array>
-		<key>NSPrintReverseOrientation</key>
-		<array>
-			<string>int</string>
-			<string>0</string>
 		</array>
 		<key>NSRightMargin</key>
 		<array>
@@ -799,7 +880,7 @@
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{1851, -105}, {710, 872}}</string>
+		<string>{{1259, 300}, {710, 872}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -813,7 +894,7 @@
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{0, 0}, {575, 733}}</string>
+		<string>{{0, 0}, {561, 719}}</string>
 		<key>Zoom</key>
 		<real>1</real>
 		<key>ZoomValues</key>

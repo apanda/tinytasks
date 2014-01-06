@@ -1,6 +1,6 @@
 # Note you need gnuplot 4.4 for the pdfcairo terminal.
 
-set terminal pdfcairo dashed font "Gill Sans, 28" dashlength 2 linewidth 6 rounded enhanced
+set terminal pdfcairo dashed font "SegoeWPN, 28" dashlength 2 linewidth 6 rounded enhanced
 
 # Line style for axes
 set style line 80 lt 1 lc rgb "#808080"
