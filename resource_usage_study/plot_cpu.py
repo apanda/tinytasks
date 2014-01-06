@@ -55,6 +55,8 @@ def main(argv):
   
   BYTES_PER_MB = 1048576
 
+  task_durations = []
+
   results_file = open("%s/%s.log" % (file_prefix, file_prefix))
   for line in results_file:
     if line.find("Task run") != -1:
@@ -63,6 +65,7 @@ def main(argv):
       task_events.append((start_time, 1))
       end_time = int(items[9][:-1])
       task_events.append((end_time, -1))
+      task_durations.append(end_time - start_time)
     elif line.find("CPU utilization") != -1:
       items = line.split(" ")
       time = int(items[4])
@@ -104,7 +107,7 @@ def main(argv):
   write_output_data(sys_cpu_filename, sys_cpu_usage, earliest_time)
   total_cpu_filename = "%s/total_cpu" % file_prefix
   write_output_data(total_cpu_filename, total_cpu_usage, earliest_time)
-
+  
   # Print average CPU usage during time when tasks were running. This assumes that
   # all the measurement intervals were the same.
   filtered_user_cpu_usage = filter(
@@ -116,6 +119,11 @@ def main(argv):
     lambda x: x[0] >= earliest_time and x[0] <= latest_time, total_cpu_usage)
   print "Average total CPU use:"
   print sum([pair[1] for pair in filtered_total_cpu_usage]) * 1.0 / len(filtered_total_cpu_usage)
+
+  # Output job duration ESTIMATE (just last task end - first task start; this is just one worker
+  # so not totally accurate) and average task duration.
+  print "Job duration ESTIMATE (ms): ", latest_time - earliest_time
+  print "Average task duration (ms): ", sum(task_durations) * 1.0 / len(task_durations)
 
   # Output IO usage data.
   rchar_filename = "%s/rchar" % file_prefix
