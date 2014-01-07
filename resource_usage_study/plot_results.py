@@ -19,7 +19,7 @@ def write_running_tasks_plot(file_prefix, y2label, output_filename, running_task
     "# Must be plotted from the parent directory for links to work correctly\n")
   write_template(running_tasks_plot_file)
   running_tasks_plot_file.write("set xlabel \"Time (ms)\"\n")
-  running_tasks_plot_file.write("set xrange [0:20000]\n")
+  running_tasks_plot_file.write("set xrange [0:100000]\n")
   running_tasks_plot_file.write("set y2tics\n")
   running_tasks_plot_file.write("set y2label \"%s\"\n" % y2label)
   running_tasks_plot_file.write("set output \"%s/%s.pdf\"\n\n" % (file_prefix, output_filename))
