@@ -109,7 +109,7 @@ def main(argv):
       total_cpu_usage1.append((time, float(items[16])))
       iowait_cpu_usage1.append((time, float(items[18])))
       idle_cpu_usage1.append((time, float(items[20])))
-      print (float(items[16]) + float(items[18]) + float(items[20]))
+      # Sanity check = 1: print (float(items[16]) + float(items[18]) + float(items[20]))
     elif line.find("CPU utilization (jiffie-based)") != -1:
       items = line.split(" ")
       time = int(items[4])
@@ -156,8 +156,14 @@ def main(argv):
   write_output_data(user_cpu_filename, user_cpu_usage1, earliest_time)
   sys_cpu_filename = "%s/sys_cpu" % file_prefix
   write_output_data(sys_cpu_filename, sys_cpu_usage1, earliest_time)
+  proctotal_cpu_filename = "%s/proctotal_cpu" % file_prefix
+  write_output_data(proctotal_cpu_filename, proctotal_cpu_usage1, earliest_time)
   total_cpu_filename = "%s/total_cpu" % file_prefix
-  write_output_data(total_cpu_filename, proctotal_cpu_usage1, earliest_time)
+  write_output_data(total_cpu_filename, total_cpu_usage1, earliest_time)
+  idle_cpu_filename = "%s/idle_cpu" % file_prefix
+  write_output_data(idle_cpu_filename, idle_cpu_usage1, earliest_time)
+  iowait_cpu_filename = "%s/iowait_cpu" % file_prefix
+  write_output_data(iowait_cpu_filename, iowait_cpu_usage1, earliest_time)
 
   # Output CPU use percentiles in order to make a box/whiskers plot.
   total_cpu_values = [pair[1] for pair in proctotal_cpu_usage1]
@@ -176,8 +182,8 @@ def main(argv):
   write_output_data(user_cpu_filename2, user_cpu_usage2, earliest_time)
   sys_cpu_filename2 = "%s/sys_cpu2" % file_prefix
   write_output_data(sys_cpu_filename2, sys_cpu_usage2, earliest_time)
-  total_cpu_filename2 = "%s/total_cpu2" % file_prefix
-  write_output_data(total_cpu_filename2, total_cpu_usage2, earliest_time)
+  proctotal_cpu_filename2 = "%s/total_cpu2" % file_prefix
+  write_output_data(proctotal_cpu_filename2, total_cpu_usage2, earliest_time)
  
   # Output CPU use percentiles in order to make a box/whiskers plot.
   total_cpu2_values = [pair[1] for pair in total_cpu_usage2]
@@ -263,12 +269,21 @@ def main(argv):
     ("\"%s\" using 1:2 w l ls 3 title \"System CPU\" axes x1y1,\\\n" %
       sys_cpu_filename))
   running_tasks_plot_file.write(
-    ("\"%s\" using 1:2 w l ls 4 title \"Total CPU\" axes x1y1,\\\n" %
+    ("\"%s\" using 1:2 w l ls 4 title \"Total Process CPU\" axes x1y1,\\\n" %
+      proctotal_cpu_filename))
+  running_tasks_plot_file.write(
+    ("\"%s\" using 1:2 w l ls 5 title \"Total CPU\" axes x1y1,\\\n" %
       total_cpu_filename))
   running_tasks_plot_file.write(
-    "\"%s\" using 1:2 w l ls 5 title \"rchar\" axes x1y2,\\\n" % rchar_filename)
+    ("\"%s\" using 1:2 w l ls 6 title \"Idle CPU\" axes x1y1,\\\n" %
+      idle_cpu_filename))
   running_tasks_plot_file.write(
-    "\"%s\" using 1:2 w l ls 6 title \"wchar\" axes x1y2\n" % wchar_filename)
+    ("\"%s\" using 1:2 w l ls 7 title \"IO Wait CPU\" axes x1y1" %
+      iowait_cpu_filename))
+ # running_tasks_plot_file.write(
+ #   "\"%s\" using 1:2 w l ls 5 title \"rchar\" axes x1y2,\\\n" % rchar_filename)
+ # running_tasks_plot_file.write(
+ #   "\"%s\" using 1:2 w l ls 6 title \"wchar\" axes x1y2\n" % wchar_filename)
   # Comment these out 'till I figure out what rbytes/wbytes actually are.
   #running_tasks_plot_file.write(
   #  "\"%s\" using 1:2 w l ls 7 title \"rbytes\" axes x1y2,\\\n" % rbytes_filename)
