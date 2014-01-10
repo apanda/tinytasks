@@ -1,3 +1,4 @@
+import math
 import sys
 
 def write_template(f):
@@ -10,6 +11,19 @@ def write_output_data(filename, data, earliest_time):
   for (time, x) in data:
     f.write("%s\t%s\n" % (time - earliest_time, x))
   f.close()
+
+""" N should be sorted before calling this function. """
+def get_percentile(N, percent, key=lambda x:x):
+    if not N:
+        return 0
+    k = (len(N) - 1) * percent
+    f = math.floor(k)
+    c = math.ceil(k)
+    if f == c:
+        return key(N[int(k)])
+    d0 = key(N[int(f)]) * (c-k)
+    d1 = key(N[int(c)]) * (k-f)
+    return d0 + d1
 
 def write_running_tasks_plot(file_prefix, y2label, output_filename, running_tasks_plot_file,
     running_tasks_filename):
@@ -36,10 +50,28 @@ def main(argv):
   # finished at that time.
   task_events = []
 
-  # Time, CPU usage tuples.
-  user_cpu_usage = []
-  sys_cpu_usage = []
-  total_cpu_usage = []
+  # Time, CPU usage tuples using two different measurement strategies.
+  # 1 uses the user/sys jiffies divided by the total elapsed jiffies.
+  # 2 estimates the utilization based on the user/sys jiffies divided
+  # by the jiffies / second on the machine (which is 100).
+  user_cpu_usage1 = []
+  sys_cpu_usage1 = []
+  proctotal_cpu_usage1 = []
+  # Time the CPU was active, across all processes.
+  total_cpu_usage1 = []
+  # Time the cpu was idle and at least one process was waiting for IO.
+  iowait_cpu_usage1 = []
+  # Time the cpu was idle.
+  idle_cpu_usage1 = []
+
+  user_cpu_usage2 = []
+  sys_cpu_usage2 = []
+  total_cpu_usage2 = []
+
+  # Time, total CPU counter tuples. Used to compute average CPU usage
+  # during experiment.
+  user_cpu_totals = []
+  sys_cpu_totals = [] 
 
   # Time, IO rate tuples
   rchar = []
@@ -57,7 +89,7 @@ def main(argv):
 
   task_durations = []
 
-  results_file = open("%s/%s.log" % (file_prefix, file_prefix))
+  results_file = open("%s/proc.log" % file_prefix)
   for line in results_file:
     if line.find("Task run") != -1:
       items = line.split(" ")
@@ -66,12 +98,29 @@ def main(argv):
       end_time = int(items[9][:-1])
       task_events.append((end_time, -1))
       task_durations.append(end_time - start_time)
-    elif line.find("CPU utilization") != -1:
+    elif line.find("CPU utilization (relative metric)") != -1:
+#    elif line.find("CPU utilization") != -1:
+      items = line.strip("\n").split(" ")
+      time = int(items[4])
+# TODO: bump these by two for old version
+      user_cpu_usage1.append((time, float(items[10])))
+      sys_cpu_usage1.append((time, float(items[12])))
+      proctotal_cpu_usage1.append((time, float(items[14])))
+      total_cpu_usage1.append((time, float(items[16])))
+      iowait_cpu_usage1.append((time, float(items[18])))
+      idle_cpu_usage1.append((time, float(items[20])))
+      print (float(items[16]) + float(items[18]) + float(items[20]))
+    elif line.find("CPU utilization (jiffie-based)") != -1:
       items = line.split(" ")
       time = int(items[4])
-      user_cpu_usage.append((time, float(items[8])))
-      sys_cpu_usage.append((time, float(items[10])))
-      total_cpu_usage.append((time, float(items[12][:-1])))
+      user_cpu_usage2.append((time, float(items[9])))
+      sys_cpu_usage2.append((time, float(items[11])))
+      total_cpu_usage2.append((time, float(items[13][:-1])))
+    elif line.find("CPU counters") != -1:
+      items = line.split(" ")
+      time = int(items[4])
+      user_cpu_totals.append((time, float(items[8])))
+      sys_cpu_totals.append((time, float(items[10])))
     elif line.find("rchar") != -1:
       items = line.split(" ")
       time = int(items[4])
@@ -92,8 +141,10 @@ def main(argv):
   running_tasks_filename = "%s/running_tasks" % file_prefix
   running_tasks_file = open(running_tasks_filename, "w")
   running_tasks = 0
-  earliest_time = int(task_events[0][0])
+# TODO: remove earliest time inflation
+  earliest_time = 110000 + int(task_events[0][0])
   latest_time = int(task_events[-1][0])
+  print "Latest time is %s ms after earliest" % (latest_time - earliest_time)
   for (time, event) in task_events:
     # Plot only the time delta -- makes the graph much easier to read.
     running_tasks_file.write("%s\t%s\n" % (time - earliest_time, running_tasks))
@@ -102,27 +153,83 @@ def main(argv):
 
   # Output CPU usage data.
   user_cpu_filename = "%s/user_cpu" % file_prefix
-  write_output_data(user_cpu_filename, user_cpu_usage, earliest_time)
+  write_output_data(user_cpu_filename, user_cpu_usage1, earliest_time)
   sys_cpu_filename = "%s/sys_cpu" % file_prefix
-  write_output_data(sys_cpu_filename, sys_cpu_usage, earliest_time)
+  write_output_data(sys_cpu_filename, sys_cpu_usage1, earliest_time)
   total_cpu_filename = "%s/total_cpu" % file_prefix
-  write_output_data(total_cpu_filename, total_cpu_usage, earliest_time)
-  
+  write_output_data(total_cpu_filename, proctotal_cpu_usage1, earliest_time)
+
+  # Output CPU use percentiles in order to make a box/whiskers plot.
+  total_cpu_values = [pair[1] for pair in proctotal_cpu_usage1]
+  total_cpu_values.sort()
+  box_plot_file = open("%s/total_cpu_box" % file_prefix, "w")
+  box_plot_file.write("%s\t%s\t%s\t%s\t%s\n" %
+    (get_percentile(total_cpu_values, 0.05),
+     get_percentile(total_cpu_values, 0.25),
+     get_percentile(total_cpu_values, 0.5),
+     get_percentile(total_cpu_values, 0.75),
+     get_percentile(total_cpu_values, 0.95)))
+  box_plot_file.close()
+ 
+  # Output CPU usage data using second metric.
+  user_cpu_filename2 = "%s/user_cpu2" % file_prefix
+  write_output_data(user_cpu_filename2, user_cpu_usage2, earliest_time)
+  sys_cpu_filename2 = "%s/sys_cpu2" % file_prefix
+  write_output_data(sys_cpu_filename2, sys_cpu_usage2, earliest_time)
+  total_cpu_filename2 = "%s/total_cpu2" % file_prefix
+  write_output_data(total_cpu_filename2, total_cpu_usage2, earliest_time)
+ 
+  # Output CPU use percentiles in order to make a box/whiskers plot.
+  total_cpu2_values = [pair[1] for pair in total_cpu_usage2]
+  total_cpu2_values.sort()
+  box_plot_file2 = open("%s/total_cpu2_box" % file_prefix, "w")
+  box_plot_file2.write("%s\t%s\t%s\t%s\t%s\n" %
+    (get_percentile(total_cpu2_values, 0.05),
+     get_percentile(total_cpu2_values, 0.25),
+     get_percentile(total_cpu2_values, 0.5),
+     get_percentile(total_cpu2_values, 0.75),
+     get_percentile(total_cpu2_values, 0.95)))
+  box_plot_file2.close()
+   
   # Print average CPU usage during time when tasks were running. This assumes that
   # all the measurement intervals were the same.
-  filtered_user_cpu_usage = filter(
-    lambda x: x[0] >= earliest_time and x[0] <= latest_time, user_cpu_usage)
+  filtered_user_cpu_usage1 = filter(
+    lambda x: x[0] >= earliest_time and x[0] <= latest_time, user_cpu_usage1)
   print "Average user CPU use:"
-  print sum([pair[1] for pair in filtered_user_cpu_usage]) * 1.0 / len(filtered_user_cpu_usage)
+  print sum([pair[1] for pair in filtered_user_cpu_usage1]) * 1.0 / len(filtered_user_cpu_usage1)
 
-  filtered_total_cpu_usage = filter(
-    lambda x: x[0] >= earliest_time and x[0] <= latest_time, total_cpu_usage)
+  filtered_proctotal_cpu_usage1 = filter(
+    lambda x: x[0] >= earliest_time and x[0] <= latest_time, proctotal_cpu_usage1)
   print "Average total CPU use:"
-  print sum([pair[1] for pair in filtered_total_cpu_usage]) * 1.0 / len(filtered_total_cpu_usage)
+  print (sum([pair[1] for pair in filtered_proctotal_cpu_usage1]) * 1.0 /
+    len(filtered_proctotal_cpu_usage1))
+
+  filtered_rchar = filter(lambda x: x[0] >= earliest_time and x[0] <= latest_time, rchar)
+  print "Average rchar rate:"
+  print sum([pair[1] for pair in filtered_rchar]) * 1.0 / len(filtered_rchar)
+  filtered_wchar = filter(lambda x: x[0] >= earliest_time and x[0] <= latest_time, wchar)
+  print "Average wchar rate:"
+  print sum([pair[1] for pair in filtered_wchar]) * 1.0 / len(filtered_wchar)
+
+  job_duration = latest_time - earliest_time
+
+  # Print averages based on the total numbers.
+  filtered_total_user_cpu = filter(
+    lambda x: x[0] >= earliest_time and x[0] <= latest_time, user_cpu_totals)
+  filtered_total_sys_cpu = filter(
+    lambda x: x[0] >= earliest_time and x[0] >= latest_time, sys_cpu_totals)
+  # Multiply by 10 because there are 100 jiffies / second.
+  elapsed_user_cpu_millis = 10 * (filtered_total_user_cpu[-1][1] - filtered_total_user_cpu[0][1])
+  # Normalize by the number of cores.
+  avg_user_cpu = elapsed_user_cpu_millis * 1.0 / (8.0 * job_duration)
+  avg_sys_cpu = ((filtered_total_sys_cpu[-1][1] - filtered_total_sys_cpu[0][1]) *
+    10.0 / (8.0 * job_duration))
+  print "Average user CPU (based on totals): ", avg_user_cpu
+  print "Average sys CPU (based on totals): ", avg_sys_cpu
 
   # Output job duration ESTIMATE (just last task end - first task start; this is just one worker
   # so not totally accurate) and average task duration.
-  print "Job duration ESTIMATE (ms): ", latest_time - earliest_time
+  print "Job duration ESTIMATE (ms): ", job_duration
   print "Average task duration (ms): ", sum(task_durations) * 1.0 / len(task_durations)
 
   # Output IO usage data.
