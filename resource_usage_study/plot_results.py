@@ -1,6 +1,9 @@
 import math
 import sys
 
+# This is totally not portable -- just the observed sector size on m2.4xlarge instances.
+SECTOR_SIZE_BYTES = 512
+
 def write_template(f):
   template_file = open("template.gp")
   for line in template_file:
@@ -75,9 +78,7 @@ def main(argv):
 
   # Time, IO rate tuples
   rchar = []
-  rbytes = []
   wchar = []
-  wbytes = []
 
   # Time, network traffic tuples.
   trans_bytes = []
@@ -125,9 +126,7 @@ def main(argv):
       items = line.split(" ")
       time = int(items[4])
       rchar.append((time, float(items[7]) / BYTES_PER_MB))
-      rbytes.append((time, float(items[13]) / BYTES_PER_MB))
       wchar.append((time, float(items[10]) / BYTES_PER_MB))
-      wbytes.append((time, float(items[16][:-1]) / BYTES_PER_MB))
     elif line.find("trans rates") != -1:
       items = line.strip("\n").split(" ")
       time = int(items[4])
@@ -241,12 +240,8 @@ def main(argv):
   # Output IO usage data.
   rchar_filename = "%s/rchar" % file_prefix
   write_output_data(rchar_filename, rchar, earliest_time)
-  rbytes_filename = "%s/rbytes" % file_prefix
-  write_output_data(rbytes_filename, rbytes, earliest_time)
   wchar_filename = "%s/wchar" % file_prefix
   write_output_data(wchar_filename, wchar, earliest_time)
-  wbytes_filename = "%s/wbytes" % file_prefix
-  write_output_data(wbytes_filename, wbytes, earliest_time)
 
   # Output network data.
   trans_bytes_filename = "%s/trans_bytes" % file_prefix
@@ -284,11 +279,6 @@ def main(argv):
  #   "\"%s\" using 1:2 w l ls 5 title \"rchar\" axes x1y2,\\\n" % rchar_filename)
  # running_tasks_plot_file.write(
  #   "\"%s\" using 1:2 w l ls 6 title \"wchar\" axes x1y2\n" % wchar_filename)
-  # Comment these out 'till I figure out what rbytes/wbytes actually are.
-  #running_tasks_plot_file.write(
-  #  "\"%s\" using 1:2 w l ls 7 title \"rbytes\" axes x1y2,\\\n" % rbytes_filename)
-  #running_tasks_plot_file.write(
-  #  "\"%s\" using 1:2 w l ls 8 title \"wbytes\" axes x1y2\n" % wbytes_filename)
 
   # Output two network files: one with bytes and another with packets.
   network_plot_file = open("%s/running_tasks_network_bytes.gp" % file_prefix, "w")
