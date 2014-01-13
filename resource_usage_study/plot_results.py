@@ -1,8 +1,11 @@
+import collections
 import math
 import sys
 
 # This is totally not portable -- just the observed sector size on m2.4xlarge instances.
 SECTOR_SIZE_BYTES = 512
+
+MIN_TIME = 110000
 
 def write_template(f):
   template_file = open("template.gp")
@@ -12,7 +15,7 @@ def write_template(f):
 def write_output_data(filename, data, earliest_time):
   f = open(filename, "w")
   for (time, x) in data:
-    f.write("%s\t%s\n" % (time - earliest_time, x))
+    f.write("%s\t%s\n" % (earliest_time, x))
   f.close()
 
 """ N should be sorted before calling this function. """
@@ -27,6 +30,16 @@ def get_percentile(N, percent, key=lambda x:x):
     d0 = key(N[int(f)]) * (c-k)
     d1 = key(N[int(c)]) * (k-f)
     return d0 + d1
+
+def get_delta(items, earliest_time, latest_time):
+  filtered_items = [x for x in items if x[0] >= earliest_time and x[0] <= latest_time]
+  return filtered_items[-1][1] - filtered_items[0][1]
+
+""" Accepts a list of (time, values) tuples and returns the average value during the time
+period after earliest_time and before latest_time. """
+def get_average(items, earliest_time, latest_time):
+  filtered_values = [x[1] for x in items if x[0] >= earliest_time and x[0] <= latest_time]
+  return sum(filtered_values) * 1.0 / len(filtered_values)
 
 def write_running_tasks_plot(file_prefix, y2label, output_filename, running_tasks_plot_file,
     running_tasks_filename):
@@ -76,9 +89,17 @@ def main(argv):
   user_cpu_totals = []
   sys_cpu_totals = [] 
 
-  # Time, IO rate tuples
+  # Time, IO rate tuples for the process. Misleading because this is the rate at
+  # which reads and writes are issued, and doesn't take into account the time to
+  # actually flush them to disk.
   rchar = []
   wchar = []
+  # Time, IO rate tuples for the whole system (listed separately for each block device),
+  # but as read from the disk stats (so reflect what's actually happening at the device-level).
+  sectors_read_rate = collections.defaultdict(list)
+  sectors_written_rate = collections.defaultdict(list)
+  sectors_read_total = collections.defaultdict(list)
+  sectors_written_total = collections.defaultdict(list)
 
   # Time, network traffic tuples.
   trans_bytes = []
@@ -127,6 +148,14 @@ def main(argv):
       time = int(items[4])
       rchar.append((time, float(items[7]) / BYTES_PER_MB))
       wchar.append((time, float(items[10]) / BYTES_PER_MB))
+    elif line.find("sectors") != -1:
+      items = line.strip("\n").split(" ")
+      time = int(items[4])
+      device_name = items[5]
+      sectors_read_rate[device_name].append((time, float(items[9])))
+      sectors_written_rate[device_name].append((time, float(items[11])))
+      sectors_read_total[device_name].append((time, int(items[14])))
+      sectors_written_total[device_name].append((time, int(items[16])))
     elif line.find("trans rates") != -1:
       items = line.strip("\n").split(" ")
       time = int(items[4])
@@ -140,10 +169,10 @@ def main(argv):
   running_tasks_filename = "%s/running_tasks" % file_prefix
   running_tasks_file = open(running_tasks_filename, "w")
   running_tasks = 0
-# TODO: remove earliest time inflation
-  earliest_time = 110000 + int(task_events[0][0])
+  # Find the first time launch after MIN_TIME.
+  absolute_min_time = task_events[0][0] + MIN_TIME
+  earliest_time = min([pair[0] for pair in task_events if pair[0] > absolute_min_time])
   latest_time = int(task_events[-1][0])
-  print "Latest time is %s ms after earliest" % (latest_time - earliest_time)
   for (time, event) in task_events:
     # Plot only the time delta -- makes the graph much easier to read.
     running_tasks_file.write("%s\t%s\n" % (time - earliest_time, running_tasks))
@@ -198,37 +227,20 @@ def main(argv):
    
   # Print average CPU usage during time when tasks were running. This assumes that
   # all the measurement intervals were the same.
-  filtered_user_cpu_usage1 = filter(
-    lambda x: x[0] >= earliest_time and x[0] <= latest_time, user_cpu_usage1)
-  print "Average user CPU use:"
-  print sum([pair[1] for pair in filtered_user_cpu_usage1]) * 1.0 / len(filtered_user_cpu_usage1)
+  print "Average user CPU use: ", get_average(user_cpu_usage1, earliest_time, latest_time)
+  print "Average total CPU use: ", get_average(proctotal_cpu_usage1, earliest_time, latest_time)
 
-  filtered_proctotal_cpu_usage1 = filter(
-    lambda x: x[0] >= earliest_time and x[0] <= latest_time, proctotal_cpu_usage1)
-  print "Average total CPU use:"
-  print (sum([pair[1] for pair in filtered_proctotal_cpu_usage1]) * 1.0 /
-    len(filtered_proctotal_cpu_usage1))
-
-  filtered_rchar = filter(lambda x: x[0] >= earliest_time and x[0] <= latest_time, rchar)
-  print "Average rchar rate:"
-  print sum([pair[1] for pair in filtered_rchar]) * 1.0 / len(filtered_rchar)
-  filtered_wchar = filter(lambda x: x[0] >= earliest_time and x[0] <= latest_time, wchar)
-  print "Average wchar rate:"
-  print sum([pair[1] for pair in filtered_wchar]) * 1.0 / len(filtered_wchar)
+  print "Average rchar rate: ", get_average(rchar, earliest_time, latest_time)
+  print "Average wchar rate: ", get_average(wchar, earliest_time, latest_time)
 
   job_duration = latest_time - earliest_time
 
   # Print averages based on the total numbers.
-  filtered_total_user_cpu = filter(
-    lambda x: x[0] >= earliest_time and x[0] <= latest_time, user_cpu_totals)
-  filtered_total_sys_cpu = filter(
-    lambda x: x[0] >= earliest_time and x[0] >= latest_time, sys_cpu_totals)
-  # Multiply by 10 because there are 100 jiffies / second.
-  elapsed_user_cpu_millis = 10 * (filtered_total_user_cpu[-1][1] - filtered_total_user_cpu[0][1])
-  # Normalize by the number of cores.
-  avg_user_cpu = elapsed_user_cpu_millis * 1.0 / (8.0 * job_duration)
-  avg_sys_cpu = ((filtered_total_sys_cpu[-1][1] - filtered_total_sys_cpu[0][1]) *
-    10.0 / (8.0 * job_duration))
+  user_cpu_delta = get_delta(user_cpu_totals, earliest_time, latest_time)
+  sys_cpu_delta = get_delta(sys_cpu_totals, earliest_time, latest_time)
+  # Multiply by 10 because there are 100 jiffies / second and normalize by the number of cores.
+  avg_user_cpu = 10 * user_cpu_delta / (8.0 * job_duration)
+  avg_sys_cpu = 10 * sys_cpu_delta / (8.0 * job_duration)
   print "Average user CPU (based on totals): ", avg_user_cpu
   print "Average sys CPU (based on totals): ", avg_sys_cpu
 
@@ -242,6 +254,18 @@ def main(argv):
   write_output_data(rchar_filename, rchar, earliest_time)
   wchar_filename = "%s/wchar" % file_prefix
   write_output_data(wchar_filename, wchar, earliest_time)
+
+  for device_name in sectors_read_rate.keys():
+    sectors_read_filename = "%s/%s_sectors_read" % (file_prefix, device_name)
+    write_output_data(sectors_read_filename, sectors_read_rate[device_name], earliest_time)
+    sectors_written_filename = "%s/%s_sectors_written" % (file_prefix, device_name)
+    write_output_data(sectors_written_filename, sectors_written_rate[device_name], earliest_time)
+    sectors_read = get_delta(sectors_read_total[device_name], earliest_time, latest_time)
+    print ("Avg MB/s read for %s: %f" %
+      (device_name, sectors_read * SECTOR_SIZE_BYTES * 1.0 / (job_duration * BYTES_PER_MB)))
+    sectors_written = get_delta(sectors_written_total[device_name], earliest_time, latest_time)
+    print ("Avg MB/s written for %s: %f" %
+      (device_name, sectors_written * SECTOR_SIZE_BYTES * 1.0 / (job_duration * BYTES_PER_MB)))
 
   # Output network data.
   trans_bytes_filename = "%s/trans_bytes" % file_prefix
