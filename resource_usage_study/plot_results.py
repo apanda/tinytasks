@@ -5,7 +5,8 @@ import sys
 # This is totally not portable -- just the observed sector size on m2.4xlarge instances.
 SECTOR_SIZE_BYTES = 512
 
-MIN_TIME = 110000
+MIN_TIME = 0
+#110000
 
 def write_template(f):
   template_file = open("template.gp")
@@ -93,7 +94,11 @@ def main(argv):
   # which reads and writes are issued, and doesn't take into account the time to
   # actually flush them to disk.
   rchar = []
+  rchar_totals = []
   wchar = []
+  wchar_totals = []
+  rbytes_totals = []
+  wbytes_totals = []
   # Time, IO rate tuples for the whole system (listed separately for each block device),
   # but as read from the disk stats (so reflect what's actually happening at the device-level).
   sectors_read_rate = collections.defaultdict(list)
@@ -143,11 +148,18 @@ def main(argv):
       time = int(items[4])
       user_cpu_totals.append((time, float(items[8])))
       sys_cpu_totals.append((time, float(items[10])))
-    elif line.find("rchar") != -1:
+    elif line.find("rchar rate") != -1:
       items = line.split(" ")
       time = int(items[4])
       rchar.append((time, float(items[7]) / BYTES_PER_MB))
       wchar.append((time, float(items[10]) / BYTES_PER_MB))
+    elif line.find("IO Totals") != -1:
+      items = line.strip("\n").split(" ")
+      time = int(items[4])
+      rchar_totals.append((time, long(items[8])))
+      wchar_totals.append((time, long(items[10])))
+      rbytes_totals.append((time, long(items[12])))
+      wbytes_totals.append((time, long(items[14])))
     elif line.find("sectors") != -1:
       items = line.strip("\n").split(" ")
       time = int(items[4])
@@ -225,15 +237,25 @@ def main(argv):
      get_percentile(total_cpu2_values, 0.95)))
   box_plot_file2.close()
    
+  job_duration = latest_time - earliest_time
+
   # Print average CPU usage during time when tasks were running. This assumes that
   # all the measurement intervals were the same.
   print "Average user CPU use: ", get_average(user_cpu_usage1, earliest_time, latest_time)
   print "Average total CPU use: ", get_average(proctotal_cpu_usage1, earliest_time, latest_time)
 
   print "Average rchar rate: ", get_average(rchar, earliest_time, latest_time)
+  print "  rchar delta: ", get_delta(rchar_totals, earliest_time, latest_time) * 1.0 / BYTES_PER_MB
+  print ("Average rchar (MB/s, from totals): %s" %
+    (get_delta(rchar_totals, earliest_time, latest_time) * 1000.0 / (job_duration * BYTES_PER_MB)))
   print "Average wchar rate: ", get_average(wchar, earliest_time, latest_time)
-
-  job_duration = latest_time - earliest_time
+  print "  wchar delta: ", get_delta(wchar_totals, earliest_time, latest_time) * 1.0 / BYTES_PER_MB
+  print ("Average wchar (from totals): %s" %
+    (get_delta(wchar_totals, earliest_time, latest_time) * 1000.0 / (job_duration * BYTES_PER_MB)))
+  print ("Average rbytes (from totals): %s" %
+    (get_delta(rbytes_totals, earliest_time, latest_time) * 1000.0 / (job_duration * BYTES_PER_MB)))
+  print ("Average wbytes (from totals): %s" %
+    (get_delta(wbytes_totals, earliest_time, latest_time) * 1000.0 / (job_duration * BYTES_PER_MB)))
 
   # Print averages based on the total numbers.
   user_cpu_delta = get_delta(user_cpu_totals, earliest_time, latest_time)
@@ -256,16 +278,20 @@ def main(argv):
   write_output_data(wchar_filename, wchar, earliest_time)
 
   for device_name in sectors_read_rate.keys():
+    print "*******", device_name
     sectors_read_filename = "%s/%s_sectors_read" % (file_prefix, device_name)
     write_output_data(sectors_read_filename, sectors_read_rate[device_name], earliest_time)
     sectors_written_filename = "%s/%s_sectors_written" % (file_prefix, device_name)
     write_output_data(sectors_written_filename, sectors_written_rate[device_name], earliest_time)
     sectors_read = get_delta(sectors_read_total[device_name], earliest_time, latest_time)
-    print ("Avg MB/s read for %s: %f" %
-      (device_name, sectors_read * SECTOR_SIZE_BYTES * 1.0 / (job_duration * BYTES_PER_MB)))
+    # Need to multiple by 1000 to convert from milliseconds to seconds.
+    avg_mbps_read = sectors_read * SECTOR_SIZE_BYTES * 1000.0 / (job_duration * BYTES_PER_MB)
+    print ("Avg MB/s read for %s: %f" % (device_name, avg_mbps_read))
     sectors_written = get_delta(sectors_written_total[device_name], earliest_time, latest_time)
-    print ("Avg MB/s written for %s: %f" %
-      (device_name, sectors_written * SECTOR_SIZE_BYTES * 1.0 / (job_duration * BYTES_PER_MB)))
+    avg_mbps_written = sectors_written * SECTOR_SIZE_BYTES * 1000.0 / (job_duration * BYTES_PER_MB)
+    print ("Avg MB/s written for %s: %f" % (device_name, avg_mbps_written))
+    print "Total MB/s read/written for %s: %f" % (device_name, avg_mbps_read + avg_mbps_written)
+    print "%s: %d sectors written; %d sectors read" % (device_name, sectors_written, sectors_read)
 
   # Output network data.
   trans_bytes_filename = "%s/trans_bytes" % file_prefix
