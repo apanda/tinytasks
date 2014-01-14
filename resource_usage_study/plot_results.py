@@ -107,10 +107,12 @@ def main(argv):
   sectors_written_total = collections.defaultdict(list)
 
   # Time, network traffic tuples.
-  trans_bytes = []
-  trans_packets = []
-  recv_bytes = []
-  recv_packets = []
+  trans_bytes_rate = []
+  trans_packets_rate = []
+  recv_bytes_rate = []
+  recv_packets_rate = []
+  trans_bytes_totals = []
+  recv_bytes_totals = []
   
   BYTES_PER_MB = 1048576
 
@@ -171,10 +173,15 @@ def main(argv):
     elif line.find("trans rates") != -1:
       items = line.strip("\n").split(" ")
       time = int(items[4])
-      trans_bytes.append((time, float(items[7]) / BYTES_PER_MB))
-      trans_packets.append((time, float(items[9])))
-      recv_bytes.append((time, float(items[13]) / BYTES_PER_MB))
-      recv_packets.append((time, float(items[15])))
+      trans_bytes_rate.append((time, float(items[7]) / BYTES_PER_MB))
+      trans_packets_rate.append((time, float(items[9])))
+      recv_bytes_rate.append((time, float(items[13]) / BYTES_PER_MB))
+      recv_packets_rate.append((time, float(items[15])))
+    elif line.find("totals: trans") != -1:
+      items = line.strip("\n").split(" ")
+      time = int(items[4])
+      trans_bytes_totals.append((time, int(items[8])))
+      recv_bytes_totals.append((time, int(items[13])))
 
   # Output file with number of running tasks.
   task_events.sort(key = lambda x: x[0])
@@ -294,14 +301,19 @@ def main(argv):
     print "%s: %d sectors written; %d sectors read" % (device_name, sectors_written, sectors_read)
 
   # Output network data.
-  trans_bytes_filename = "%s/trans_bytes" % file_prefix
-  write_output_data(trans_bytes_filename, trans_bytes, earliest_time)
-  trans_packets_filename = "%s/trans_packets" % file_prefix
-  write_output_data(trans_packets_filename, trans_packets, earliest_time)
-  recv_bytes_filename = "%s/recv_bytes" % file_prefix
-  write_output_data(recv_bytes_filename, recv_bytes, earliest_time)
-  recv_packets_filename = "%s/recv_packets" % file_prefix
-  write_output_data(recv_packets_filename, recv_packets, earliest_time)
+  trans_bytes_rate_filename = "%s/trans_bytes_rate" % file_prefix
+  write_output_data(trans_bytes_rate_filename, trans_bytes_rate, earliest_time)
+  trans_packets_rate_filename = "%s/trans_packets_rate" % file_prefix
+  write_output_data(trans_packets_rate_filename, trans_packets_rate, earliest_time)
+  recv_bytes_rate_filename = "%s/recv_bytes_rate" % file_prefix
+  write_output_data(recv_bytes_rate_filename, recv_bytes_rate, earliest_time)
+  recv_packets_rate_filename = "%s/recv_packets_rate" % file_prefix
+  write_output_data(recv_packets_rate_filename, recv_packets_rate, earliest_time)
+
+  trans_mbytes = get_delta(trans_bytes_totals, earliest_time, latest_time) * 1.0 / BYTES_PER_MB
+  print "Avg MB/s transmitted:", trans_mbytes * 1000.0 / job_duration, "total:", trans_mbytes
+  recv_mbytes = get_delta(recv_bytes_totals, earliest_time, latest_time) * 1.0 / BYTES_PER_MB
+  print "Avg MB/s received:", recv_mbytes * 1000.0 / job_duration, "total:", recv_mbytes
 
   # Output one file with running tasks, CPU, and IO usage.
   running_tasks_plot_file = open("%s/running_tasks_cpu.gp" % file_prefix, "w")
@@ -336,18 +348,18 @@ def main(argv):
     network_plot_file, running_tasks_filename)
   network_plot_file.write(
     ("\"%s\" using 1:2 w l ls 2 title \"Transmitted bytes\" axes x1y2,\\\n" %
-      trans_bytes_filename))
+      trans_bytes_rate_filename))
   network_plot_file.write(
-    "\"%s\" using 1:2 w l ls 3 title \"Received bytes\" axes x1y2\n" % recv_bytes_filename)
+    "\"%s\" using 1:2 w l ls 3 title \"Received bytes\" axes x1y2\n" % recv_bytes_rate_filename)
 
   network_plot_file = open("%s/running_tasks_network_packets.gp" % file_prefix, "w")
   write_running_tasks_plot(file_prefix, "packets", "running_tasks_network_packets",
     network_plot_file, running_tasks_filename)
   network_plot_file.write(
     ("\"%s\" using 1:2 w l ls 2 title \"Transmitted packets\" axes x1y2,\\\n" %
-      trans_packets_filename))
+      trans_packets_rate_filename))
   network_plot_file.write(
-    "\"%s\" using 1:2 w l ls 3 title \"Received packets\" axes x1y2\n" % recv_packets_filename)
+    "\"%s\" using 1:2 w l ls 3 title \"Received packets\" axes x1y2\n" % recv_packets_rate_filename)
 
 
 if __name__ == "__main__":
