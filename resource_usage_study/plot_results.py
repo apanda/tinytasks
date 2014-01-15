@@ -5,8 +5,7 @@ import sys
 # This is totally not portable -- just the observed sector size on m2.4xlarge instances.
 SECTOR_SIZE_BYTES = 512
 
-MIN_TIME = 0
-#110000
+MIN_TIME = 50000
 
 def write_template(f):
   template_file = open("template.gp")
@@ -135,7 +134,7 @@ def main(argv):
       items = line.split(" ")
       time = int(items[4])
       gc_rates.append((time, float(items[13])))
-      gc_totals.append((time, items[7].toLong))
+      gc_totals.append((time, long(items[7])))
     elif line.find("CPU utilization (relative metric)") != -1:
       items = line.strip("\n").split(" ")
       time = int(items[4])
@@ -336,6 +335,8 @@ def main(argv):
   write_running_tasks_plot(file_prefix, "Percent", "running_tasks_cpu", running_tasks_plot_file,
     running_tasks_filename)
   running_tasks_plot_file.write(
+    ("\"%s\" using 1:2 w l ls 4 title \"GC\" axes x1y2,\\\n" % gc_filename))
+  running_tasks_plot_file.write(
     ("\"%s\" using 1:2 w l ls 2 title \"User CPU\" axes x1y2,\\\n" %
       user_cpu_filename))
   running_tasks_plot_file.write(
@@ -353,10 +354,6 @@ def main(argv):
   running_tasks_plot_file.write(
     ("\"%s\" using 1:2 w l ls 7 title \"IO Wait CPU\" axes x1y2" %
       iowait_cpu_filename))
- # running_tasks_plot_file.write(
- #   "\"%s\" using 1:2 w l ls 5 title \"rchar\" axes x1y2,\\\n" % rchar_filename)
- # running_tasks_plot_file.write(
- #   "\"%s\" using 1:2 w l ls 6 title \"wchar\" axes x1y2\n" % wchar_filename)
 
   # Output two network files: one with bytes and another with packets.
   network_plot_file = open("%s/running_tasks_network_bytes.gp" % file_prefix, "w")
@@ -367,6 +364,25 @@ def main(argv):
       trans_bytes_rate_filename))
   network_plot_file.write(
     "\"%s\" using 1:2 w l ls 3 title \"Received bytes\" axes x1y2\n" % recv_bytes_rate_filename)
+
+  io_plot_file = open("%s/running_tasks_io.gp" % file_prefix, "w")
+  write_running_tasks_plot(file_prefix, "MB/s", "running_tasks_io", io_plot_file,
+    running_tasks_filename)
+  next_line_style = 2
+  for device_name in sectors_read_rate.keys():
+    if next_line_style > 2:
+      io_plot_file.write(",\\\n")
+    sectors_read_filename = "%s/%s_sectors_read" % (file_prefix, device_name)
+    io_plot_file.write(
+      "\"%s\" using 1:($2/%s) w l ls %d title \"%s read\" axes x1y2,\\\n" %
+      (sectors_read_filename, BYTES_PER_MB / 512, next_line_style, device_name))
+    next_line_style += 1
+    sectors_written_filename = "%s/%s_sectors_written" % (file_prefix, device_name)
+    io_plot_file.write(
+      "\"%s\" using 1:($2/%s) w l ls %d title \"%s written\" axes x1y2" %
+      (sectors_written_filename, BYTES_PER_MB / 512, next_line_style, device_name))
+    next_line_style += 1
+  io_plot_file.write("\n")
 
   network_plot_file = open("%s/running_tasks_network_packets.gp" % file_prefix, "w")
   write_running_tasks_plot(file_prefix, "packets", "running_tasks_network_packets",
