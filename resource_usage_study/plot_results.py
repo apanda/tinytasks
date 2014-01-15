@@ -16,7 +16,7 @@ def write_template(f):
 def write_output_data(filename, data, earliest_time):
   f = open(filename, "w")
   for (time, x) in data:
-    f.write("%s\t%s\n" % (earliest_time, x))
+    f.write("%s\t%s\n" % (time - earliest_time, x))
   f.close()
 
 """ N should be sorted before calling this function. """
@@ -66,6 +66,10 @@ def main(argv):
   # item is 1 if a task started at that time and -1 if a task
   # finished at that time.
   task_events = []
+
+  # Time, GC tuples.
+  gc_rates = []
+  gc_totals = []
 
   # Time, CPU usage tuples using two different measurement strategies.
   # 1 uses the user/sys jiffies divided by the total elapsed jiffies.
@@ -127,11 +131,14 @@ def main(argv):
       end_time = int(items[9][:-1])
       task_events.append((end_time, -1))
       task_durations.append(end_time - start_time)
+    elif line.find("GC total") != -1:
+      items = line.split(" ")
+      time = int(items[4])
+      gc_rates.append((time, float(items[13])))
+      gc_totals.append((time, items[7].toLong))
     elif line.find("CPU utilization (relative metric)") != -1:
-#    elif line.find("CPU utilization") != -1:
       items = line.strip("\n").split(" ")
       time = int(items[4])
-# TODO: bump these by two for old version
       user_cpu_usage1.append((time, float(items[10])))
       sys_cpu_usage1.append((time, float(items[12])))
       proctotal_cpu_usage1.append((time, float(items[14])))
@@ -246,10 +253,18 @@ def main(argv):
    
   job_duration = latest_time - earliest_time
 
+  # Output GC data.
+  gc_filename = "%s/gc" % file_prefix
+  write_output_data(gc_filename, gc_rates, earliest_time)
+  total_gc_time = get_delta(gc_totals, earliest_time, latest_time)
+  print "Total GC millis:", total_gc_time
+  print "Fraction of time doing GC: ", total_gc_time * 1.0 / job_duration
+
   # Print average CPU usage during time when tasks were running. This assumes that
   # all the measurement intervals were the same.
   print "Average user CPU use: ", get_average(user_cpu_usage1, earliest_time, latest_time)
   print "Average total CPU use: ", get_average(proctotal_cpu_usage1, earliest_time, latest_time)
+  print "Average IO-wait CPU use: ", get_average(iowait_cpu_usage1, earliest_time, latest_time)
 
   print "Average rchar rate: ", get_average(rchar, earliest_time, latest_time)
   print "  rchar delta: ", get_delta(rchar_totals, earliest_time, latest_time) * 1.0 / BYTES_PER_MB
@@ -277,6 +292,7 @@ def main(argv):
   # so not totally accurate) and average task duration.
   print "Job duration ESTIMATE (ms): ", job_duration
   print "Average task duration (ms): ", sum(task_durations) * 1.0 / len(task_durations)
+  print "Total tasks:", len(task_durations)
 
   # Output IO usage data.
   rchar_filename = "%s/rchar" % file_prefix
@@ -317,25 +333,25 @@ def main(argv):
 
   # Output one file with running tasks, CPU, and IO usage.
   running_tasks_plot_file = open("%s/running_tasks_cpu.gp" % file_prefix, "w")
-  write_running_tasks_plot(file_prefix, "MB", "running_tasks_cpu", running_tasks_plot_file,
+  write_running_tasks_plot(file_prefix, "Percent", "running_tasks_cpu", running_tasks_plot_file,
     running_tasks_filename)
   running_tasks_plot_file.write(
-    ("\"%s\" using 1:2 w l ls 2 title \"User CPU\" axes x1y1,\\\n" %
+    ("\"%s\" using 1:2 w l ls 2 title \"User CPU\" axes x1y2,\\\n" %
       user_cpu_filename))
   running_tasks_plot_file.write(
-    ("\"%s\" using 1:2 w l ls 3 title \"System CPU\" axes x1y1,\\\n" %
+    ("\"%s\" using 1:2 w l ls 3 title \"System CPU\" axes x1y2,\\\n" %
       sys_cpu_filename))
+ # running_tasks_plot_file.write(
+ #   ("\"%s\" using 1:2 w l ls 4 title \"Total Process CPU\" axes x1y2,\\\n" %
+ #     proctotal_cpu_filename))
   running_tasks_plot_file.write(
-    ("\"%s\" using 1:2 w l ls 4 title \"Total Process CPU\" axes x1y1,\\\n" %
-      proctotal_cpu_filename))
-  running_tasks_plot_file.write(
-    ("\"%s\" using 1:2 w l ls 5 title \"Total CPU\" axes x1y1,\\\n" %
+    ("\"%s\" using 1:2 w l ls 5 title \"Total CPU\" axes x1y2,\\\n" %
       total_cpu_filename))
   running_tasks_plot_file.write(
-    ("\"%s\" using 1:2 w l ls 6 title \"Idle CPU\" axes x1y1,\\\n" %
+    ("\"%s\" using 1:2 w l ls 6 title \"Idle CPU\" axes x1y2,\\\n" %
       idle_cpu_filename))
   running_tasks_plot_file.write(
-    ("\"%s\" using 1:2 w l ls 7 title \"IO Wait CPU\" axes x1y1" %
+    ("\"%s\" using 1:2 w l ls 7 title \"IO Wait CPU\" axes x1y2" %
       iowait_cpu_filename))
  # running_tasks_plot_file.write(
  #   "\"%s\" using 1:2 w l ls 5 title \"rchar\" axes x1y2,\\\n" % rchar_filename)
